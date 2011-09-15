@@ -1,0 +1,19 @@
+﻿/* textbox */
+span.textbox {
+    position: relative; /* Should probably be static, but not sure why this is here, and don't want to break existing pages. */
+    display: inline;
+}
+.envisorTheme span.textbox 
+{
+    position: static;
+}
+span.textbox input.watermarked {
+    color: Gray;
+}
+span.textbox .star {
+    color: Red;
+    font-size: large;
+    padding-right: 4px;
+    vertical-align: middle;
+    height: 10px;
+}

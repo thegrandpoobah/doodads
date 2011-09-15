@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<component xmlns="http://schemas.vastcap.com/componentDefinition"
+           type="Vastardis.UI.Components.Label"
+           inheritsFrom="Vastardis.UI.Components.Component">
+  <behaviour path="~/Components/Label/Label.js" />
+  <templates>
+    <base path="~/Components/Label/Label.html"/>
+  </templates>
+</component>

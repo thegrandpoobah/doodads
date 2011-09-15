@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<component xmlns="http://schemas.vastcap.com/componentDefinition"
+           type="Vastardis.UI.Components.TextBox2"
+           inheritsFrom="Vastardis.UI.Components.Component"
+           validates="true">
+  <behaviour path="~/Components/Textbox/TextBox.js" />
+  <templates>
+    <base path="~/Components/TextBox/TextBox.html"/>
+  </templates>
+  <stylesheets>
+    <stylesheet path="~/Components/TextBox/TextBox.css"/>
+  </stylesheets>
+</component>

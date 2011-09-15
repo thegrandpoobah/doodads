@@ -1,0 +1,318 @@
+﻿(function ($, undefined) {
+    var TextBox2 = function () {
+        this.onTextAreaKeyDown$proxy = $.proxy(this.onTextAreaKeyDown, this);
+        this.onKeyUp$debounced = $.debounce(this.onKeyUp, 10, this);
+        this.onFocus$proxy = $.proxy(this.onFocus, this);
+        this.onBlur$proxy = $.proxy(this.onBlur, this);
+        this.onRequiredChanged$proxy = $.proxy(this.onRequiredChanged, this);
+
+        this._text = '';
+
+        this._focused = false;
+        this._enabled = true;
+
+        this._watermarkOn = false;
+        this._watermarkingEnabled = true;
+    }
+
+    TextBox2.DefaultRequiredRule = function () {
+        this.validate = function (content) {
+            return {
+                valid: content.trim().length > 0
+				, message: ''
+            }
+        }
+    };
+
+    TextBox2.defaultOptions = {
+        text: ''
+		, watermark: ''
+		, maxlength: -1
+		, showStar: false
+		, multiline: false
+		, password: false
+		, enabled: true
+		, rows: 4
+		, cols: 40
+    };
+
+    TextBox2.prototype = $.extend(new base.constructor(), {
+        onComponentReady: function () {
+            base.onComponentReady.apply(this, arguments);
+
+            if (this._options.required && this._options.validates) {
+                this.required(true, new TextBox2.DefaultRequiredRule());
+            }
+        }
+        , constructElement: function () {
+            base.constructElement.apply(this, arguments);
+
+            this._input = this._source.find('input, textarea');
+
+            if (this._options.validates && this._options.maxlength !== -1) {
+                var self = this;
+                this.addRule(new function () {
+                    this.validate = function (context) {
+                        return {
+                            valid: context.toString().length <= self._options.maxlength
+				            , message: String.format('Character count {0} of {1}', context.length, self._options.maxlength)
+				            , alwaysShow: true
+                        };
+                    };
+                });
+            }
+
+            if (this._options.showStar) {
+                this._star = this._source.find('span.star');
+            }
+
+        }
+        , cssClassPrefix: function () {
+            return 'textbox';
+        }
+        , bindEvents: function () {
+            this._input
+				.bind('keyup', this.onKeyUp$debounced)
+				.bind('focus', this.onFocus$proxy)
+				.bind('blur', this.onBlur$proxy);
+
+            if (this._options.multiline) {
+                this._input.bind('keydown', this.onTextAreaKeyDown$proxy);
+            }
+
+            $(this).bind('required', this.onRequiredChanged$proxy);
+        }
+		, render: function () {
+		    base.render.apply(this, arguments);
+
+		    if (this._options.text.trim() !== '') {
+		        this.text(this._options.text);
+		    } else if (this._options.watermark.trim() !== '') {
+		        this._addWatermark();
+		    }
+
+		    this.enabled(this._options.enabled);
+		}
+		, watermarkingEnabled: function () {
+		    if (arguments.length === 0) {
+		        return this._watermarkingEnabled;
+		    } else {
+		        // in combination, resets the watermark if necessary
+		        this._removeWatermark();
+		        this._watermarkingEnabled = arguments[0];
+		        this._addWatermark();
+		    }
+		}
+		, _addWatermark: function () {
+		    if (this.watermarkingEnabled() && !this._watermarkOn && this._input.val().length === 0) {
+		        this._input.addClass('watermarked');
+		        this._input.val(this._options.watermark);
+		        this._watermarkOn = true;
+		    }
+		}
+		, _removeWatermark: function () {
+		    if (this.watermarkingEnabled() && this._watermarkOn) {
+		        this._input.val('');
+		        this._watermarkOn = false;
+		    }
+		    this._input.removeClass('watermarked');
+		}
+        , _setCaretPosition: function (pos) {
+            var ctrl = this._input[0]; // need the actual DOM element (not jQuery)
+
+            if (ctrl.setSelectionRange) {
+                ctrl.focus();
+                ctrl.setSelectionRange(pos, pos);
+            } else if (ctrl.createTextRange) {
+                var range = ctrl.createTextRange();
+                range.collapse(true);
+                range.moveEnd('character', pos);
+                range.moveStart('character', pos);
+                range.select();
+            }
+        }
+
+		, templateData: function () {
+		    var obj = { showStar: this._options.showStar };
+
+		    if (this._options.multiline) {
+		        return $.extend(obj, { isMultiLine: true, rows: this._options.rows, cols: this._options.cols });
+		    } else {
+
+		        obj = $.extend(obj, {
+		            maxlength: this._options.maxlength,
+		            hasMaxlength: this._options.maxlength !== -1
+		        });
+
+		        if (this._options.password) {
+		            return $.extend(obj, { isPassword: true });
+		        } else {
+		            return $.extend(obj, { isText: true });
+		        }
+		    }
+
+		}
+		, validationContext: function () {
+		    return this.text();
+		}
+		, validationTarget: function () {
+		    return this._input;
+		}
+		, text: function (/*value, triggerEvents*/) {
+		    ///	<summary>
+		    ///		1: text() - returns the text.
+		    ///		2: text(value) - Sets the text to value.
+		    ///		3: text(value, triggerEvents) - Set the text to value; if "triggerEvents" is true, triggers the change and changing events.
+		    ///	</summary>
+		    /// <param name="value" type="String" optional="true" />
+		    /// <param name="triggerEvents" type="Boolean" optional="true">
+		    ///		If true, trigger the change and the changing events.
+		    ///	</param>
+		    /// <returns type="String" />
+
+		    if (arguments.length === 0) {
+		        return this._watermarkOn ? '' : this._input.val();
+		    } else if (arguments[0] !== this._text) {
+		        // in tandem with _addWatermark below, ensures that the
+		        // watermark properties are in a consistent state
+		        this._removeWatermark();
+
+		        if (arguments[1]) {
+		            this.trigger_changing();
+		        }
+
+		        this._text = arguments[0];
+		        if (this._input.val() !== this._text) {
+		            this._input.val(this._text);
+		            if (this.hasInputFocus()) {
+		                // the edge case where the user is focussed and the text changes on a timeout/debounce
+		                // can potentially cause the input field's caret to become invisible. set the caret
+                        // to the end of the string to bring it back into view.
+		                this._setCaretPosition(this._text.length);
+		            }
+		        }
+		        this.validate();
+
+		        // there is a chance that the incoming value is the blank string
+		        // at which point, the watermark should be displayed (if applicable)
+		        if (!this.hasInputFocus()) {
+		            this._addWatermark();
+		        }
+
+		        if (arguments[1]) {
+		            this.trigger_changed();
+		        }
+		    }
+		}
+		, focus: function () {
+		    this._input.focus();
+		}
+        , hasInputFocus: function () {
+            return this._focused;
+        }
+        /* BEGIN Enable/Disable management */
+		, enabled: function (/*value*/) {
+		    ///	<summary>
+		    ///		1: enabled() - Indicates whether the component is enabled.
+		    ///		2: enabled(true) - Enable the component.
+		    ///		3: enabled(false) - Disable the component.
+		    ///	</summary>
+		    /// <param name="value" type="Boolean" optional="true"/>
+
+		    if (arguments.length === 0) {
+		        return this._enabled;
+		    } else {
+
+		        var isEnabled = arguments[0];
+
+		        // No point in re-doing logic if the enabled state hasn't changed
+		        if ((this._enabled && !isEnabled) || (!this._enabled && isEnabled)) {
+		            if (isEnabled) {
+		                this._input.removeAttr('disabled');
+		            } else {
+		                this._input.attr('disabled', true);
+		            }
+		            this._enabled = isEnabled;
+		        }
+		    }
+		}
+		, disabled: function (/*value*/) {
+		    ///	<summary>
+		    ///		1: disabled() - Indicates whether the component is disabled.
+		    ///		2: disabled(true) - Disable the component.
+		    ///		3: disabled(false) - Enable the component.
+		    ///	</summary>
+		    /// <param name="value" type="Boolaean" optional="true" />
+
+		    if (arguments.length === 0) {
+		        return !this.enabled();
+		    } else {
+		        this.enabled(!arguments[0]);
+		    }
+
+		}
+        /* END Enable/Disable management */
+
+        /* BEGIN Trigger management */
+		, trigger_changing: function () {
+		    $(this).trigger('changing');
+		}
+		, trigger_changed: function () {
+		    $(this).trigger('changed');
+		}
+        /* END Trigger management */
+
+        /* BEGIN Event handling */
+		, onRequiredChanged: function (/*e*/) {
+		    if (this._options.showStar) {
+		        this._star[this.required() ? 'show' : 'hide']();
+		    }
+		}
+        , onKeyUp: function (e) {
+            this.text(this._input.val(), true);
+        }
+		, onFocus: function (e) {
+		    this._focused = true;
+		    this._removeWatermark();
+		    if (this._options.validates) {
+		        if (!this.ranValidation()) {
+		            this.validate();
+		        } else {
+		            this.setHintboxVisibility();
+		        }
+		    }
+		    $(this).trigger('focus');
+		}
+        , onBlur: function (e) {
+            if (this._options.validates) {
+                this.hideHintbox();
+            }
+            this._addWatermark();
+            $(this).trigger('blur');
+            this._focused = false;
+        }
+		, onTextAreaKeyDown: function (e) {
+		    var key = e.keyCode || e.which;
+		    var value = e.target.value;
+		    if (key >= 32 &&
+		        key < 127 &&
+		        this._options.maxlength !== -1 &&
+		        value.length >= this._options.maxlength) {
+		        e.target.value = value.substring(0, this._options.maxlength);
+		        e.preventDefault();
+		    }
+		}
+        /* END Event handling */
+
+        , dispose: function () {
+            $(this).unbind('required', this.onRequiredChanged$proxy);
+
+            base.dispose.apply(this, arguments);
+        }
+    });
+
+    window.getComponentType = function () {
+        return TextBox2;
+    }
+
+})(jQuery);

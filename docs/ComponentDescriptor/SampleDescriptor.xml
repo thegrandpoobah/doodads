@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<component xmlns="http://schemas.vastcap.com/componentDefinition"
+           type="Vastardis.UI.Components.Samples.Descriptor"
+           inheritsFrom="Vastardis.UI.Components.Component"
+           validates="false">
+  <behaviour path="~/Components/Documentation/ComponentDescriptor/SampleDescriptor.js" />
+  <templates>
+    <base path="~/Components/Documentation/ComponentDescriptor/SampleDescriptor.html" />
+    <partial name="apartial" path="~/Components/Documentation/ComponentDescriptor/SampleDescriptor.partial.html"/>
+  </templates>
+  <stylesheets>
+    <stylesheet path="~/Components/Documentation/ComponentDescriptor/SampleDescriptor.css" />
+  </stylesheets>
+  <imports>
+    <import path="~/Components/Documentation/ComponentDescriptor/ExtraFunctions.js"/>
+  </imports>
+</component>

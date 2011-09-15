@@ -1,0 +1,131 @@
+﻿/* hintbox */
+div.hintbox {
+    position: absolute;
+    display: none;
+    z-index: 1000000;
+}
+div.hintbox table {
+	/*position: absolute;*/
+	border-collapse: collapse;	
+	border-spacing:0;
+	width: 250px;
+}
+div.hintbox table  td
+{
+	padding: 0;
+}
+/* HINTBOX */
+
+/* hintbox top */
+div.hintbox td.tl, td.tla {
+    width: 39px;
+    height: 25px;
+}
+div.hintbox td.tl {
+    background: url(/Components/HintBox/Images/Error/hintbox_top_left.png) no-repeat bottom left;
+}
+div.hintbox td.tla {
+    background: url(/Components/HintBox/Images/Error/hintbox_arrow_top_left.png) no-repeat bottom left;
+}
+div.hintbox td.t {
+   background: url(/Components/HintBox/Images/Error/hintbox_top.png) repeat-x top;
+}
+div.hintbox td.tr, div.hintbox td.tra {
+    width: 37px;
+    height: 25px;
+}
+div.hintbox td.tr {
+    background: url(/Components/HintBox/Images/Error/hintbox_top_right.png) no-repeat bottom right;
+}
+div.hintbox td.tra {
+	background: url(/Components/HintBox/Images/Error/hintbox_arrow_top_right.png) no-repeat bottom right;
+}
+/* hintbox middle */
+div.hintbox td.ml, div.hintbox td.mr  {
+    height: 25px;
+}
+div.hintbox td.ml {
+    background: url(/Components/HintBox/Images/Error/hintbox_left.png) repeat-y left;
+}
+div.hintbox td.m {
+    background-color: White;
+}
+div.hintbox td.m div {
+    vertical-align: middle;
+}
+div.hintbox td.mr {
+	background: url(/Components/HintBox/Images/Error/hintbox_right.png) repeat-y right;
+}
+/* hintbox bottom */
+div.hintbox td.bl, td.bla {
+    width: 39px;
+    height: 25px;
+}
+div.hintbox td.bl {
+    background: url(/Components/HintBox/Images/Error/hintbox_bottom_left.png) no-repeat bottom left;
+}
+div.hintbox td.bla {
+    background: url(/Components/HintBox/Images/Error/hintbox_arrow_bottom_left.png) no-repeat bottom left;
+}
+div.hintbox td.b {
+   background: url(/Components/HintBox/Images/Error/hintbox_bottom.png) repeat-x bottom;
+}
+div.hintbox td.br, div.hintbox td.bra {
+    width: 37px;
+    height: 29px;
+}
+div.hintbox td.br {
+    background: url(/Components/HintBox/Images/Error/hintbox_bottom_right.png) no-repeat bottom right;
+}
+div.hintbox td.bra {
+	background: url(/Components/HintBox/Images/Error/hintbox_arrow_bottom_right.png) no-repeat bottom right;
+}
+
+/* INFOBOX */
+
+/* infobox top */
+div.infobox td.tl {
+    background: url(/Components/HintBox/Images/Info/infobox_top_left.png) no-repeat bottom left;
+}
+div.infobox td.tla {
+    background: url(/Components/HintBox/Images/Info/infobox_arrow_top_left.png) no-repeat bottom left;
+}
+div.infobox td.t {
+   background: url(/Components/HintBox/Images/Info/infobox_top.png) repeat-x top;
+}
+div.infobox td.tr {
+    background: url(/Components/HintBox/Images/Info/infobox_top_right.png) no-repeat bottom right;
+}
+div.infobox td.tra {
+	background: url(/Components/HintBox/Images/Info/infobox_arrow_top_right.png) no-repeat bottom right;
+}
+/* infobox middle */
+div.infobox td.ml {
+    background: url(/Components/HintBox/Images/Info/infobox_left.png) repeat-y left;
+}
+div.infobox td.mr {
+	background: url(/Components/HintBox/Images/Info/infobox_right.png) repeat-y right;
+}
+/* infobox bottom */
+div.infobox td.bl {
+    background: url(/Components/HintBox/Images/Info/infobox_bottom_left.png) no-repeat bottom left;
+}
+div.infobox td.bla {
+	background: url(/Components/HintBox/Images/Info/infobox_arrow_bottom_left.png) no-repeat bottom left;
+}
+div.infobox td.b {
+	background: url(/Components/HintBox/Images/Info/infobox_bottom.png) repeat-x bottom;
+}
+div.infobox td.br {
+    background: url(/Components/HintBox/Images/Info/infobox_bottom_right.png) no-repeat bottom right;
+}
+div.infobox td.bra {
+	background: url(/Components/HintBox/Images/Info/infobox_arrow_bottom_right.png) no-repeat bottom right;
+}
+
+div.hintbox ul.hintlist,
+div.infobox ul.hintlist
+{
+    margin: 0;
+    padding: 0;
+}

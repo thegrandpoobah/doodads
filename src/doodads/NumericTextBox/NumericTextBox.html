@@ -1,0 +1,16 @@
+﻿<span>
+    <component 
+        id="input" 
+        url="/Components/TextBox.component" 
+        options="{
+            showStar: {{showStar}}
+            , enabled: {{enabled}}
+            , validates: false
+            , text: '{{value}}' 
+        }" 
+        onvalid="onInputValid"
+        oninvalid="onInputInvalid"
+        onfocus="onFocus" 
+        onblur="onBlur" 
+        onchanging="onChanging" />
+</span>

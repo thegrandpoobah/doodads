@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<component xmlns="http://schemas.vastcap.com/componentDefinition"
+           type="Vastardis.UI.Components.NumericTextBox"
+           inheritsFrom="Vastardis.UI.Components.Component"
+           validates="true">
+  <behaviour path="~/Components/NumericTextBox/NumericTextBox.js" />
+  <templates>
+    <base path="~/Components/NumericTextBox/NumericTextBox.html"/>
+  </templates>
+  <stylesheets>
+    <stylesheet path="~/Components/NumericTextBox/NumericTextBox.css"/>
+  </stylesheets>
+  <imports>
+    <import path="~/Components/TextBox.component"/>
+  </imports>
+</component>

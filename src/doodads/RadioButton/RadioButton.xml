@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<component xmlns="http://schemas.vastcap.com/componentDefinition"
+           type="Vastardis.UI.Components.RadioButton"
+           inheritsFrom="Vastardis.UI.Components.Component">
+  <behaviour path="~/Components/RadioButton/RadioButton.js" />
+  <templates>
+    <base path="~/Components/RadioButton/RadioButton.html" />
+  </templates>
+  <stylesheets>
+    <stylesheet path="~/Components/RadioButton/RadioButton.css" />
+  </stylesheets>
+</component>

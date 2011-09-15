@@ -1,0 +1,6 @@
+﻿<span>
+	{{#showStar}}<span class="star">*</span>{{/showStar}}
+	{{#isText}}<input type="text" autocomplete="off" {{#hasMaxlength}}maxlength="{{maxlength}}"{{/hasMaxlength}} />{{/isText}}
+	{{#isPassword}}<input type="password" autocomplete="off" {{#hasMaxlength}}maxlength="{{maxlength}}"{{/hasMaxlength}}/>{{/isPassword}}
+	{{#isMultiLine}}<textarea cols="{{cols}}" rows="{{rows}}" autocomplete="off" />{{/isMultiLine}}
+</span>

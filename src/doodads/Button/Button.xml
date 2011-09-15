@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<component xmlns="http://schemas.vastcap.com/componentDefinition"
+           type="Vastardis.UI.Components.Button"
+           inheritsFrom="Vastardis.UI.Components.Component">
+  <behaviour path="~/Components/Button/Button.js" />
+  <templates>
+    <base path="~/Components/Button/Button.html" />
+  </templates>
+  <stylesheets>
+    <stylesheet path="~/Components/Button/Button.css" />
+  </stylesheets>
+</component>

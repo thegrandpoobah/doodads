@@ -1,0 +1,179 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema 
+  attributeFormDefault="unqualified" 
+  elementFormDefault="qualified" 
+  targetNamespace="http://schemas.vastcap.com/componentDefinition" 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="component">
+    <xs:complexType>
+      <xs:annotation>
+        <xs:documentation>
+          The root element of the Component Descriptor XML Schema
+        </xs:documentation>
+      </xs:annotation>
+      <xs:all>
+        <xs:element name="behaviour" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:annotation>
+              <xs:documentation>
+                The Behaviour class of a component implements all of the necessary behavioural logic of a given component.
+              </xs:documentation>
+            </xs:annotation>
+            <xs:attribute name="path" type="xs:string" use="required">
+              <xs:annotation>
+                <xs:documentation>
+                  A URL to the JavaScript file which contais the behaviour class.
+                  NOTE: You can use the ~/ prefix to create a path relative to the base of the web application.
+                </xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="templates" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:annotation>
+              <xs:documentation>
+                Templates are Mustache code files which define the HTML structure for a given component.
+              </xs:documentation>
+            </xs:annotation>
+            <xs:sequence>
+              <xs:element name="base" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                  <xs:annotation>
+                    <xs:documentation>
+                      The Base Mustache template acts as the root of the HTML fragment for a given component.
+                    </xs:documentation>
+                  </xs:annotation>
+                  <xs:attribute name="path" type="xs:string" use="required">
+                    <xs:annotation>
+                      <xs:documentation>
+                        A URL to the Mustache template file which contains the Base template.
+                        NOTE: You can use the ~/ prefix to create a path relative to the base of the web application.
+                        NOTE: The base template MUST exist on the originating server.
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="partial" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:annotation>
+                    <xs:documentation>
+                      A Partial Mustache template for a component provides a means of separating complex HTML fragments into multiple template files.
+                      Partials also act as an easy extension point for a component by being overridable in descendant Components.
+                    </xs:documentation>
+                  </xs:annotation>
+                  <xs:attribute name="name" type="xs:string" use="required">
+                    <xs:annotation>
+                      <xs:documentation>
+                        The name of the partial as referenced by other Mustache template files.
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="path" type="xs:string" use="required">
+                    <xs:annotation>
+                      <xs:documentation>
+                        A URL to the Mustache template file which contains the Partial template.
+                        NOTE: You can use the ~/ prefix to create a path relative to the base of the web application.
+                        NOTE: The template MUST exist on the originating server.
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>        
+        <xs:element name="stylesheets" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:annotation>
+              <xs:documentation>
+                Provides a means to reference CSS resources on the server.
+              </xs:documentation>
+            </xs:annotation>
+            <xs:sequence>
+              <xs:element name="stylesheet" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:annotation>
+                    <xs:documentation>
+                      Stylesheets are Cascading Stylesheets that provide the look for a given component.
+                    </xs:documentation>
+                  </xs:annotation>
+                  <xs:attribute name="path" type="xs:string" use="required">
+                    <xs:annotation>
+                      <xs:documentation>
+                        A URL to the stylesheet being referenced.
+                        NOTE: You can use the ~/ prefix to create a path relative to the base of the web application.
+                        NOTE: The stylesheet MUST exist on the originating server.
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+               </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="imports" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:annotation>
+              <xs:documentation>
+                Provides a mean to reference JavaScript resources on the server.
+              </xs:documentation>
+            </xs:annotation>
+            <xs:sequence>
+              <xs:element name="import" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:annotation>
+                    <xs:documentation>
+                      Imports are JavaScript files that are required by a given component before it can function correctly.
+                      These include other components and arbitrary code files that would typically not be included in the initial load
+                      of a page.
+                    </xs:documentation>
+                  </xs:annotation>
+                  <xs:attribute name="path" type="xs:string" use="required">
+                    <xs:annotation>
+                      <xs:documentation>
+                        A URL to the JavaScript file which contais the behaviour class.
+                        NOTE: You can use the ~/ prefix to create a path relative to the base of the web application.
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:all>
+      <xs:attribute name="type" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>
+            The fully-qualified JavaScript typename that will be used to reference this component from JS code.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="inheritsFrom" type="xs:string" use="optional" default="Vastardis.UI.Components.Component">
+        <xs:annotation>
+          <xs:documentation>
+            The fully-qualified JavaScript typename of the base Component class to inherit functionality from. 
+            Defaults to Vastardis.UI.Components.Component
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="validates" type="xs:boolean" use="optional" default="false">
+        <xs:annotation>
+          <xs:documentation>
+            Determines whether or not this Component should include support for the rule based validation facet of the Component Infrastructure.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="inheritsTemplates" type="xs:boolean" use="optional" default="false">
+        <xs:annotation>
+          <xs:documentation>
+            Determines whether or not this Component should inherit the Mustache templates of its base component.
+            Defaults to false.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

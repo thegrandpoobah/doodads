@@ -1,0 +1,8 @@
+﻿<span>
+    <span class="affordance">
+        {{^showOnHover}}<span class="arrow"><span>&nbsp;</span></span>{{/showOnHover}}
+         <span class="itemContainer"></span>
+        {{#showOnHover}}<span class="arrow"><span>&nbsp;</span></span>{{/showOnHover}}
+    </span>
+    <ul>{{#items}}{{>item}}{{/items}}</ul>
+</span>

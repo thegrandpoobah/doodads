@@ -1,0 +1,105 @@
+﻿ul.listView 
+{
+    border: solid 1px black;
+    padding: 0px;
+    outline: none;
+    -moz-user-select: none;
+    overflow: auto;
+}
+
+ul.listView li 
+{
+    cursor: default;
+    list-style: none;
+    padding: 3px;
+    border-top: solid 1px transparent;
+    border-bottom: solid 1px transparent;
+    color: Black;
+}
+
+ul.listView li.selected,
+ul.listView li.selectedTop,
+ul.listView li.selectedBottom,
+ul.listView li.selectedTopBottom
+{
+    background-color: #E3E3E3;
+}
+ul.listView li.selectedTop 
+{
+    border-top: solid 1px #A4A4A4;
+    border-bottom: solid 1px #E3E3E3;
+}
+
+ul.listView li.selectedBottom 
+{
+    border-top: solid 1px #E3E3E3;
+    border-bottom: solid 1px #A4A4A4;
+}
+
+ul.listView li.selectedTopBottom 
+{
+    border-top: solid 1px #A4A4A4;
+    border-bottom: solid 1px #A4A4A4;
+}
+
+ul.listView:focus li.selected,
+ul.listView:focus li.selectedTop,
+ul.listView:focus li.selectedBottom,
+ul.listView:focus li.selectedTopBottom
+{
+    background-color: #d1e8fc;
+}
+
+ul.listView:focus li.selectedTop 
+{
+    border-top: solid 1px #96A7B5;
+    border-bottom: solid 1px #d1e8fc;
+}
+
+ul.listView:focus li.selectedBottom 
+{
+    border-top: solid 1px #d1e8fc;
+    border-bottom: solid 1px #96A7B5;
+}
+
+ul.listView:focus li.selectedTopBottom 
+{
+    border-top: solid 1px #96A7B5;
+    border-bottom: solid 1px #96A7B5;
+}
+
+ul.listView:focus li.keyboardSelectionInverted
+{
+    border-top: solid 1px #d1e8fc;
+    border-bottom: solid 1px #d1e8fc;
+}
+ul.listView:focus li.keyboardSelection 
+{
+    background-color: #b3a596;
+    border-top: solid 1px #82776D;
+    border-bottom: solid 1px #82776D;
+}
+
+ul.listView li:hover 
+{
+    border-top: solid 1px #96A7B5;
+    border-bottom: solid 1px #96A7B5;    
+    background-color: #B6CADB;
+}
+ul.listView li.selected:hover,
+ul.listView li.selectedTop:hover,
+ul.listView li.selectedBottom:hover,
+ul.listView li.selectedTopBottom:hover 
+{
+    background-color: #b3a596;
+    border-top: solid 1px #82776D;
+    border-bottom: solid 1px #82776D;
+}
+ul.listView:focus li.keyboardSelectionInverted:hover 
+{
+    background-color: #B6CADB; 
+}
+ul.listView:focus li.keyboardSelection:hover 
+{
+    background-color: #b3a596;
+}

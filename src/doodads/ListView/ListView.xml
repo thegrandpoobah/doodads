@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<component xmlns="http://schemas.vastcap.com/componentDefinition"
+           type="Vastardis.UI.Components.ListView"
+           inheritsFrom="Vastardis.UI.Components.Generics.List">
+  <behaviour path="~/Components/ListView/ListView.js"/>
+  <templates>
+    <base path="~/Components/ListView/ListView.html"/>
+    <partial name="item" path="~/Components/ListView/ListView.item.html"/>
+  </templates>
+  <stylesheets>
+    <stylesheet path="~/Components/ListView/ListView.css"/>
+  </stylesheets>
+  <imports>
+    <import path="~/Components/List.component"/>
+  </imports>
+</component>
