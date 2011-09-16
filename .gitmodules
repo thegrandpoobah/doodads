@@ -1,3 +1,9 @@
 [submodule "src/mustache"]
 	path = src/mustache
 	url = git@github.com:doodads/mustache.js.git
+[submodule "src/string-measurement"]
+	path = src/string-measurement
+	url = git@github.com:doodads/string-measurement.git
+[submodule "src/innershiv"]
+	path = src/innershiv
+	url = git@github.com:doodads/innershiv.git
