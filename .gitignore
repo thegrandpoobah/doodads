@@ -1,1 +1,8 @@
+csharp/*.suo
+output/*
+src/builders/csharp/obj
 support/*
+tests/builders/csharp/bin
+tests/builders/csharp/obj
+tests/builders/csharp/JavaScript/*
+tests/builders/csharp/Doodads.Builder.Test.csproj.user
