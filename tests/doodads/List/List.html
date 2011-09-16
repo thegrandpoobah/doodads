@@ -1,0 +1,10 @@
+﻿{{!
+<summary>the container for the list</summary>
+<remarks>
+ Note that the {{#items}}{{/items}} Mustache section is the iteration marker
+ Note that {{>item}} refers to the individual list item partial template
+ These two are necessary to drive the functionality of the generic list, although not necessarily
+ in the exact same way as presented here.
+</remarks>
+!}}
+<ul>{{#items}}{{>item}}{{/items}}</ul>

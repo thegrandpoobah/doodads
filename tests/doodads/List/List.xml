@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<component xmlns="http://schemas.vastcap.com/componentDefinition"
+           type="Vastardis.UI.Components.Generics.List"
+           inheritsFrom="Vastardis.UI.Components.Component">
+  <behaviour path="~/Components/List/List.js" />
+  <templates>
+    <base path="~/Components/List/List.html"/>
+    <partial name="item" path="~/Components/List/List.item.html"/>
+  </templates>
+</component>
