@@ -1,0 +1,3 @@
+[submodule "src/mustache"]
+	path = src/mustache
+	url = git@github.com:doodads/mustache.js.git
