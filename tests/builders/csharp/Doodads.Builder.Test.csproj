@@ -1,0 +1,197 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C2A079B8-D640-4B32-B654-631C9EAC68D7}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Doodads.Builder.Test</RootNamespace>
+    <AssemblyName>Doodads.Builder.Test</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\..\output\doodads.js">
+      <Link>JavaScript\doodads.js</Link>
+    </Content>
+    <Content Include="..\..\..\src\support\jquery-1.6.4.js">
+      <Link>JavaScript\jquery-1.6.4.js</Link>
+    </Content>
+    <Content Include="..\..\..\src\support\jquery.debounce-1.0.5.js">
+      <Link>JavaScript\jquery.debounce-1.0.5.js</Link>
+    </Content>
+    <Content Include="Default.html" />
+    <Content Include="TestDoodad\TestDoodad.html" />
+    <Content Include="TestDoodad\TestDoodad.js" />
+    <Content Include="TestDoodad\TestDoodad.xml" />
+    <Content Include="Web.config" />
+    <Content Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\builders\csharp\Doodads.Builder.csproj">
+      <Project>{FE43FFFC-6001-4063-AADA-B31C586B2E95}</Project>
+      <Name>Doodads.Builder</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
+  
+  <!--
+  These extra targets/modifications are so that Linked files get copied to their appropriate locations in Web App projects
+  and are courtesy of James Dawson
+  http://consultingblogs.emc.com/jamesdawson/archive/2008/06/03/using-linked-files-with-web-application-projects.aspx  
+  -->
+  
+  <!--
+  ============================================================
+  _CopyWebApplication
+  
+  MODIFIED: Ignores linked files as part of normal deployment logic.
+  This target will copy the build outputs along with the
+  content files into a _PublishedWebsites folder.
+  This Task is only necessary when $(OutDir) has been redirected
+  to a folder other than ~\bin such as is the case with Team Build.
+  ============================================================
+  -->
+  <Target Name="_CopyWebApplication" Condition="'$(OutDir)' != '$(OutputPath)'">
+    <!-- Log tasks -->
+    <Message Text="Copying Web Application Project Files for $(MSBuildProjectName)" />
+    <!-- Create the _PublishedWebsites\app\bin folder -->
+    <MakeDir Directories="$(WebProjectOutputDir)\bin" />
+    <!-- Copy build outputs to _PublishedWebsites\app\bin folder -->
+    <Copy SourceFiles="@(IntermediateAssembly)"
+          DestinationFolder="$(WebProjectOutputDir)\bin"
+          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(AddModules)"
+          DestinationFolder="$(WebProjectOutputDir)\bin"
+          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(IntermediateOutputPath)$(_SGenDllName)"
+          DestinationFolder="$(WebProjectOutputDir)\%(Content.SubFolder)%(Content.RecursiveDir)"
+          SkipUnchangedFiles="true"
+          Condition="'$(_SGenDllCreated)'=='true'" />
+    <Copy SourceFiles="$(IntermediateOutputPath)$(TargetName).pdb"
+          DestinationFolder="$(WebProjectOutputDir)\bin"
+          SkipUnchangedFiles="true"
+          Condition="'$(_DebugSymbolsProduced)'=='true'" />
+    <Copy SourceFiles="@(DocFileItem)"
+          DestinationFolder="$(WebProjectOutputDir)\bin"
+          SkipUnchangedFiles="true"
+          Condition="'$(_DocumentationFileProduced)'=='true'" />
+    <Copy SourceFiles="@(IntermediateSatelliteAssembliesWithTargetPath)"
+          DestinationFiles="@(IntermediateSatelliteAssembliesWithTargetPath->'$(WebProjectOutputDir)\bin\%(Culture)\$(TargetName).resources.dll')"
+          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(ReferenceComWrappersToCopyLocal); @(ResolvedIsolatedComModules); @(_DeploymentLooseManifestFile); @(NativeReferenceFile)"
+          DestinationFolder="$(WebProjectOutputDir)\bin"
+          SkipUnchangedFiles="true" />
+    <!-- copy any referenced assemblies to _PublishedWebsites\app\bin folder -->
+    <Copy SourceFiles="@(ReferenceCopyLocalPaths)"
+          DestinationFolder="$(WebProjectOutputDir)\bin"
+          SkipUnchangedFiles="true" />
+    <!-- MODIFICATION HERE: Copy local content files (i.e. non-linked files) recursively to _PublishedWebsites\app\ folder -->
+    <Copy Condition=" '%(Content.Link)' == '' "
+          SourceFiles="%(Content.Identity)"
+          DestinationFolder="$(WebProjectOutputDir)\%(Content.RelativeDir)" />
+  </Target>
+  <!--
+  ============================================================
+  CopyLinkedContentFiles
+
+  A new target to copy any linked content files into the
+  web application output folder.
+
+  NOTE: This is necessary even when '$(OutDir)' has not been redirected.
+  ============================================================
+  -->
+  <Target Name="CopyLinkedContentFiles">
+    <!-- Remove any old copies of the files -->
+    <Delete Condition=" '%(Content.Link)' != '' AND Exists('$(WebProjectOutputDir)\%(Content.Link)') "
+            Files="$(WebProjectOutputDir)\%(Content.Link)" />
+    <!-- Copy linked content files recursively to the project folder -->
+    <Copy Condition=" '%(Content.Link)' != '' "
+          SourceFiles="%(Content.Identity)"
+          DestinationFiles="$(WebProjectOutputDir)\%(Content.Link)" />
+  </Target>
+  <!-- Override the default target dependencies to -->
+  <!-- include the new _CopyLinkedContentFiles target. -->
+  <PropertyGroup>
+    <PrepareForRunDependsOn>
+      $(PrepareForRunDependsOn);
+      _CopyWebApplication;
+      CopyLinkedContentFiles;
+      _BuiltWebOutputGroupOutput
+    </PrepareForRunDependsOn>
+  </PropertyGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>34888</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>
+          </IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
