@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-(function(undefined) {
+(function($, undefined) {
     var ValidationEventArgs = function (args) {
         this.data = args;
         this._propagationStopped = false;
@@ -34,5 +34,5 @@ THE SOFTWARE.
         }
     };
 	
-	Vastardis.UI.Components.ValidationEventArgs = ValidationEventArgs;
-})();
+	$.extend(true, window, { Vastardis: { UI: { Components: { ValidationEventArgs: ValidationEventArgs}}} });
+})(jQuery);

@@ -1,4 +1,4 @@
-﻿/* The MIT License
+/* The MIT License
 
 Copyright (c) 2011 Vastardis Capital Services, http://www.vastcap.com/
 
@@ -960,7 +960,7 @@ THE SOFTWARE.
 		    /// Note that this method is meant to support component authors and should rarely be used
 		    /// by component consumers.
 		    ///</remarks>
-		    var e = new ValidationEventArgs(arguments);
+		    var e = new Vastardis.UI.Components.ValidationEventArgs(arguments);
 
 		    $(this).trigger('valid', e);
 
@@ -977,7 +977,7 @@ THE SOFTWARE.
 		    /// Note that this method is meant to support component authors and should rarely be used
 		    /// by component consumers.
 		    ///</remarks>
-		    var e = new ValidationEventArgs(arguments);
+		    var e = new Vastardis.UI.Components.ValidationEventArgs(arguments);
 
 		    $(this).trigger('invalid', e);
 
