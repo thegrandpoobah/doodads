@@ -8,7 +8,6 @@ task('concatenate', function(params) {
 		'innershiv/innershiv.src.js'
 		, 'mustache/mustache.js'
 		, 'string-measurement/string-measurement.js'
-		, 'core/ValidationEventArgs.js'
 		, 'core/Component.js'
 		, 'core/ComponentFactory.js'
 		, 'core/capturingEvents.js'

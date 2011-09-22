@@ -952,6 +952,14 @@ THE SOFTWARE.
         /* END Event Management */
 
         /* BEGIN Validation Management */
+		, _trigger_validity: function Component$trigger_validity(isValid) {
+			var e = $.Event(isValid ? 'valid' : 'invalid'), $this = $(this);
+		    $this.trigger.call($this, e, arguments);
+			
+		    if (!e.isPropagationStopped() && this.parent()) {
+		        this.parent()._valid(isValid);
+		    }
+		}
 		, trigger_valid: function Component$trigger_valid() {
 		    ///<summary>
 		    /// Triggers the "valid" event.
@@ -960,14 +968,7 @@ THE SOFTWARE.
 		    /// Note that this method is meant to support component authors and should rarely be used
 		    /// by component consumers.
 		    ///</remarks>
-		    var e = new Vastardis.UI.Components.ValidationEventArgs(arguments);
-
-		    $(this).trigger('valid', e);
-
-		    if (!e.isPropagationStopped() && this.parent()) {
-		        this.parent()._valid(true);
-		    }
-
+			this._trigger_validity(true);
 		}
 		, trigger_invalid: function Component$trigger_invalid() {
 		    ///<summary>
@@ -977,13 +978,7 @@ THE SOFTWARE.
 		    /// Note that this method is meant to support component authors and should rarely be used
 		    /// by component consumers.
 		    ///</remarks>
-		    var e = new Vastardis.UI.Components.ValidationEventArgs(arguments);
-
-		    $(this).trigger('invalid', e);
-
-		    if (!e.isPropagationStopped() && this.parent()) {
-		        this.parent()._valid(false);
-		    }
+			this._trigger_validity(false);
 		}
 		, valid: function Component$valid(/*value*/) {
 		    /// <summary>

@@ -193,11 +193,11 @@ THE SOFTWARE.
         , hasInputFocus: function NumericTextBox$hasInputFocus() {
             return this._focused;
         }
-        , onInputValid: function NumericTextBox$onInputValid(e, args) {
-            args.stopPropagation();
+        , onInputValid: function NumericTextBox$onInputValid(e) {
+            e.stopPropagation();
         }
-        , onInputInvalid: function NumericTextBox$onInputInvalid(e, args) {
-            args.stopPropagation();
+        , onInputInvalid: function NumericTextBox$onInputInvalid(e) {
+            e.stopPropagation();
         }
         /* END Validation */
 
