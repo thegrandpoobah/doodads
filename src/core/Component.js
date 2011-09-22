@@ -1218,4 +1218,17 @@ THE SOFTWARE.
                 return components;
         }
     }
+
+
+    doodads.setup = function(base, defaultOptions, definition) {
+        var init = definition.init;
+        delete definition.init;
+        var obj = function() {
+            init.apply(this, arguments);
+        }
+        obj.defaultOptions = defaultOptions;
+        obj.prototype = $.extend(new base.constructor(), obj);
+        return obj;   
+    }
+    
 })(jQuery);
