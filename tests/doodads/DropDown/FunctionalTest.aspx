@@ -29,6 +29,7 @@
     <a id="delayLoadTest" href="#">Delay Load Test (DE1564)</a>
     <a id="removeMe" href="#">Remove the selected item</a>
     <a id="addAnItem" href="#">Add an item</a>
+    <a id="hookChanging" href="#">Hook changing and cancel all changes</a>
     
     <script type="text/javascript">
         (function ($) {
@@ -67,6 +68,12 @@
                 $('#addAnItem').click(function (e) {
                     naturalState.addItem({ text: 'Rufus T. Firefly', value: 10 });
                     e.preventDefault();
+                });
+
+                $('#hookChanging').click(function (e) {
+                    $(naturalState).bind('changing', function (e, args) {
+                        e.preventDefault();
+                    });
                 });
             });
         })(jQuery);        

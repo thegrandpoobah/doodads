@@ -80,39 +80,6 @@ THE SOFTWARE.
     }
     DropDown3._activeDropDown = null;
 
-    // Copied verbatim from: http://www.alexandre-gomes.com/?p=115
-    // Licensing terms to follow (most likely Public Domain)
-    function getScrollbarWidth() {
-        if (!getScrollbarWidth._width) {
-            var inner = document.createElement('p');
-            inner.style.width = "100%";
-            inner.style.height = "200px";
-
-            var outer = document.createElement('div');
-            outer.style.position = "absolute";
-            outer.style.top = "0px";
-            outer.style.left = "0px";
-            outer.style.visibility = "hidden";
-            outer.style.width = "200px";
-            outer.style.height = "150px";
-            outer.style.overflow = "hidden";
-            outer.appendChild(inner);
-
-            document.body.appendChild(outer);
-            var w1 = inner.offsetWidth;
-            outer.style.overflow = 'scroll';
-            var w2 = inner.offsetWidth;
-            if (w1 == w2) w2 = outer.clientWidth;
-
-            document.body.removeChild(outer);
-
-            getScrollbarWidth._width = w1 - w2;
-        }
-
-        return getScrollbarWidth._width;
-    }
-    getScrollbarWidth._width = null;
-
     DropDown3.prototype = $.extend(new base.constructor(), {
         onComponentReady: function DropDown$onComponentReady() {
             base.onComponentReady.apply(this, arguments);
@@ -272,7 +239,10 @@ THE SOFTWARE.
 
 		    } else if (this._selectedIndex !== arguments[0]) {
 		        if (arguments[1]) {
-		            this.trigger_changing();
+		            if (!this.trigger_changing(this._selectedIndex, arguments[0])) {
+		                // change was programmatically cancelled
+		                return;
+		            }
 		        }
 
 		        if (this._selectedIndex !== undefined && this._selectedIndex >= 0) {
@@ -579,8 +549,13 @@ THE SOFTWARE.
 
 		    }
 		}
-		, trigger_changing: function DropDown$trigger_changing() {
-		    $(this).trigger('changing');
+		, trigger_changing: function DropDown$trigger_changing(currentSelection, newSelection) {
+		    var evt = $.Event('changing');
+		    $(this).trigger(evt, [{
+		        currentSelection: currentSelection
+                , newSelection: newSelection
+		    }]);
+		    return !evt.isDefaultPrevented();
 		}
 		, trigger_changed: function DropDown$trigger_changed() {
 		    $(this).trigger('changed');
