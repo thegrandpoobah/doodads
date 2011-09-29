@@ -95,8 +95,8 @@ THE SOFTWARE.
         , bindEvents: function () {
             this._input
 				.bind('keyup', this.onKeyUp$debounced)
-				.bind('focus', this.onFocus$proxy)
-				.bind('blur', this.onBlur$proxy);
+				.bind('focus.cmp', this.onFocus$proxy)
+				.bind('blur.cmp', this.onBlur$proxy);
 
             if (this._options.multiline) {
                 this._input.bind('keydown', this.onTextAreaKeyDown$proxy);
@@ -209,7 +209,7 @@ THE SOFTWARE.
 		            if (this.hasInputFocus()) {
 		                // the edge case where the user is focussed and the text changes on a timeout/debounce
 		                // can potentially cause the input field's caret to become invisible. set the caret
-                        // to the end of the string to bring it back into view.
+		                // to the end of the string to bring it back into view.
 		                this._setCaretPosition(this._text.length);
 		            }
 		        }
@@ -282,6 +282,12 @@ THE SOFTWARE.
 		, trigger_changed: function () {
 		    $(this).trigger('changed');
 		}
+        , trigger_focus: function () {
+            $(this).trigger('focus');
+        }
+        , trigger_blur: function () {
+            $(this).trigger('blur');
+        }
         /* END Trigger management */
 
         /* BEGIN Event handling */
@@ -303,14 +309,28 @@ THE SOFTWARE.
 		            this.setHintboxVisibility();
 		        }
 		    }
-		    $(this).trigger('focus');
+
+		    // BEGIN: WORKAROUND for bug 524360 in FireFox
+		    // see https://bugzilla.mozilla.org/show_bug.cgi?id=524360 for more details
+		    // (ideally this whole section would just be $(this).trigger('focus');
+		    this._input.unbind('focus.cmp blur.cmp').blur();
+
+		    var self = this;
+		    window.setTimeout(function () {
+		        self.trigger_focus();
+				
+		        self._input.focus()
+                    .bind('focus.cmp', self.onFocus$proxy)
+                    .bind('blur.cmp', self.onBlur$proxy);
+		    }, 0);
+		    // END: WORKAROUND for bug 524360
 		}
         , onBlur: function (e) {
             if (this._options.validates) {
                 this.hideHintbox();
             }
             this._addWatermark();
-            $(this).trigger('blur');
+            this.trigger_blur();
             this._focused = false;
         }
 		, onTextAreaKeyDown: function (e) {
@@ -336,5 +356,4 @@ THE SOFTWARE.
     window.getComponentType = function () {
         return TextBox2;
     }
-
 })(jQuery);
