@@ -297,7 +297,13 @@ THE SOFTWARE.
 		    }
 		}
         , onKeyUp: function (e) {
-            this.text(this._input.val(), true);
+            var val;
+            if (this._watermarkOn) {
+                val = '';
+            } else {
+                val = this._input.val();
+            }
+            this.text(val, true);
         }
 		, onFocus: function (e) {
 		    this._focused = true;
