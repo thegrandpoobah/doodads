@@ -515,12 +515,12 @@ THE SOFTWARE.
             ///</remarks>
             if (!this._options.instantiateComponents) { return; }
 
-            var templateDataCache,
+            var templateDataCache, dfds,
                 self = this;
-
-            this._source.find('component').each(function (index, componentElement) {
-                var $componentElement = $(componentElement), dsAttr,
-                    options,
+			
+			dfds = this._source.find('component').map(function (index, componentElement) {
+                var $componentElement = $(componentElement), asyncCreationDfd, dsAttr,
+                    options, 
                     component, $component,
                     autogenId;
 
@@ -530,71 +530,93 @@ THE SOFTWARE.
                     options = {};
                 }
                 options.id = $componentElement.attr('id');
+				
+                var instantiationSibling = Component.instantiationSibling.clone();
+				instantiationSibling.insertAfter($componentElement);
+				$componentElement.remove();
 
-                if ($componentElement.attr('url')) {
-                    component = vsc.ComponentFactory2.create($componentElement.attr('url'), options);
-                } else {
-                    component = new vsc.Component(options);
-                }
-                $component = $(component);
+				asyncCreationDfd = $.Deferred();
+				if ($componentElement.attr('url')) {
+					vsc.ComponentFactory2.createAsync($componentElement.attr('url'), options)
+						.done(function(result) {
+							asyncCreationDfd.resolve(result);
+						});
+				} else {
+					asyncCreationDfd.resolve(new vsc.Component(options));
+				}
+				
+				var completionDfd = $.Deferred();
+				
+				asyncCreationDfd.promise().done(function(component) {
+					var $component,
+						autogenId;
+						
+					component.translateInnerMarkup($componentElement);
+					
+					if (options.id) {
+						// if the child has an id, then create a reference to the
+						// child on the parent's 'this'.
+						// this way, the parent can reference the child using 'this._{id}'
+						autogenId = '_' + options.id;
+						self[autogenId] = component;
+						self._autogenChildren.push(autogenId);
+					}
 
-                component.translateInnerMarkup($componentElement);
+					dsAttr = $componentElement.attr('dataSource');
+					if (dsAttr) {
+						if (!templateDataCache) {
+							templateDataCache = self.templateData();
+						}
 
-                if (options.id) {
-                    // if the child has an id, then create a reference to the
-                    // child on the parent's 'this'.
-                    // this way, the parent can reference the child using 'this._{id}'
-                    autogenId = '_' + options.id;
-                    self[autogenId] = component;
-                    self._autogenChildren.push(autogenId);
-                }
+						if (dsAttr === '.') {
+							// the special marker '.' is for passing the full dataSource 
+							// down to the child component
+							component.dataSource(templateDataCache);
+						} else {
+							// why not just component.dataSource(this.templateData()[dsAttr])?
+							// dsAttr may contain a compound property ('x.y.z') which would not work
+							// without the eval.
+							component.dataSource(eval('templateDataCache.' + dsAttr));
+						}
+					}
 
-                dsAttr = $componentElement.attr('dataSource');
-                if (dsAttr) {
-                    if (!templateDataCache) {
-                        templateDataCache = self.templateData();
-                    }
+					// auto-bind events based on attributes that start with "on"
+					$.each(componentElement.attributes, function (i, attr) {
+						if (attr.name.indexOf('on') !== 0 || typeof self[attr.nodeValue] !== 'function') {
+							return;
+						}
 
-                    if (dsAttr === '.') {
-                        // the special marker '.' is for passing the full dataSource 
-                        // down to the child component
-                        component.dataSource(templateDataCache);
-                    } else {
-                        // why not just component.dataSource(this.templateData()[dsAttr])?
-                        // dsAttr may contain a compound property ('x.y.z') which would not work
-                        // without the eval.
-                        component.dataSource(eval('templateDataCache.' + dsAttr));
-                    }
-                }
+						var proxyName = attr.nodeValue + '$proxy',
+							evtName = attr.name.substr(2);
 
-                // auto-bind events based on attributes that start with "on"
-                $.each(componentElement.attributes, function (i, attr) {
-                    if (attr.name.indexOf('on') !== 0 || typeof self[attr.nodeValue] !== 'function') {
-                        return;
-                    }
+						if (!self[proxyName]) {
+							// do not recreate the proxy if it already exists
+							// happens if/when you bind to events in a mustache loop
+							self[proxyName] = $.proxy(self[attr.nodeValue], self);
+						}
+						$component.bind(evtName, self[proxyName]);
+						self._autogenUnbinds.push({
+							component: component
+							, evt: evtName
+							, fn: self[proxyName]
+						});
+					});
 
-                    var proxyName = attr.nodeValue + '$proxy',
-                        evtName = attr.name.substr(2);
-
-                    if (!self[proxyName]) {
-                        // do not recreate the proxy if it already exists
-                        // happens if/when you bind to events in a mustache loop
-                        self[proxyName] = $.proxy(self[attr.nodeValue], self);
-                    }
-                    $component.bind(evtName, self[proxyName]);
-                    self._autogenUnbinds.push({
-                        component: component
-                        , evt: evtName
-                        , fn: self[proxyName]
-                    });
-                });
-
-                self.addChild(component);
-
-                Component.instantiationSibling.insertAfter($componentElement);
-                component.render(Component.instantiationSibling);
-                component.element().unwrap();
-            }).remove();
+					self.addChild(component);
+					
+					component.render(instantiationSibling);
+					component.element().unwrap();
+					
+					completionDfd.resolve();
+				});
+				
+				return completionDfd.promise();
+			});
+			
+			$.when.apply(null, dfds)
+				.done(function() {
+					self.onChildrenReady();
+				});
         }
         , translateInnerMarkup: function Component$translateInnerMarkup(sourceElement) {
             ///<summary>
@@ -835,6 +857,14 @@ THE SOFTWARE.
 
             // Default Implementation is basically abstract since there is nothing to bind unto.
         }
+		, onChildrenReady: function Component$onChildrenReady() {
+			///<summmary>
+			/// Callback function that getsw called when the children components have finished the rendering process.
+			/// Note that this callback gets invoked afer every time the root element is reconstructed (rerendered)
+			///</summary>
+			
+			// Default Implementation is basically abstract since there is nothing to bind unto.
+		}
 
         , onAttached: function Component$onAttached() {
             ///<summary>
@@ -1219,7 +1249,7 @@ THE SOFTWARE.
         }
     }
 
-
+/*
     doodads.setup = function(base, defaultOptions, definition) {
         var init = definition.init;
         delete definition.init;
@@ -1230,5 +1260,5 @@ THE SOFTWARE.
         obj.prototype = $.extend(new base.constructor(), obj);
         return obj;   
     }
-    
+*/    
 })(jQuery);

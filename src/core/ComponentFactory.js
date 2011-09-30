@@ -47,6 +47,13 @@ THE SOFTWARE.
 
             return $.extend(new componentClass(options || {}), { __instantiatedTypeUrl: url });
         }
+		, createAsync: function ComponentFactory$createAsync(url, options) {
+			var dfd = $.Deferred();
+			
+			dfd.resolve(this.create(url, options));
+			
+			return dfd.promise();
+		}
         , canonicalize: function ComponentFactory$canonicalize(url) {
             ///<summary>
             /// Creates a absolute url out of the passed in url.
