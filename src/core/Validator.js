@@ -27,7 +27,7 @@ THE SOFTWARE.
     var vsc = Vastardis.UI.Components;
 
     vsc.Component.addValidationAPI = function (component) {
-        $.each(['valid'], function (index, item) {
+        $.each(['valid', 'dispose'], function (index, item) {
             component.prototype['_prototype_' + item] = component.prototype[item];
         });
 
@@ -48,7 +48,7 @@ THE SOFTWARE.
             component[key] = component.__validator[key];
         }
 
-        $.each(['valid'], function (index, item) {
+        $.each(['valid', 'dispose'], function (index, item) {
             var prototypeFunction = '_prototype_' + item;
             component[item] = component[prototypeFunction];
             delete component[prototypeFunction];
@@ -59,10 +59,6 @@ THE SOFTWARE.
     // determines how long the validator waits for an async rule to callback before
     // showing the user a message.
     var ASYNC_GRACE_PERIOD = 100;
-
-    var sharedHintBox,
-		sharedHintList,
-		sharedHintBoxActiveTarget = null;
 
     Validator = {
         addRule: function (value) {
@@ -98,6 +94,18 @@ THE SOFTWARE.
             }
             return this._prototype_valid.apply(this, arguments);
         }
+		, validationContext: function Component$validationContext() {
+		    ///<summary>
+		    /// A JS object representation of the properties of this component that are needed
+		    /// to test validity.
+		    ///</summary>
+			///<remarks>
+			/// It is the responsibility of the component author to correctly expose a validationContext
+			/// object bag to the validation infrastructure.
+			///</remarks>
+		    return null;
+		}
+		
         , validate: function (/*traversalHistory*/) {
             ///<summary>
             ///
@@ -147,8 +155,7 @@ THE SOFTWARE.
                     if (this._pendingRules === 0) return;
 
                     this._backList.push({ text: 'Validating...', isAsync: true });
-                    privateMethods.prepareHintbox.call(this);
-                    this.setHintboxVisibility();
+					privateMethods.trigger_validationApplied.call(this);
                 }, this), ASYNC_GRACE_PERIOD);
             }
 
@@ -225,57 +232,32 @@ THE SOFTWARE.
             this.validate();
         }
 
-		, setHintboxVisibility: function () {
-		    if (this.hasInputFocus() && (this._backList || []).length > 0) {
-		        this.showHintbox();
-		    } else {
-		        this.hideHintbox();
-		    }
-		}
-        , showHintbox: function () {
-            var target = this.validationTarget();
-
-            if (!target || sharedHintBoxActiveTarget === target) return;
-
-            sharedHintBoxActiveTarget = target;
-            privateMethods.prepareHintbox.call(this);
-
-            privateMethods.hintBox.call(this).show(target,
-                this._options.hintBoxOrientation || 'bottom right',
-                this._options.hintBoxDirection || 'down right');
-
-            captureEvent('mousedown', this.element(), $.proxy(privateMethods.onCapturedMouseDown, this));
-        }
-        , hideHintbox: function () {
-            var target = this.validationTarget();
-
-            if (!target || sharedHintBoxActiveTarget !== target) return;
-
-            sharedHintBoxActiveTarget = null;
-
-            privateMethods.hintBox.call(this).hide();
-
-            releaseEvent('mousedown');
-        }
-		
 		, _initializeValidationListeners: function () {
 			var i, n, listener;
 			for (i=0, n=validationListeners.length; i<n; ++i) {
 				listener = validationListeners[i];
 				
 				if (listener.canListen(this)) {
+					//this._listeners.push(listener.listen(this));
 					listener.listen(this);
 				}
 			}
 		}
-    };
+		
+		, dispose: function () {
+			privateMethods.tearDownValidationListeners.call(this);
+			
+		    return this._prototype_dispose.apply(this, arguments);
+		}
+	};
 
     var privateMethods = {
-        onCapturedMouseDown: function (e) {
-            if (e.originalTarget === this.validationTarget()[0]) return;
-
-            this.hideHintbox();
-        }
+		tearDownValidationListeners: function() {
+			/*$.each(this._listeners, function() {
+				this.dispose();
+			});*/
+		}
+		
 		, ruleCallback: function (result, passId, traversalHistory) {
 		    if (this._passId !== passId) {
 		        return;
@@ -339,61 +321,12 @@ THE SOFTWARE.
 				/* possibly others */
 			});
 		}
-		, prepareHintbox: function () {
-		    var target = this.validationTarget();
-
-		    if (!target || sharedHintBoxActiveTarget !== target) return;
-
-		    privateMethods.hintList.call(this).dataSource(this._backList);
-		    // set the color
-		    if (this._backList.length > 0) {
-		        if (this._computedValidity) {
-		            privateMethods.hintBox.call(this).element().addClass('infobox');
-		        } else {
-		            privateMethods.hintBox.call(this).element().removeClass('infobox');
-		        }
-		    }
-		}
-        , hintList: function () {
-            if (!sharedHintList) {
-                sharedHintList = vsc.ComponentFactory2.create('/Components/List.component', { cssClass: 'hintlist' });
-                privateMethods.hintBox.call(this).addChild(sharedHintList);
-            }
-            return sharedHintList;
-        }
-        , hintBox: function () {
-            if (!sharedHintBox) {
-                sharedHintBox = vsc.ComponentFactory2.create('/Components/HintBox.component');
-                sharedHintBox.render($(document.body));
-            }
-            return sharedHintBox;
-        }
     }
 	
 	var validationListeners = [];
 	vsc.Component.registerValidationListener = function(listener) {
 		validationListeners.push(listener);
 	}
-	
-	HintBoxValidationListener = {
-		canListen: function(component) {
-			if (component._options.validationListeners.indexOf('hintlist') !== -1 && // the component *wants* the hint-list
-				$.isFunction(component.validationTarget)) { // and the component implements the IHintBoxListenerSource interface
-				
-				return true;
-			} else {
-				return false;
-			}
-		}
-		, listen: function(component) {
-			$(component).bind('validationApplied', function(e, args) { // TODO: remember to dispose of this event
-		        privateMethods.prepareHintbox.call(e.target);
-		        e.target.setHintboxVisibility();
-			});
-		}
-	}
-	
-	vsc.Component.registerValidationListener(HintBoxValidationListener);
 	
     // Validation Rules
     var ValidationRules = {};

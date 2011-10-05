@@ -12,6 +12,7 @@ task('concatenate', function(params) {
 		, 'core/ComponentFactory.js'
 		, 'core/capturingEvents.js'
 		, 'core/Validator.js'
+		, 'core/HintBoxValidationListener.js'
 		, 'core/z-manager.js'
 	];
 
