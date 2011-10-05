@@ -69,7 +69,7 @@
 		, onCapturedMouseDown: function HintBoxValidationListener$onCapturedMouseDown(e) {
             if (e.originalTarget === this._component.validationTarget()[0]) return;
 
-            this.hideHintbox();		
+            this.hideHintBox();
 		}
 		
 		/* END Event Handlers */
