@@ -734,6 +734,10 @@ THE SOFTWARE.
                 // create a two-way relationship between the component and the DOM
                 this._source.data(DOMCOMPONENTMETA, this);
 
+				if (this._options.validates) {
+					this._initializeValidationListeners();
+				}
+				
                 this.onComponentReady();
             }
         }

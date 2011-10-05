@@ -37,7 +37,10 @@ THE SOFTWARE.
         }
 
         $.extend(component.prototype, Validator);
-        $.extend(component.defaultOptions, { validates: true });
+        $.extend(component.defaultOptions, { 
+			validates: true
+			, validationListeners: 'hintlist'
+		});
     }
 
     vsc.Component.removeValidationAPI = function (component) {
@@ -254,6 +257,17 @@ THE SOFTWARE.
 
             releaseEvent('mousedown');
         }
+		
+		, _initializeValidationListeners: function () {
+			var i, n, listener;
+			for (i=0, n=validationListeners.length; i<n; ++i) {
+				listener = validationListeners[i];
+				
+				if (listener.canListen(this)) {
+					listener.listen(this);
+				}
+			}
+		}
     };
 
     var privateMethods = {
@@ -315,9 +329,15 @@ THE SOFTWARE.
 		            }
 		        }, this));
 
-		        privateMethods.prepareHintbox.call(this);
-		        this.setHintboxVisibility();
+				privateMethods.trigger_validationApplied.call(this);
 		    }
+		}
+		, trigger_validationApplied: function() {
+			$(this).trigger('validationApplied', {
+				messages: this._backList
+				, isValid: this._computedValidity
+				/* possibly others */
+			});
 		}
 		, prepareHintbox: function () {
 		    var target = this.validationTarget();
@@ -349,7 +369,32 @@ THE SOFTWARE.
             return sharedHintBox;
         }
     }
-
+	
+	var validationListeners = [];
+	vsc.Component.registerValidationListener = function(listener) {
+		validationListeners.push(listener);
+	}
+	
+	HintBoxValidationListener = {
+		canListen: function(component) {
+			if (component._options.validationListeners.indexOf('hintlist') !== -1 && // the component *wants* the hint-list
+				$.isFunction(component.validationTarget)) { // and the component implements the IHintBoxListenerSource interface
+				
+				return true;
+			} else {
+				return false;
+			}
+		}
+		, listen: function(component) {
+			$(component).bind('validationApplied', function(e, args) { // TODO: remember to dispose of this event
+		        privateMethods.prepareHintbox.call(e.target);
+		        e.target.setHintboxVisibility();
+			});
+		}
+	}
+	
+	vsc.Component.registerValidationListener(HintBoxValidationListener);
+	
     // Validation Rules
     var ValidationRules = {};
 
