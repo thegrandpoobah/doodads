@@ -404,24 +404,12 @@ THE SOFTWARE.
 
             this._focused = true;
             this._affordance.addClass('tracking');
-
-            if (this._options.validates) {
-                if (!this.ranValidation()) {
-                    this.validate();
-                } else {
-                    this.setHintboxVisibility();
-                }
-            }
         }
         , onBlur: function DropDown$onBlur() {
             this._focused = false;
 
             if (!this._isListVisible) {
                 this._affordance.removeClass('tracking');
-            }
-
-            if (this._options.validates) {
-                this.hideHintbox();
             }
         }
 		, onResize: function DropDown$onResize() {

@@ -130,19 +130,9 @@ THE SOFTWARE.
 		}
 		, onFocus: function(e) {
 		    this._focused = true;
-		    if (this._options.validates) {
-		        if (!this.ranValidation()) {
-		            this.validate();
-		        } else {
-		            this.setHintboxVisibility();
-		        }
-		    }
 		    $(this).trigger('focus');
 		}
         , onBlur: function(e) {
-            if (this._options.validates) {
-                this.hideHintbox();
-            }
             $(this).trigger('blur');
             this._focused = false;
         }

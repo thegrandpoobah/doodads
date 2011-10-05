@@ -308,14 +308,7 @@ THE SOFTWARE.
 		, onFocus: function (e) {
 		    this._focused = true;
 		    this._removeWatermark();
-		    if (this._options.validates) {
-		        if (!this.ranValidation()) {
-		            this.validate();
-		        } else {
-		            this.setHintboxVisibility();
-		        }
-		    }
-
+		    
 		    // BEGIN: WORKAROUND for bug 524360 in FireFox
 		    // see https://bugzilla.mozilla.org/show_bug.cgi?id=524360 for more details
 		    // (ideally this whole section would just be $(this).trigger('focus');
@@ -332,9 +325,6 @@ THE SOFTWARE.
 		    // END: WORKAROUND for bug 524360
 		}
         , onBlur: function (e) {
-            if (this._options.validates) {
-                this.hideHintbox();
-            }
             this._addWatermark();
             this.trigger_blur();
             this._focused = false;

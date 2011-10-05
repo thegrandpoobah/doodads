@@ -205,24 +205,12 @@ THE SOFTWARE.
 		, onFocus: function NumericTextBox$onFocus(e) {
 		    this._focused = true;
 
-		    if (this._options.validates) {
-		        if (!this.ranValidation()) {
-		            this.validate();
-		        } else {
-		            this.setHintboxVisibility();
-		        }
-		    }
-
 		    this._updateTextBox();
 
 		    this._input._input.select();
 		}
 		, onBlur: function NumericTextBox$onBlur(e) {
 		    this._focused = false;
-
-		    if (this._options.validates) {
-		        this.hideHintbox();
-		    }
 
 		    this._updateTextBox();
 		}
