@@ -27,7 +27,7 @@ THE SOFTWARE.
     var vsc = Vastardis.UI.Components;
 
     vsc.Component.addValidationAPI = function (component) {
-        $.each(['valid'], function (index, item) {
+        $.each(['valid', 'dispose'], function (index, item) {
             component.prototype['_prototype_' + item] = component.prototype[item];
         });
 
@@ -45,7 +45,7 @@ THE SOFTWARE.
             component[key] = component.__validator[key];
         }
 
-        $.each(['valid'], function (index, item) {
+        $.each(['valid', 'dispose'], function (index, item) {
             var prototypeFunction = '_prototype_' + item;
             component[item] = component[prototypeFunction];
             delete component[prototypeFunction];
@@ -254,6 +254,10 @@ THE SOFTWARE.
 
             releaseEvent('mousedown');
         }
+
+		, dispose: function () {
+		    return this._prototype_dispose.apply(this, arguments);
+		}		
     };
 
     var privateMethods = {
