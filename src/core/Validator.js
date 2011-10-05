@@ -27,7 +27,7 @@ THE SOFTWARE.
     var vsc = Vastardis.UI.Components;
 
     vsc.Component.addValidationAPI = function (component) {
-        $.each(['valid', 'dispose'], function (index, item) {
+        $.each(['valid', 'validationContext', 'dispose'], function (index, item) {
             component.prototype['_prototype_' + item] = component.prototype[item];
         });
 
@@ -48,7 +48,7 @@ THE SOFTWARE.
             component[key] = component.__validator[key];
         }
 
-        $.each(['valid', 'dispose'], function (index, item) {
+        $.each(['valid', 'validationContext', 'dispose'], function (index, item) {
             var prototypeFunction = '_prototype_' + item;
             component[item] = component[prototypeFunction];
             delete component[prototypeFunction];
@@ -103,7 +103,11 @@ THE SOFTWARE.
 			/// It is the responsibility of the component author to correctly expose a validationContext
 			/// object bag to the validation infrastructure.
 			///</remarks>
-		    return null;
+			if (this._prototype_validationContext) {
+				return this._prototype_validationContext.apply(this, arguments);
+			} else {
+				return null;
+			}
 		}
 		
         , validate: function (/*traversalHistory*/) {
@@ -133,7 +137,6 @@ THE SOFTWARE.
             var callback = $.proxy(function (result) {
                 privateMethods.ruleCallback.call(this, result, passId, traversalHistory || [this]);
             }, this);
-
 
             $.each(this._rules || [], $.proxy(function (index, rule) {
                 var result = rule.validate(context, {
@@ -238,8 +241,8 @@ THE SOFTWARE.
 				listener = validationListeners[i];
 				
 				if (listener.canListen(this)) {
-					//this._listeners.push(listener.listen(this));
-					listener.listen(this);
+					this._listeners = this._listeners || [];
+					this._listeners.push(listener.listen(this));
 				}
 			}
 		}
@@ -253,9 +256,9 @@ THE SOFTWARE.
 
     var privateMethods = {
 		tearDownValidationListeners: function() {
-			/*$.each(this._listeners, function() {
+			$.each(this._listeners, function() {
 				this.dispose();
-			});*/
+			});
 		}
 		
 		, ruleCallback: function (result, passId, traversalHistory) {
@@ -325,6 +328,17 @@ THE SOFTWARE.
 	
 	var validationListeners = [];
 	vsc.Component.registerValidationListener = function(listener) {
+		///<summary>
+		/// Adds a Validation Listener to the validation listener registry.
+		/// Validation Listeners perform an action after every execution of the validate function
+		/// Typically, listeners modify the DOM to reflect the invalid state of a component.
+		///</summary>
+		///<param name="listener">
+		/// The Validation Listener to add to the registry
+		/// The listener is a type with the following static methods:
+		///  * canListen(component): determines if the listener is compatible with the given component
+		///  * listen(component): hook unto the validation infrastructure to receive notifications on validation changes
+		///</param>
 		validationListeners.push(listener);
 	}
 	

@@ -113,7 +113,7 @@
             captureEvent('mousedown', this._component.element(), this.onCapturedMouseDown$proxy);		
 		}
 		, hideHintBox: function HintBoxValidationListener$hideHintBox() {
-            var target = this._component.validationTarget();
+            var target = this._component ? this._component.validationTarget() : null;
 
             if (!target || sharedHintBoxActiveTarget !== target) return;
 
