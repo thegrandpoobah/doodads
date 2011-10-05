@@ -133,7 +133,7 @@ THE SOFTWARE.
                 });
 
                 if (!result.async) {
-                    privateMethods.ruleCallback.call(this, result, this._passId, traversalHistory || [this]);
+                    callback(result);
                 } else {
                     hasAsync = true;
                 }
