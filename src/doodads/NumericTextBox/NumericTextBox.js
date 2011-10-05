@@ -41,7 +41,7 @@ THE SOFTWARE.
 
     NumericTextBox.defaultOptions = {
         value: null
-        , required: true
+        , required: false
 		, showStar: false
 		, enabled: true
 		, textDecimals: 2
@@ -208,11 +208,15 @@ THE SOFTWARE.
 		    this._updateTextBox();
 
 		    this._input._input.select();
+
+		    this.trigger_focus();
 		}
 		, onBlur: function NumericTextBox$onBlur(e) {
 		    this._focused = false;
 
 		    this._updateTextBox();
+
+		    this.trigger_blur();
 		}
 		, onChanging: function NumericTextBox$onChanging(e) {
 		    this._computeVal();
@@ -252,6 +256,12 @@ THE SOFTWARE.
         }
 
         /* BEGIN Event Dispatch */
+        , trigger_focus: function NumericTextBox$trigger_focus() {
+            $(this).trigger('focus');
+        }
+        , trigger_blur: function NumericTextBox$trigger_blur() {
+            $(this).trigger('blur');
+        }
         , trigger_changing: function NumericTextBox$trigger_changing() {
             $(this).trigger('changing');
         }

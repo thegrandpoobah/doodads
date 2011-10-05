@@ -124,14 +124,14 @@
             releaseEvent('mousedown');
 		}
 		
-        , hintList: function () {
+        , hintList: function HintBoxValidationListener$hintList() {
             if (!sharedHintList) {
                 sharedHintList = Vastardis.UI.Components.Component.create('/Components/List.component', { cssClass: 'hintlist' });
                 this.hintBox().addChild(sharedHintList);
             }
             return sharedHintList;
         }
-        , hintBox: function () {
+        , hintBox: function HintBoxValidationListener$hintBox() {
             if (!sharedHintBox) {
                 sharedHintBox = Vastardis.UI.Components.Component.create('/Components/HintBox.component');
                 sharedHintBox.render($(document.body));
@@ -139,7 +139,7 @@
             return sharedHintBox;
         }
 		
-		, dispose: function(component) {
+		, dispose: function HintBoxValidationListener$dispose(component) {
 			$(component)
 				.unbind('validationApplied', this.onValidationApplied$proxy)
 				.unbind('focus', this.onComponentFocus$proxy)
@@ -147,8 +147,6 @@
 		}		
 	};
 	
-	// TODO: Create proper namespace for these guys
-	Vastardis.UI.Components.HintBoxValidationListener = HintBoxValidationListener;
-	
+	$.extend(true, window, { Vastardis: { UI: { Components: { ValidationListeners: { HintBoxValidationListener: HintBoxValidationListener}}}});
 	Vastardis.UI.Components.Component.registerValidationListener(HintBoxValidationListener);
 })(jQuery);

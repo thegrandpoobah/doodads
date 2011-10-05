@@ -37,10 +37,10 @@ THE SOFTWARE.
         }
 
         $.extend(component.prototype, Validator);
-        $.extend(component.defaultOptions, { 
-			validates: true
+        component.defaultOptions = $.extend({
+            validates: true
 			, validationListeners: 'hintlist'
-		});
+        }, component.defaultOptions);
     }
 
     vsc.Component.removeValidationAPI = function (component) {
