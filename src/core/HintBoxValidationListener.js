@@ -30,7 +30,7 @@
 		};
 	}
 	HintBoxValidationListener.canListen = function(component) {
-		if (component._options.validationListeners.indexOf('hintlist') !== -1 && // the component *wants* the hint-list
+		if (component._options.validationListeners.indexOf('hintbox') !== -1 && // the component *wants* the hint-list
 			$.isFunction(component.validationTarget)) { // and the component implements the IHintBoxListenerSource interface
 			
 			return true;

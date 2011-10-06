@@ -39,7 +39,7 @@ THE SOFTWARE.
         $.extend(component.prototype, Validator);
         component.defaultOptions = $.extend({
             validates: true
-			, validationListeners: 'hintlist'
+			, validationListeners: 'hintbox'
         }, component.defaultOptions);
     }
 
