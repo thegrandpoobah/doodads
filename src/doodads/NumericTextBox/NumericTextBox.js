@@ -56,10 +56,10 @@ THE SOFTWARE.
         }
     };
 
-    NumericTextBox.DefaultValidationRule = function (ctx) {
-        this.validate = function (content) {
+    NumericTextBox.DefaultValidationRule = function () {
+        this.validate = function (context, args) {
             return {
-                valid: (content === null && !ctx.required()) || regexes.Number.test(content)
+                valid: (args.callee.isValidationContextEmpty(context) && !args.callee.required()) || regexes.Number.test(context)
                 , message: 'Please enter a valid number'
             };
         };
@@ -70,7 +70,7 @@ THE SOFTWARE.
             this._input.watermarkingEnabled(false);
 
             if (this._options.validates) {
-                this.addRule(new NumericTextBox.DefaultValidationRule(this));
+                this.addRule(new NumericTextBox.DefaultValidationRule());
 
                 if (this._options.required) {
                     this.required(true, new NumericTextBox.DefaultRequiredRule());
@@ -190,6 +190,9 @@ THE SOFTWARE.
 		, validationContext: function NumericTextBox$validationContext() {
 		    return this.val();
 		}
+        , isValidationContextEmpty: function NumericTextBox$isValidationContextEmpty(context) {
+            return this._input.text().trim() === '';
+        }
         , hasInputFocus: function NumericTextBox$hasInputFocus() {
             return this._focused;
         }

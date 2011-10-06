@@ -27,7 +27,7 @@ THE SOFTWARE.
     var vsc = Vastardis.UI.Components;
 
     vsc.Component.addValidationAPI = function (component) {
-        $.each(['valid', 'validationContext', 'dispose'], function (index, item) {
+        $.each(['valid', 'validationContext', 'isValidationContextEmpty', 'dispose'], function (index, item) {
             component.prototype['_prototype_' + item] = component.prototype[item];
         });
 
@@ -48,7 +48,7 @@ THE SOFTWARE.
             component[key] = component.__validator[key];
         }
 
-        $.each(['valid', 'validationContext', 'dispose'], function (index, item) {
+        $.each(['valid', 'validationContext', 'isValidationContextEmpty', 'dispose'], function (index, item) {
             var prototypeFunction = '_prototype_' + item;
             component[item] = component[prototypeFunction];
             delete component[prototypeFunction];
@@ -94,22 +94,30 @@ THE SOFTWARE.
             }
             return this._prototype_valid.apply(this, arguments);
         }
-		, validationContext: function Component$validationContext() {
+
+		, isValidationContextEmpty: function (context) {
+		    if (this._prototype_isValidationContextEmpty) {
+		        return this._prototype_isValidationContextEmpty.apply(this, arguments);
+		    } else {
+		        return (context === null || context === '');
+		    }
+		}
+		, validationContext: function () {
 		    ///<summary>
 		    /// A JS object representation of the properties of this component that are needed
 		    /// to test validity.
 		    ///</summary>
-			///<remarks>
-			/// It is the responsibility of the component author to correctly expose a validationContext
-			/// object bag to the validation infrastructure.
-			///</remarks>
-			if (this._prototype_validationContext) {
-				return this._prototype_validationContext.apply(this, arguments);
-			} else {
-				return null;
-			}
+		    ///<remarks>
+		    /// It is the responsibility of the component author to correctly expose a validationContext
+		    /// object bag to the validation infrastructure.
+		    ///</remarks>
+		    if (this._prototype_validationContext) {
+		        return this._prototype_validationContext.apply(this, arguments);
+		    } else {
+		        return null;
+		    }
 		}
-		
+
         , validate: function (/*traversalHistory*/) {
             ///<summary>
             ///
@@ -120,7 +128,7 @@ THE SOFTWARE.
 
             if (this._validationSuspended) {
                 return;
-            } else if (!this.required() && (context === null || context === '')) {
+            } else if (!this.required() && this.isValidationContextEmpty(context)) {
                 // By-pass validation
                 this._computedValidity = true;
                 privateMethods.afterRulesRan.call(this, traversalHistory || [this]);
@@ -158,7 +166,7 @@ THE SOFTWARE.
                     if (this._pendingRules === 0) return;
 
                     this._backList.push({ text: 'Validating...', isAsync: true });
-					privateMethods.trigger_validationApplied.call(this);
+                    privateMethods.trigger_validationApplied.call(this);
                 }, this), ASYNC_GRACE_PERIOD);
             }
 
@@ -236,31 +244,31 @@ THE SOFTWARE.
         }
 
 		, _initializeValidationListeners: function () {
-			var i, n, listener;
-			for (i=0, n=validationListeners.length; i<n; ++i) {
-				listener = validationListeners[i];
-				
-				if (listener.canListen(this)) {
-					this._listeners = this._listeners || [];
-					this._listeners.push(listener.listen(this));
-				}
-			}
+		    var i, n, listener;
+		    for (i = 0, n = validationListeners.length; i < n; ++i) {
+		        listener = validationListeners[i];
+
+		        if (listener.canListen(this)) {
+		            this._listeners = this._listeners || [];
+		            this._listeners.push(listener.listen(this));
+		        }
+		    }
 		}
-		
+
 		, dispose: function () {
-			privateMethods.tearDownValidationListeners.call(this);
-			
+		    privateMethods.tearDownValidationListeners.call(this);
+
 		    return this._prototype_dispose.apply(this, arguments);
 		}
-	};
+    };
 
     var privateMethods = {
-		tearDownValidationListeners: function() {
-			$.each(this._listeners, function() {
-				this.dispose();
-			});
-		}
-		
+        tearDownValidationListeners: function () {
+            $.each(this._listeners, function () {
+                this.dispose();
+            });
+        }
+
 		, ruleCallback: function (result, passId, traversalHistory) {
 		    if (this._passId !== passId) {
 		        return;
@@ -314,34 +322,34 @@ THE SOFTWARE.
 		            }
 		        }, this));
 
-				privateMethods.trigger_validationApplied.call(this);
+		        privateMethods.trigger_validationApplied.call(this);
 		    }
 		}
-		, trigger_validationApplied: function() {
-			$(this).trigger('validationApplied', {
-				messages: this._backList
+		, trigger_validationApplied: function () {
+		    $(this).trigger('validationApplied', {
+		        messages: this._backList
 				, isValid: this._computedValidity
-				/* possibly others */
-			});
+		        /* possibly others */
+		    });
 		}
     }
-	
-	var validationListeners = [];
-	vsc.Component.registerValidationListener = function(listener) {
-		///<summary>
-		/// Adds a Validation Listener to the validation listener registry.
-		/// Validation Listeners perform an action after every execution of the validate function
-		/// Typically, listeners modify the DOM to reflect the invalid state of a component.
-		///</summary>
-		///<param name="listener">
-		/// The Validation Listener to add to the registry
-		/// The listener is a type with the following static methods:
-		///  * canListen(component): determines if the listener is compatible with the given component
-		///  * listen(component): hook unto the validation infrastructure to receive notifications on validation changes
-		///</param>
-		validationListeners.push(listener);
-	}
-	
+
+    var validationListeners = [];
+    vsc.Component.registerValidationListener = function (listener) {
+        ///<summary>
+        /// Adds a Validation Listener to the validation listener registry.
+        /// Validation Listeners perform an action after every execution of the validate function
+        /// Typically, listeners modify the DOM to reflect the invalid state of a component.
+        ///</summary>
+        ///<param name="listener">
+        /// The Validation Listener to add to the registry
+        /// The listener is a type with the following static methods:
+        ///  * canListen(component): determines if the listener is compatible with the given component
+        ///  * listen(component): hook unto the validation infrastructure to receive notifications on validation changes
+        ///</param>
+        validationListeners.push(listener);
+    }
+
     // Validation Rules
     var ValidationRules = {};
 

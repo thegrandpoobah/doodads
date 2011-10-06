@@ -12,7 +12,9 @@
 		sharedHintList,
 		sharedHintBoxActiveTarget = null;
 
-	HintBoxValidationListener = function(component) {
+	var HintBoxValidationListener = function(component) {
+		if (arguments.length === 0) { return; }
+		
 		this.onValidationApplied$proxy = $.proxy(this.onValidationApplied, this);
 		this.onComponentFocus$proxy = $.proxy(this.onComponentFocus, this);
 		this.onComponentBlur$proxy = $.proxy(this.onComponentBlur, this);
@@ -67,7 +69,8 @@
 			}
 		}
 		, onCapturedMouseDown: function HintBoxValidationListener$onCapturedMouseDown(e) {
-            if (e.originalTarget === this._component.validationTarget()[0]) return;
+            var validationTarget = this._component.validationTarget();
+            if (validationTarget && e.originalTarget === validationTarget[0]) return;
 
             this.hideHintBox();
 		}
@@ -146,7 +149,8 @@
 				.unbind('blur', this.onComponentBlur$proxy);
 		}		
 	};
+	HintBoxValidationListener.prototype.constructor = HintBoxValidationListener;
 	
-	$.extend(true, window, { Vastardis: { UI: { Components: { ValidationListeners: { HintBoxValidationListener: HintBoxValidationListener}}}});
+	$.extend(true, window, { Vastardis: { UI: { Components: { ValidationListeners: { HintBoxValidationListener: HintBoxValidationListener}}}}});
 	Vastardis.UI.Components.Component.registerValidationListener(HintBoxValidationListener);
 })(jQuery);
