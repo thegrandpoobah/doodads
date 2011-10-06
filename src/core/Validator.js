@@ -230,7 +230,7 @@ THE SOFTWARE.
             this._validationSuspended = true;
         }
         , resumeValidation: function () {
-            ///<summary>Renables validation code and forces a validation event to run</summary>
+            ///<summary>Re-enables validation code and forces a validation event to run</summary>
             this._validationSuspended = false;
             this.validate();
         }
