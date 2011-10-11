@@ -163,7 +163,7 @@ THE SOFTWARE.
 
             if (hasAsync) {
                 setTimeout($.proxy(function () {
-                    if (this._pendingRules === 0) return;
+                    if (this._pendingRules === 0 || passId !== this._passId) return;
 
                     this._backList.push({ text: 'Validating...', isAsync: true });
                     privateMethods.trigger_validationApplied.call(this);
