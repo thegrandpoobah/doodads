@@ -264,7 +264,7 @@ THE SOFTWARE.
 
     var privateMethods = {
         tearDownValidationListeners: function () {
-            $.each(this._listeners, function () {
+            $.each(this._listeners || [], function () {
                 this.dispose();
             });
         }
