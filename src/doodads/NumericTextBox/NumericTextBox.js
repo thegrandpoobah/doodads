@@ -46,20 +46,21 @@ THE SOFTWARE.
 		, enabled: true
 		, textDecimals: 2
 		, valueDecimals: 4
+        , validationListeners: 'hintbox outline'
     }
 
-    NumericTextBox.DefaultRequiredRule = function () {
-        this.validate = function (content) {
+    NumericTextBox.DefaultRequiredRule = new function () {
+        this.validate = function (context) {
             return {
                 valid: true
             };
         }
     };
 
-    NumericTextBox.DefaultValidationRule = function () {
+    NumericTextBox.DefaultValidationRule = new function () {
         this.validate = function (context, args) {
             return {
-                valid: (args.callee.isValidationContextEmpty(context) && !args.callee.required()) || regexes.Number.test(context)
+                valid: regexes.Number.test(context)
                 , message: 'Please enter a valid number'
             };
         };
@@ -70,10 +71,10 @@ THE SOFTWARE.
             this._input.watermarkingEnabled(false);
 
             if (this._options.validates) {
-                this.addRule(new NumericTextBox.DefaultValidationRule());
+                this.addRule(NumericTextBox.DefaultValidationRule);
 
                 if (this._options.required) {
-                    this.required(true, new NumericTextBox.DefaultRequiredRule());
+                    this.required(true, NumericTextBox.DefaultRequiredRule);
                 }
             }
         }
