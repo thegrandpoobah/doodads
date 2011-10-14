@@ -59,6 +59,7 @@
 		        if (!e.target.ranValidation()) {
 		            e.target.validate();
 		        } else {
+		            this._component = e.target;
 		            this.setHintBoxVisibility();
 		        }
 		    }
@@ -78,7 +79,7 @@
         /* END Event Handlers */
 
 		, setHintBoxVisibility: function HintBoxValidationListener$setHintBoxVisibility(component) {
-		    if (this._component.hasInputFocus() && (this._validationState.messages || []).length > 0) {
+		    if (this._component && this._component.hasInputFocus() && (this._validationState.messages || []).length > 0) {
 		        this.showHintBox();
 		    } else {
 		        this.hideHintBox();
