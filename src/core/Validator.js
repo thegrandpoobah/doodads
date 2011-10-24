@@ -255,6 +255,19 @@ THE SOFTWARE.
 		    }
 		}
 
+        , getValidationListener: function (type) {
+            var listener;
+
+            $.each(this._listeners, function () {
+                if (this instanceof type) {
+                    listener = this;
+                    return false; // break;
+                }
+            });
+
+            return listener;
+        }
+		
 		, dispose: function () {
 		    privateMethods.tearDownValidationListeners.call(this);
 
