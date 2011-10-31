@@ -128,23 +128,19 @@ THE SOFTWARE.
 		, trigger_changed: function() {
 		    $(this).trigger('changed', this._checked);
 		}
-		, onFocus: function(e) {
-		    this._focused = true;
-		    if (this._options.validates) {
-		        if (!this.ranValidation()) {
-		            this.validate();
-		        } else {
-		            this.setHintboxVisibility();
-		        }
-		    }
+		, trigger_focus: function() {
 		    $(this).trigger('focus');
 		}
-        , onBlur: function(e) {
-            if (this._options.validates) {
-                this.hideHintbox();
-            }
+		, trigger_blur: function() {
             $(this).trigger('blur');
+		}
+		, onFocus: function(e) {
+		    this._focused = true;
+			this.trigger_focus();
+		}
+        , onBlur: function(e) {
             this._focused = false;
+			this.trigger_blur();
         }
 		, onClick: function() {
 		    this._checked = this._input[0].checked;

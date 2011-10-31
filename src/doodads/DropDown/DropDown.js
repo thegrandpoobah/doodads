@@ -405,13 +405,7 @@ THE SOFTWARE.
             this._focused = true;
             this._affordance.addClass('tracking');
 
-            if (this._options.validates) {
-                if (!this.ranValidation()) {
-                    this.validate();
-                } else {
-                    this.setHintboxVisibility();
-                }
-            }
+            this.trigger_focus();
         }
         , onBlur: function DropDown$onBlur() {
             this._focused = false;
@@ -420,9 +414,7 @@ THE SOFTWARE.
                 this._affordance.removeClass('tracking');
             }
 
-            if (this._options.validates) {
-                this.hideHintbox();
-            }
+            this.trigger_blur();
         }
 		, onResize: function DropDown$onResize() {
 		    this._updateItemContainer();
@@ -549,6 +541,12 @@ THE SOFTWARE.
 
 		    }
 		}
+        , trigger_focus: function DropDown$trigger_focus() {
+            $(this).trigger('focus');
+        }
+        , trigger_blur: function DropDown$trigger_blur() {
+            $(this).trigger('blur');
+        }
 		, trigger_changing: function DropDown$trigger_changing(currentSelection, newSelection) {
 		    var evt = $.Event('changing');
 		    $(this).trigger(evt, [{
@@ -747,3 +745,4 @@ THE SOFTWARE.
     }
 
 })(jQuery);
+

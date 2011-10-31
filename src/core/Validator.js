@@ -27,7 +27,7 @@ THE SOFTWARE.
     var vsc = Vastardis.UI.Components;
 
     vsc.Component.addValidationAPI = function (component) {
-        $.each(['valid', 'dispose'], function (index, item) {
+        $.each(['valid', 'validationContext', 'isValidationContextEmpty', 'dispose'], function (index, item) {
             component.prototype['_prototype_' + item] = component.prototype[item];
         });
 
@@ -37,7 +37,10 @@ THE SOFTWARE.
         }
 
         $.extend(component.prototype, Validator);
-        $.extend(component.defaultOptions, { validates: true });
+        component.defaultOptions = $.extend({
+            validates: true
+			, validationListeners: 'hintbox'
+        }, component.defaultOptions);
     }
 
     vsc.Component.removeValidationAPI = function (component) {
@@ -45,7 +48,7 @@ THE SOFTWARE.
             component[key] = component.__validator[key];
         }
 
-        $.each(['valid', 'dispose'], function (index, item) {
+        $.each(['valid', 'validationContext', 'isValidationContextEmpty', 'dispose'], function (index, item) {
             var prototypeFunction = '_prototype_' + item;
             component[item] = component[prototypeFunction];
             delete component[prototypeFunction];
@@ -56,10 +59,6 @@ THE SOFTWARE.
     // determines how long the validator waits for an async rule to callback before
     // showing the user a message.
     var ASYNC_GRACE_PERIOD = 100;
-
-    var sharedHintBox,
-		sharedHintList,
-		sharedHintBoxActiveTarget = null;
 
     Validator = {
         addRule: function (value) {
@@ -95,6 +94,30 @@ THE SOFTWARE.
             }
             return this._prototype_valid.apply(this, arguments);
         }
+
+		, isValidationContextEmpty: function (context) {
+		    if (this._prototype_isValidationContextEmpty) {
+		        return this._prototype_isValidationContextEmpty.apply(this, arguments);
+		    } else {
+		        return (context === null || context === '');
+		    }
+		}
+		, validationContext: function () {
+		    ///<summary>
+		    /// A JS object representation of the properties of this component that are needed
+		    /// to test validity.
+		    ///</summary>
+		    ///<remarks>
+		    /// It is the responsibility of the component author to correctly expose a validationContext
+		    /// object bag to the validation infrastructure.
+		    ///</remarks>
+		    if (this._prototype_validationContext) {
+		        return this._prototype_validationContext.apply(this, arguments);
+		    } else {
+		        return null;
+		    }
+		}
+
         , validate: function (/*traversalHistory*/) {
             ///<summary>
             ///
@@ -105,7 +128,7 @@ THE SOFTWARE.
 
             if (this._validationSuspended) {
                 return;
-            } else if (!this.required() && (context === null || context === '')) {
+            } else if (!this.required() && this.isValidationContextEmpty(context)) {
                 // By-pass validation
                 this._computedValidity = true;
                 privateMethods.afterRulesRan.call(this, traversalHistory || [this]);
@@ -123,7 +146,6 @@ THE SOFTWARE.
                 privateMethods.ruleCallback.call(this, result, passId, traversalHistory || [this]);
             }, this);
 
-
             $.each(this._rules || [], $.proxy(function (index, rule) {
                 var result = rule.validate(context, {
                     computedValidity: this._computedValidity,
@@ -133,7 +155,7 @@ THE SOFTWARE.
                 });
 
                 if (!result.async) {
-                    privateMethods.ruleCallback.call(this, result, this._passId, traversalHistory || [this]);
+                    callback(result);
                 } else {
                     hasAsync = true;
                 }
@@ -141,11 +163,10 @@ THE SOFTWARE.
 
             if (hasAsync) {
                 setTimeout($.proxy(function () {
-                    if (this._pendingRules === 0) return;
+                    if (this._pendingRules === 0 || passId !== this._passId) return;
 
                     this._backList.push({ text: 'Validating...', isAsync: true });
-                    privateMethods.prepareHintbox.call(this);
-                    this.setHintboxVisibility();
+                    privateMethods.trigger_validationApplied.call(this);
                 }, this), ASYNC_GRACE_PERIOD);
             }
 
@@ -217,55 +238,50 @@ THE SOFTWARE.
             this._validationSuspended = true;
         }
         , resumeValidation: function () {
-            ///<summary>Renables validation code and forces a validation event to run</summary>
+            ///<summary>Re-enables validation code and forces a validation event to run</summary>
             this._validationSuspended = false;
             this.validate();
         }
 
-		, setHintboxVisibility: function () {
-		    if (this.hasInputFocus() && (this._backList || []).length > 0) {
-		        this.showHintbox();
-		    } else {
-		        this.hideHintbox();
+		, _initializeValidationListeners: function () {
+		    var i, n, listener;
+		    for (i = 0, n = validationListeners.length; i < n; ++i) {
+		        listener = validationListeners[i];
+
+		        if (listener.canListen(this)) {
+		            this._listeners = this._listeners || [];
+		            this._listeners.push(listener.listen(this));
+		        }
 		    }
 		}
-        , showHintbox: function () {
-            var target = this.validationTarget();
 
-            if (!target || sharedHintBoxActiveTarget === target) return;
+        , getValidationListener: function (type) {
+            var listener;
 
-            sharedHintBoxActiveTarget = target;
-            privateMethods.prepareHintbox.call(this);
+            $.each(this._listeners, function () {
+                if (this instanceof type) {
+                    listener = this;
+                    return false; // break;
+                }
+            });
 
-            privateMethods.hintBox.call(this).show(target,
-                this._options.hintBoxOrientation || 'bottom right',
-                this._options.hintBoxDirection || 'down right');
-
-            captureEvent('mousedown', this.element(), $.proxy(privateMethods.onCapturedMouseDown, this));
+            return listener;
         }
-        , hideHintbox: function () {
-            var target = this.validationTarget();
-
-            if (!target || sharedHintBoxActiveTarget !== target) return;
-
-            sharedHintBoxActiveTarget = null;
-
-            privateMethods.hintBox.call(this).hide();
-
-            releaseEvent('mousedown');
-        }
-
+		
 		, dispose: function () {
+		    privateMethods.tearDownValidationListeners.call(this);
+
 		    return this._prototype_dispose.apply(this, arguments);
 		}
     };
 
     var privateMethods = {
-        onCapturedMouseDown: function (e) {
-            if (e.originalTarget === this.validationTarget()[0]) return;
-
-            this.hideHintbox();
+        tearDownValidationListeners: function () {
+            $.each(this._listeners || [], function () {
+                this.dispose();
+            });
         }
+
 		, ruleCallback: function (result, passId, traversalHistory) {
 		    if (this._passId !== passId) {
 		        return;
@@ -319,39 +335,32 @@ THE SOFTWARE.
 		            }
 		        }, this));
 
-		        privateMethods.prepareHintbox.call(this);
-		        this.setHintboxVisibility();
+		        privateMethods.trigger_validationApplied.call(this);
 		    }
 		}
-		, prepareHintbox: function () {
-		    var target = this.validationTarget();
-
-		    if (!target || sharedHintBoxActiveTarget !== target) return;
-
-		    privateMethods.hintList.call(this).dataSource(this._backList);
-		    // set the color
-		    if (this._backList.length > 0) {
-		        if (this._computedValidity) {
-		            privateMethods.hintBox.call(this).element().addClass('infobox');
-		        } else {
-		            privateMethods.hintBox.call(this).element().removeClass('infobox');
-		        }
-		    }
+		, trigger_validationApplied: function () {
+		    $(this).trigger('validationApplied', {
+		        messages: this._backList
+				, isValid: this._computedValidity
+		        /* possibly others */
+		    });
 		}
-        , hintList: function () {
-            if (!sharedHintList) {
-                sharedHintList = vsc.ComponentFactory2.create('/Components/List.component', { cssClass: 'hintlist' });
-                privateMethods.hintBox.call(this).addChild(sharedHintList);
-            }
-            return sharedHintList;
-        }
-        , hintBox: function () {
-            if (!sharedHintBox) {
-                sharedHintBox = vsc.ComponentFactory2.create('/Components/HintBox.component');
-                sharedHintBox.render($(document.body));
-            }
-            return sharedHintBox;
-        }
+    }
+
+    var validationListeners = [];
+    vsc.Component.registerValidationListener = function (listener) {
+        ///<summary>
+        /// Adds a Validation Listener to the validation listener registry.
+        /// Validation Listeners perform an action after every execution of the validate function
+        /// Typically, listeners modify the DOM to reflect the invalid state of a component.
+        ///</summary>
+        ///<param name="listener">
+        /// The Validation Listener to add to the registry
+        /// The listener is a type with the following static methods:
+        ///  * canListen(component): determines if the listener is compatible with the given component
+        ///  * listen(component): hook unto the validation infrastructure to receive notifications on validation changes
+        ///</param>
+        validationListeners.push(listener);
     }
 
     // Validation Rules

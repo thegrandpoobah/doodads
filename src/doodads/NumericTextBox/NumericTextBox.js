@@ -41,25 +41,26 @@ THE SOFTWARE.
 
     NumericTextBox.defaultOptions = {
         value: null
-        , required: true
+        , required: false
 		, showStar: false
 		, enabled: true
 		, textDecimals: 2
 		, valueDecimals: 4
+        , validationListeners: 'hintbox outline'
     }
 
-    NumericTextBox.DefaultRequiredRule = function () {
-        this.validate = function (content) {
+    NumericTextBox.DefaultRequiredRule = new function () {
+        this.validate = function (context) {
             return {
                 valid: true
             };
         }
     };
 
-    NumericTextBox.DefaultValidationRule = function (ctx) {
-        this.validate = function (content) {
+    NumericTextBox.DefaultValidationRule = new function () {
+        this.validate = function (context, args) {
             return {
-                valid: (content === null && !ctx.required()) || regexes.Number.test(content)
+                valid: regexes.Number.test(context)
                 , message: 'Please enter a valid number'
             };
         };
@@ -70,10 +71,10 @@ THE SOFTWARE.
             this._input.watermarkingEnabled(false);
 
             if (this._options.validates) {
-                this.addRule(new NumericTextBox.DefaultValidationRule(this));
+                this.addRule(NumericTextBox.DefaultValidationRule);
 
                 if (this._options.required) {
-                    this.required(true, new NumericTextBox.DefaultRequiredRule());
+                    this.required(true, NumericTextBox.DefaultRequiredRule);
                 }
             }
         }
@@ -190,6 +191,9 @@ THE SOFTWARE.
 		, validationContext: function NumericTextBox$validationContext() {
 		    return this.val();
 		}
+        , isValidationContextEmpty: function NumericTextBox$isValidationContextEmpty(context) {
+            return this._input.text().trim() === '';
+        }
         , hasInputFocus: function NumericTextBox$hasInputFocus() {
             return this._focused;
         }
@@ -205,26 +209,18 @@ THE SOFTWARE.
 		, onFocus: function NumericTextBox$onFocus(e) {
 		    this._focused = true;
 
-		    if (this._options.validates) {
-		        if (!this.ranValidation()) {
-		            this.validate();
-		        } else {
-		            this.setHintboxVisibility();
-		        }
-		    }
-
 		    this._updateTextBox();
 
 		    this._input._input.select();
+
+		    this.trigger_focus();
 		}
 		, onBlur: function NumericTextBox$onBlur(e) {
 		    this._focused = false;
 
-		    if (this._options.validates) {
-		        this.hideHintbox();
-		    }
-
 		    this._updateTextBox();
+
+		    this.trigger_blur();
 		}
 		, onChanging: function NumericTextBox$onChanging(e) {
 		    this._computeVal();
@@ -264,6 +260,12 @@ THE SOFTWARE.
         }
 
         /* BEGIN Event Dispatch */
+        , trigger_focus: function NumericTextBox$trigger_focus() {
+            $(this).trigger('focus');
+        }
+        , trigger_blur: function NumericTextBox$trigger_blur() {
+            $(this).trigger('blur');
+        }
         , trigger_changing: function NumericTextBox$trigger_changing() {
             $(this).trigger('changing');
         }

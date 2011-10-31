@@ -756,6 +756,10 @@ THE SOFTWARE.
                 // create a two-way relationship between the component and the DOM
                 this._source.data(DOMCOMPONENTMETA, this);
 
+				if (this._options.validates) {
+					this._initializeValidationListeners();
+				}
+				
                 this.onComponentReady();
             }
         }
@@ -1047,21 +1051,6 @@ THE SOFTWARE.
 		    } else {
 		        this.trigger_invalid(this);
 		    }
-		}
-		, validationContext: function Component$validationContext() {
-		    ///<summary>
-		    /// A JS object representation of the properties of this component that are needed
-		    /// to test validity.
-		    ///</summary>
-		    return null;
-		}
-		, validationTarget: function Component$validationTarget() {
-		    ///<summary>
-		    /// Returns the DOM element that acts as the user-visible validation site.
-		    /// The validation infrastructure will use this DOM element to show hints/notes
-		    /// to the end user about why the component is in an invalid state.
-		    ///</summary>
-		    return this.element();
 		}
         , _computeValidityState: function Component$_computeValidityState() {
             ///<summary>
