@@ -73,7 +73,7 @@ THE SOFTWARE.
 		}		
 	};
 
-	function doodadConstructor(name) {
+	function builder(name) {
 		this.name = name;
 		this.setupObject = {
 			base: null,
@@ -87,7 +87,7 @@ THE SOFTWARE.
 			statics: {}
 		};
 	}
-	doodadConstructor.prototype = {
+	builder.prototype = {
 		inheritsFrom: function(inheritsFrom) {
 			this.setupObject.base = inheritsFrom;
 			
@@ -194,7 +194,7 @@ THE SOFTWARE.
 				return constructionCache[name];
 			}
 			
-			var constructor = new doodadConstructor(name);
+			var constructor = new builder(name);
 			
 			definition = $.extend({
 				inheritsTemplates: false,
