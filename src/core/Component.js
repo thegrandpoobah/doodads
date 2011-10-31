@@ -537,7 +537,7 @@ THE SOFTWARE.
 
 				asyncCreationDfd = $.Deferred();
 				if ($componentElement.attr('url')) {
-					vsc.ComponentFactory2.createAsync($componentElement.attr('url'), options)
+					doodads.create($componentElement.attr('url'), options)
 						.done(function(result) {
 							asyncCreationDfd.resolve(result);
 						});
@@ -1193,7 +1193,7 @@ THE SOFTWARE.
         ///<param name="url" type="String">The URL to load the Component from.</param>
         ///<param name="options" type="Object" mayBeNull="true" optional="true">The options to initialize the component with</param>
         ///<returns type="Vastardis.UI.Components.Component" />
-        return Vastardis.UI.Components.ComponentFactory2.create(url, options);
+        return doodads.create(url, options);
     }
 
     Component.measureString = function (string, styles) {
@@ -1237,17 +1237,4 @@ THE SOFTWARE.
                 return components;
         }
     }
-
-/*
-    doodads.setup = function(base, defaultOptions, definition) {
-        var init = definition.init;
-        delete definition.init;
-        var obj = function() {
-            init.apply(this, arguments);
-        }
-        obj.defaultOptions = defaultOptions;
-        obj.prototype = $.extend(new base.constructor(), obj);
-        return obj;   
-    }
-*/    
 })(jQuery);
