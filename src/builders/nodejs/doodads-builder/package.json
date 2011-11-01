@@ -1,0 +1,11 @@
+{ 
+	"name" : "doodads-builder",
+	"description" : "Doodads builder",
+	"version" : "1.0.0",
+	"author" : "Kiro Risk <kirollos@gmail.com>",
+	"contributors" : [
+		"Sahab Yazdani <s@s.com>"
+	],
+	"main" : "./builder.js",
+	"engine": "node >= 0.4.1"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "doodads-builder-test",
+  "description" : "Test doodads builder",
+  "version": "1.0.0",
+  "author": "Kirollos Risk",
+  "dependencies": {
+    "express": "2.4.7"
+  }
+}

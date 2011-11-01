@@ -1,0 +1,11 @@
+{
+	"behavior": "./TestDoodad/TestDoodad.js",
+	"templates": {
+		"base": "./TestDoodad/TestDoodad.html",
+		"partials": [
+			{ "name": "something", "path": "./TestDoodad/TestDoodad.html" } 
+		]
+	}
+}
+
+

@@ -1,0 +1,42 @@
+var sys = require("sys"),  
+    http = require("http"),  
+    url = require("url"),  
+    path = require("path"),  
+    fs = require("fs"),
+
+	express = require("express"),
+    doodads = require('../../../src/builders/nodejs/doodads-builder');
+
+var	app = express.createServer();
+
+app.use(express.bodyParser());
+app.use("/javascript", express.static(__dirname + '/javascript'));
+app.use("/stylesheet", express.static(__dirname + '/stylesheet'));
+app.set("view options", { layout: false });
+
+app.get('/', function(req, res){
+	res.render(__dirname + '/index.html', { layout: false });
+});
+
+app.register('.html', {
+	compile: function(str, options){
+		return function(locals){
+			return str;
+		};
+	}
+});
+
+
+var builder = new doodads.Builder(__dirname);
+app.get('*.doodad', function(req, res){
+	builder.build(req, function (content) {
+        res.writeHead(200, {'Content-Type' : 'text/html'});
+        res.end(content);
+	});
+});
+
+var port = process.env.PORT || 8080;
+
+app.listen(port, function() {
+  console.log("Listening on " + port);
+}); 	

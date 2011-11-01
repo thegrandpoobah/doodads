@@ -22,56 +22,57 @@ THE SOFTWARE.
 */
 (function($, undefined) {
 	var canonicalizationDiv = null,
-		typeCache = {},
-		waitFunctionCache = {},
-		constructionCache = {};
-	
-	var utils = {
-		getResponseFunc: function(url) {
-			return (waitFunctionCache[utils.canonicalize(url)] || { func : $.noop }).func;
+		cache = {
+			types: {},
+			waitFunctions: {},
+			constructions: {}
 		},
-		canonicalize: function ComponentFactory$canonicalize(url) {
-			///<summary>
-			/// Creates a absolute url out of the passed in url.
-			///</summary>
-			///<param name="url" type="String">The URL to canonicalize.</param>
-			///<remarks>
-			/// from http://grack.com/blog/2009/11/17/absolutizing-url-in-javascript/ by Matt Mastracci
-			/// CC by Attribution 3.0
-			/// adapted to use one time lazy initialization.
-			///</remarks>
-			if (!canonicalizationDiv) {
-				canonicalizationDiv = document.createElement('div');
-			}
+		utils = {
+			getResponseFunc: function(url) {
+				return (cache.waitFunctions[utils.canonicalize(url)] || { func : $.noop }).func;
+			},
+			canonicalize: function ComponentFactory$canonicalize(url) {
+				///<summary>
+				/// Creates a absolute url out of the passed in url.
+				///</summary>
+				///<param name="url" type="String">The URL to canonicalize.</param>
+				///<remarks>
+				/// from http://grack.com/blog/2009/11/17/absolutizing-url-in-javascript/ by Matt Mastracci
+				/// CC by Attribution 3.0
+				/// adapted to use one time lazy initialization.
+				///</remarks>
+				if (!canonicalizationDiv) {
+					canonicalizationDiv = document.createElement('div');
+				}
 
-			var div = canonicalizationDiv;
-			div.innerHTML = '<a></a>';
-			div.firstChild.href = url; // Ensures that the href is properly escaped
-			div.innerHTML = div.innerHTML; // Run the current innerHTML back through the parser
-			return div.firstChild.href;
-		},
-		require: function(url) {
-			var canonUrl = utils.canonicalize(url);
+				var div = canonicalizationDiv;
+				div.innerHTML = '<a></a>';
+				div.firstChild.href = url; // Ensures that the href is properly escaped
+				div.innerHTML = div.innerHTML; // Run the current innerHTML back through the parser
+				return div.firstChild.href;
+			},
+			require: function(url) {
+				var canonUrl = utils.canonicalize(url);
 
-			if (waitFunctionCache[canonUrl]) {
-				return waitFunctionCache[canonUrl].dfd.promise();
-			} else {
-				waitFunctionCache[canonUrl] = {
-					func: function(type) {
-						var dfd = waitFunctionCache[canonUrl].dfd;
-						typeCache[canonUrl] = type;
-						delete waitFunctionCache[canonUrl];
-						dfd.resolve();
-					},
-					dfd: $.Deferred()
-				};
+				if (cache.waitFunctions[canonUrl]) {
+					return cache.waitFunctions[canonUrl].dfd.promise();
+				} else {
+					cache.waitFunctions[canonUrl] = {
+						func: function(type) {
+							var dfd = cache.waitFunctions[canonUrl].dfd;
+							cache.types[canonUrl] = type;
+							delete cache.waitFunctions[canonUrl];
+							dfd.resolve();
+						},
+						dfd: $.Deferred()
+					};
 
-				yepnope(canonUrl);
-			
-				return waitFunctionCache[canonUrl].dfd.promise();
-			}
-		}		
-	};
+					yepnope(canonUrl);
+				
+					return cache.waitFunctions[canonUrl].dfd.promise();
+				}
+			}		
+		};
 
 	function builder(name) {
 		this.name = name;
@@ -183,15 +184,15 @@ THE SOFTWARE.
 
 				// after everything is done..
 				utils.getResponseFunc(name)(new_doodad);
-				delete constructionCache[name];
+				delete cache.constructions[name];
 			});
 		}
 	}
 	
 	doodads = {
 		setup: function(name, definition) {
-			if (constructionCache[name]) {
-				return constructionCache[name];
+			if (cache.constructions[name]) {
+				return cache.constructions[name];
 			}
 			
 			var constructor = new builder(name);
@@ -202,14 +203,16 @@ THE SOFTWARE.
 				stylesheets: null,
 				validates: false
 			}, definition);
+
 			if (definition.validates) {
 				constructor.validates();
 			}
+
 			constructor
 				.templates(definition.templates, definition.inheritsTemplates)
 				.stylesheets(definition.stylesheets);
 			
-			constructionCache[name] = constructor;
+			cache.constructions[name] = constructor;
 			
 			return constructor;
 		},		
@@ -230,7 +233,7 @@ THE SOFTWARE.
 			return dfd.promise();
 		},
 		getType: function(url) {
-			return typeCache[utils.canonicalize(url)];
+			return cache.types[utils.canonicalize(url)];
 		}
 	};
 })(jQuery);
