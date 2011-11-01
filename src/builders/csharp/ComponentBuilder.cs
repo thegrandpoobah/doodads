@@ -183,6 +183,29 @@ namespace Vastardis.UI.Components
                     fields.Add(templateOutput.ToString());
                 }
 
+                if (c.stylesheets != null)
+                {
+                    List<string> styleSet = new List<string>();
+
+                    foreach (componentStylesheet cssDep in c.stylesheets)
+                    {
+                        string path = context.Server.MapPath(cssDep.path);
+                        if (File.Exists(path))
+                        {
+                            context.Response.AddFileDependency(path);
+                            styleSet.Add(string.Format("{0}: {1}", serializer.Serialize(VirtualPathUtility.ToAbsolute(cssDep.path)), serializer.Serialize(File.ReadAllText(path))));
+                        }
+#if DEBUG
+                        else
+                        {
+                            output.AppendFormat("\n/* WARNING: Stylesheet \"{0}\" not found. */\n", cssDep.path);
+                        }
+#endif
+                    }
+
+                    fields.Add(string.Format("stylesheets: {{ {0} }}", string.Join(",", styleSet.ToArray())));
+                }
+
                 output.Append(string.Join(",", fields.ToArray()));
                 output.AppendLine("});");
 

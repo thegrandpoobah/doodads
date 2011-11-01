@@ -22,10 +22,12 @@ THE SOFTWARE.
 */
 (function($, undefined) {
 	var canonicalizationDiv = null,
+		headDom = null,
 		cache = {
 			types: {},
 			waitFunctions: {},
-			constructions: {}
+			constructions: {},
+			stylesheets: {}
 		},
 		utils = {
 			getResponseFunc: function(url) {
@@ -71,7 +73,43 @@ THE SOFTWARE.
 				
 					return cache.waitFunctions[canonUrl].dfd.promise();
 				}
-			}		
+			},
+			addStylesheet: function(url, byteStream) {
+				///<summary>
+				/// Associates a stylesheet with a given url, adding the stylesheet to the DOM.
+				///</summary>
+				///<param name="url" type="String">The URL to associate the stylesheet with.</param>
+				///<param name="byteStream" type="String">The CSS stylessheet to add to the DOM</param>
+				url = utils.canonicalize(url);
+
+				if (cache.stylesheets[url]) {
+					return;
+				}
+
+				cache.stylesheets[url] = true;
+
+				if (!headDom) {
+					headDom = $('head', document);
+				}
+
+				if ($.browser.msie) {
+					var joinedResult,
+						style$ = $('style#__componentInfrastructure', headDom);
+
+					if (style$.length !== 0) {
+						joinedResult = style$.data('stylesheets') + '\n' + byteStream;
+						style$.remove();
+					} else {
+						joinedResult = byteStream;
+					}
+
+					$('<style id="__componentInfrastructure" type="text/css">' + joinedResult + '</style>')
+						.data('stylesheets', joinedResult)
+						.appendTo(headDom);
+				} else {
+					headDom.append('<style type="text/css">' + byteStream + '</style>');
+				}			
+			}
 		};
 
 	function builder(name) {
@@ -154,6 +192,7 @@ THE SOFTWARE.
 			}
 			
 			baseDfd.promise().done(function(baseType) {
+				var key;
 				var new_doodad = function(options, defaultOptions) {
 					if (arguments.length === 0) { return; }
 					
@@ -176,12 +215,18 @@ THE SOFTWARE.
 					Vastardis.UI.Components.Component.addValidationAPI(new_doodad);
 				}
 				
-				for (var key in setupObject.statics) {
+				for (key in setupObject.statics) {
 					if (setupObject.statics.hasOwnProperty(key)) {
 						new_doodad[key] = setupObject.statics[key];
 					}
 				}
 
+				for (key in setupObject.stylesheets) {
+					if (setupObject.stylesheets.hasOwnProperty(key)) {
+						utils.addStylesheet(key, setupObject.stylesheets[key]);
+					}
+				}
+				
 				// after everything is done..
 				utils.getResponseFunc(name)(new_doodad);
 				delete cache.constructions[name];
