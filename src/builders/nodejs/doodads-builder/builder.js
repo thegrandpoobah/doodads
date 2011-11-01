@@ -46,19 +46,19 @@ builder.prototype.build = function(req, callback) {
 		} else {
 			var baseTmplBuffer = fs.readFileSync(this.dir + definition.templates.base);
 			baseTmpl = JSON.stringify(baseTmplBuffer.toString());
+			delete definition.templates.base;
 		}
 		templateOuput.push("base : " + baseTmpl);
 
 		// Partials
-		if (definition.templates.partials) {
-			for (var i = 0, len = definition.templates.partials.length; i < len; i++) {
-				var partialTmpl = definition.templates.partials[i],
-					partialTmplBuffer = fs.readFileSync(this.dir + partialTmpl.path),
-					partialTmplString = JSON.stringify(partialTmplBuffer.toString());
+		for (var key in definition.templates) {
+			var partialTmplPath = definition.templates[key],
+				partialTmplBuffer = fs.readFileSync(this.dir + partialTmplPath),
+				partialTmplString = JSON.stringify(partialTmplBuffer.toString());
 
-				templateOuput.push(", " + partialTmpl.name + " : " + partialTmplString + "\n");
-			}
+			templateOuput.push(", \"" + key + "\" : " + partialTmplString + "\n");
 		}
+
 		templateOuput.push("}");
 		fields.push(templateOuput.join(""));
 	}
@@ -66,7 +66,9 @@ builder.prototype.build = function(req, callback) {
 	output.push(fields.join(','));
 	output.push("});");
 
-	callback(output.join('\n'));
+	var result = output.join('\n')
+
+	callback(result);
 }
 
 exports.Builder = builder;
