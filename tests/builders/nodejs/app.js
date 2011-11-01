@@ -4,9 +4,21 @@ var sys = require("sys"),
     path = require("path"),  
     fs = require("fs"),
 
-	express = require("express"),
+	//express = require("express"),
     doodads = require('../../../src/builders/nodejs/doodads-builder');
 
+
+
+var builder = new doodads.Builder(__dirname);
+var req =  {
+	params: ['TestDoodad'],
+	originalUrl: '/TestDoodad.doodad'
+}
+builder.build(req, function (content) {
+    console.log(content);
+});
+
+/*
 var	app = express.createServer();
 
 app.use(express.bodyParser());
@@ -26,7 +38,6 @@ app.register('.html', {
 	}
 });
 
-
 var builder = new doodads.Builder(__dirname);
 app.get('*.doodad', function(req, res){
 	builder.build(req, function (content) {
@@ -40,3 +51,4 @@ var port = process.env.PORT || 8080;
 app.listen(port, function() {
   console.log("Listening on " + port);
 }); 	
+*/
