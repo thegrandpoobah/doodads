@@ -5,7 +5,7 @@ var sys = require("sys"),
     fs = require("fs"),
 
 	express = require("express"),
-    doodads = require('../../../src/builders/nodejs/doodads-builder');
+    doodads = require('../doodads-builder');
 
 /*
 var builder = new doodads.Builder(__dirname);
