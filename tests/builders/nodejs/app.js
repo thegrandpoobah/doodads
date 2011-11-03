@@ -24,6 +24,7 @@ app.use(express.bodyParser());
 app.use("/javascript", express.static(__dirname + '/javascript'));
 app.use("/stylesheet", express.static(__dirname + '/stylesheet'));
 app.set("view options", { layout: false });
+app.use("/views", express.static(__dirname + '/public/views', { maxAge: 86400000 }));
 
 app.get('/', function(req, res){
 	res.render(__dirname + '/index.html', { layout: false });
@@ -40,7 +41,7 @@ app.register('.html', {
 var builder = new doodads.Builder(__dirname);
 app.get('*.doodad', function(req, res){
 	builder.build(req, function (content) {
-        res.writeHead(200, {'Content-Type' : 'text/html'});
+        res.writeHead(200, {'Content-Type' : 'text/html', 'Cache-Control' : "max-age=2592000, must-revalidate"});
         res.end(content);
 	});
 });
