@@ -6,3 +6,4 @@ tests/builders/csharp/bin
 tests/builders/csharp/obj
 tests/builders/csharp/JavaScript/*
 tests/builders/csharp/Doodads.Builder.Test.csproj.user
+tests/builders/nodejs/javascript/*

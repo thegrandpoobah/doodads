@@ -29,4 +29,7 @@ THE SOFTWARE.
   <templates>
     <base path="~/TestDoodad/TestDoodad.html"/>
   </templates>
+  <stylesheets>
+    <stylesheet path="~/TestDoodad/TestDoodad.css"/>
+  </stylesheets>
 </component>

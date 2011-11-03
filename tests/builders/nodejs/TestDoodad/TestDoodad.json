@@ -5,7 +5,7 @@
 		"something": "./TestDoodad/TestDoodad.html"
 	},
 	"stylesheets": [
-    	"./TestDoodad/TestDoodad.css",
+    	"/TestDoodad/TestDoodad.css"
   	]
 }
 

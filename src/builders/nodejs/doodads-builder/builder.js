@@ -14,12 +14,13 @@ builder.prototype.build = function(req, callback) {
 	output.push("doodads.setup('" + originalUrl + "', definition);");
 
 	// definition
-	var definitionBuffer = fs.readFileSync(this.dir + '/' + name + '/' + name + '.json');
-	var definition = JSON.parse(definitionBuffer.toString());
+	var definitionBuffer = fs.readFileSync(this.dir + '/' + name + '/' + name + '.json'),
+		definition = JSON.parse(definitionBuffer.toString());
 
 	// Behavior
-	var behaviourBuffer = fs.readFileSync(self.dir + definition.behavior);
-	var behaviourString = behaviourBuffer.toString();
+	var behaviourBuffer = fs.readFileSync(self.dir + definition.behavior),
+		behaviourString = behaviourBuffer.toString();
+
 	behaviourString = behaviourString.replace(/doodads\s*\.\s*setup\(\)/g, "doodads.setup('" + originalUrl + "')");
 
 	output.push(behaviourString);
@@ -36,8 +37,10 @@ builder.prototype.build = function(req, callback) {
 
 	// Templates
 	if (definition.templates) {
-		var templateOuput = [];
-		templateOuput.push("templates: {");
+		var templateOutput = [],
+			partials = [];
+
+		templateOutput.push("templates: {");
 
 		// Base
 		var baseTmpl;
@@ -48,7 +51,7 @@ builder.prototype.build = function(req, callback) {
 			baseTmpl = JSON.stringify(baseTmplBuffer.toString());
 			delete definition.templates.base;
 		}
-		templateOuput.push("base : " + baseTmpl);
+		templateOutput.push("base : " + baseTmpl);
 
 		// Partials
 		for (var key in definition.templates) {
@@ -56,11 +59,36 @@ builder.prototype.build = function(req, callback) {
 				partialTmplBuffer = fs.readFileSync(this.dir + partialTmplPath),
 				partialTmplString = JSON.stringify(partialTmplBuffer.toString());
 
-			templateOuput.push(", \"" + key + "\" : " + partialTmplString + "\n");
+			partials.push("\"" + key + "\" : " + partialTmplString + "\n");
 		}
 
-		templateOuput.push("}");
-		fields.push(templateOuput.join(""));
+		if (partials.length > 0) {
+			templateOutput.push(',');
+			templateOutput.push(partials.join(','));
+		}
+		templateOutput.push("}");
+		fields.push(templateOutput.join(""));
+	}
+
+	// Stylesheets
+	if (definition.stylesheets) {
+		var stylesheetsOutput = [];
+			stylesheets = [];
+
+		stylesheetsOutput.push("stylesheets: {");
+
+		for (var i = 0, len = definition.stylesheets.length; i < len; i++) {
+			var stylesheetPath = definition.stylesheets[i],
+				stylesheetBuffer = fs.readFileSync(this.dir + stylesheetPath),
+				stylesheetString = JSON.stringify(stylesheetBuffer.toString());
+			
+			stylesheets.push(JSON.stringify(stylesheetPath) + " : " + stylesheetString + "\n");					
+		}
+
+		
+		stylesheetsOutput.push(stylesheets.join(','));
+		stylesheetsOutput.push("}");
+		fields.push(stylesheetsOutput.join(""));
 	}
 
 	output.push(fields.join(','));

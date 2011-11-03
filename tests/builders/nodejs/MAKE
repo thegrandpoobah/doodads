@@ -1,0 +1,5 @@
+cp ../../../output/doodads.js javascript
+cp ../../../src/support/* javascript
+
+# run node application
+node app.js
