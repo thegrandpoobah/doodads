@@ -1,9 +1,8 @@
-csharp/*.suo
 output/*
-src/builders/csharp/obj
 support/*
-tests/builders/csharp/bin
-tests/builders/csharp/obj
-tests/builders/csharp/JavaScript/*
-tests/builders/csharp/Doodads.Builder.Test.csproj.user
+builders/csharp/**/obj
+builders/csharp/**/bin
+builders/csharp/*.suo
+builders/csharp/**/*.user
+builders/csharp/Doodads.Builder.Test/JavaScript/*
 tests/builders/nodejs/javascript

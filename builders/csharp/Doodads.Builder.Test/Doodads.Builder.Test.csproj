@@ -83,7 +83,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\builders\csharp\Doodads.Builder.csproj">
+    <ProjectReference Include="..\Doodads.Builder\Doodads.Builder.csproj">
       <Project>{FE43FFFC-6001-4063-AADA-B31C586B2E95}</Project>
       <Name>Doodads.Builder</Name>
     </ProjectReference>
