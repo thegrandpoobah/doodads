@@ -59,6 +59,7 @@ THE SOFTWARE.
         this._tabIndex = this._options.tabIndex;
         this._isAttached = false;
         this._isValid = true;
+		this._disposing = false;
 
         this._listenToChildrenValidity = true;
 
@@ -261,16 +262,16 @@ THE SOFTWARE.
             /// is effectively a noop.
             ///</summary>
             ///<param name="component">The component to remove from the children list</param>
-            var found = false;
-
-            var invalidCount = 0;
+            var found = false,
+                disposing = this._disposing,
+                invalidCount = 0;
 
             this._children = $.map(this._children, function (c, index) {
                 if (c === child) {
                     found = true;
                     return null;
                 } else {
-                    if (!c.valid()) invalidCount++;
+                    if (!disposing && !c.valid()) invalidCount++;
                     return c;
                 }
             });
@@ -278,7 +279,7 @@ THE SOFTWARE.
             if (found) {
                 child.parent(null);
 
-                if (invalidCount === 0 && this.listenToChildrenValidity()) {
+                if (!disposing && invalidCount === 0 && this.listenToChildrenValidity()) {
                     this._valid(true);
                 }
             }
@@ -1156,7 +1157,8 @@ THE SOFTWARE.
             /// Note that the fragment removed from the DOM is not actually disposed until 
             /// after the Garbage Collector gets around to it.
             ///</remarks>
-
+            this._disposing = true;
+			
             this.tearDownComponents();
 
             if (!this._isResizeAutotriggered()) {
