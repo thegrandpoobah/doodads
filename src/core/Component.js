@@ -133,7 +133,7 @@ THE SOFTWARE.
                 this._id = arguments[0];
                 this._setDomId();
 
-                $.each(this._children, $.proxy(function (index, child) {
+                $.each(this.children(), $.proxy(function (index, child) {
                     child.parent(this);
                 }, this));
             }
@@ -174,10 +174,14 @@ THE SOFTWARE.
 
             this._hookWindowResize();
 
-            $.each(this._children, function (index, child) {
+            $.each(this.children(), function (index, child) {
                 child._refreshParent();
             });
         }
+		
+		, children: function Component$children() {
+			return this._children || [];
+		}
 
         , parent: function Component$parent(/*[newParent]*/) {
             ///<summary>
@@ -221,7 +225,7 @@ THE SOFTWARE.
             ///</summary>
             ///<returns>True if the component is a child, false otherwise</returns>
             var found = false;
-            $.each(this._children, function (index, c) {
+            $.each(this.children(), function (index, c) {
                 if (c === child) {
                     found = true;
                     return false;
@@ -804,7 +808,7 @@ THE SOFTWARE.
 
             this.onAttached();
 
-            $.each(this._children, function (index, child) {
+            $.each(this.children(), function (index, child) {
                 child._notifyAttachment();
             });
         }
@@ -813,7 +817,7 @@ THE SOFTWARE.
 
             this.onDetached();
 
-            $.each(this._children, function (index, child) {
+            $.each(this.children(), function (index, child) {
                 child._notifyDetachment();
             });
         }
@@ -922,7 +926,7 @@ THE SOFTWARE.
                 this.onResize();
             }
 
-            $.each(this._children, function (index, child) {
+            $.each(this.children(), function (index, child) {
                 child._onResize();
             });
         }
@@ -1031,7 +1035,7 @@ THE SOFTWARE.
             var isValid = true;
 
             if (this.listenToChildrenValidity()) {
-                $.each(this._children, function (index, child) {
+                $.each(this.children(), function (index, child) {
                     if (!child.valid()) {
                         isValid = false;
                         return false;
@@ -1096,7 +1100,7 @@ THE SOFTWARE.
             });
             this._autogenUnbinds.length = 0;
 
-            $.each($.merge([], this._children), function (index, child) {
+            $.each($.merge([], this.children()), function (index, child) {
                 child.dispose();
             });
             this._children.length = 0;
