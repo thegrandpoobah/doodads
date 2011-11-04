@@ -1,0 +1,12 @@
+{
+	"behavior": "./TestDoodad/TestDoodad.js",
+	"templates": {
+		"base": "./TestDoodad/TestDoodad.html",
+		"something": "./TestDoodad/TestDoodad.html"
+	},
+	"stylesheets": [
+    	"/TestDoodad/TestDoodad.css"
+  	]
+}
+
+

@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doodads.Builder", "..\src\builders\csharp\Doodads.Builder.csproj", "{FE43FFFC-6001-4063-AADA-B31C586B2E95}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doodads.Builder", "Doodads.Builder\Doodads.Builder.csproj", "{FE43FFFC-6001-4063-AADA-B31C586B2E95}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doodads.Builder.Test", "..\tests\builders\csharp\Doodads.Builder.Test.csproj", "{C2A079B8-D640-4B32-B654-631C9EAC68D7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doodads.Builder.Test", "Doodads.Builder.Test\Doodads.Builder.Test.csproj", "{C2A079B8-D640-4B32-B654-631C9EAC68D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
