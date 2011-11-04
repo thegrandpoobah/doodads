@@ -1,4 +1,5 @@
-var fs = require('fs');
+var fs = require('fs'),
+	path = require('path');
 
 function builder(dir) {
 	this.dir = dir;	
@@ -6,15 +7,18 @@ function builder(dir) {
 
 builder.prototype.build = function(req, callback) {
 	var self = this,
-		name = req.params[0],
+		n = req.params[0],
 		output = [],
 		originalUrl = req.originalUrl;
 
 	output.push("(function(definition) {");	
 	output.push("doodads.setup('" + originalUrl + "', definition);");
 
+	var directory = path.dirname(originalUrl),
+		filename = path.basename(originalUrl, '.doodad')
+
 	// definition
-	var definitionBuffer = fs.readFileSync(this.dir + '/' + name + '/' + name + '.json'),
+	var definitionBuffer = fs.readFileSync(this.dir + '/' + directory + '/' + filename + '/' + filename + '.json'),
 		definition = JSON.parse(definitionBuffer.toString());
 
 	// Behavior
