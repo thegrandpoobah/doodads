@@ -9,7 +9,7 @@ task('concatenate', function(params) {
 		, 'mustache/mustache.js'
 		, 'string-measurement/string-measurement.js'
 		, 'core/Component.js'
-		, 'core/ComponentFactory.js'
+		, 'core/builder.js'
 		, 'core/capturingEvents.js'
 		, 'core/Validator.js'
 		, 'core/HintBoxValidationListener.js'

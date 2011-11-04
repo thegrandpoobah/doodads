@@ -3,12 +3,19 @@
     <title></title>
     <script type="text/javascript" src="JavaScript/jquery-1.6.4.js"></script>
     <script type="text/javascript" src="JavaScript/jquery.debounce-1.0.5.js"></script>
+    <script type="text/javascript" src="JavaScript/yepnope.js"></script>
     <script type="text/javascript" src="JavaScript/doodads.js"></script>
-    <script type="text/javascript" src="TestDoodad.component"></script>
     <script type="text/javascript">
         $(function () {
-            var component = Vastardis.UI.Components.Component.create('/TestDoodad.component', {text: 'Success!'});
-            component.render($(document.body));
+            doodads.create('Derived.component', { text: '[DERIVED] From index.html' })
+                .done(function (component) {
+                    component.render($(document.body));
+                });
+
+            doodads.create('TestDoodad.component', { text: '[TESTDOODAD] From index.html' })
+                .done(function (component) {
+                    component.render($(document.body));
+                });
         });
     </script>
 </head>

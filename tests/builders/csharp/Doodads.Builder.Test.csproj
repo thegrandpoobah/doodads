@@ -59,6 +59,12 @@
     <Content Include="..\..\..\src\support\jquery.debounce-1.0.5.js">
       <Link>JavaScript\jquery.debounce-1.0.5.js</Link>
     </Content>
+    <Content Include="..\..\..\src\support\yepnope.js">
+      <Link>JavaScript\yepnope.js</Link>
+    </Content>
+    <Content Include="Derived\Derived.html" />
+    <Content Include="Derived\Derived.js" />
+    <Content Include="Derived\Derived.xml" />
     <Content Include="Default.html" />
     <Content Include="TestDoodad\TestDoodad.html" />
     <Content Include="TestDoodad\TestDoodad.js" />
@@ -82,13 +88,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
-  
   <!--
   These extra targets/modifications are so that Linked files get copied to their appropriate locations in Web App projects
   and are courtesy of James Dawson
   http://consultingblogs.emc.com/jamesdawson/archive/2008/06/03/using-linked-files-with-web-application-projects.aspx  
   -->
-  
   <!--
   ============================================================
   _CopyWebApplication
@@ -106,38 +110,17 @@
     <!-- Create the _PublishedWebsites\app\bin folder -->
     <MakeDir Directories="$(WebProjectOutputDir)\bin" />
     <!-- Copy build outputs to _PublishedWebsites\app\bin folder -->
-    <Copy SourceFiles="@(IntermediateAssembly)"
-          DestinationFolder="$(WebProjectOutputDir)\bin"
-          SkipUnchangedFiles="true" />
-    <Copy SourceFiles="@(AddModules)"
-          DestinationFolder="$(WebProjectOutputDir)\bin"
-          SkipUnchangedFiles="true" />
-    <Copy SourceFiles="$(IntermediateOutputPath)$(_SGenDllName)"
-          DestinationFolder="$(WebProjectOutputDir)\%(Content.SubFolder)%(Content.RecursiveDir)"
-          SkipUnchangedFiles="true"
-          Condition="'$(_SGenDllCreated)'=='true'" />
-    <Copy SourceFiles="$(IntermediateOutputPath)$(TargetName).pdb"
-          DestinationFolder="$(WebProjectOutputDir)\bin"
-          SkipUnchangedFiles="true"
-          Condition="'$(_DebugSymbolsProduced)'=='true'" />
-    <Copy SourceFiles="@(DocFileItem)"
-          DestinationFolder="$(WebProjectOutputDir)\bin"
-          SkipUnchangedFiles="true"
-          Condition="'$(_DocumentationFileProduced)'=='true'" />
-    <Copy SourceFiles="@(IntermediateSatelliteAssembliesWithTargetPath)"
-          DestinationFiles="@(IntermediateSatelliteAssembliesWithTargetPath->'$(WebProjectOutputDir)\bin\%(Culture)\$(TargetName).resources.dll')"
-          SkipUnchangedFiles="true" />
-    <Copy SourceFiles="@(ReferenceComWrappersToCopyLocal); @(ResolvedIsolatedComModules); @(_DeploymentLooseManifestFile); @(NativeReferenceFile)"
-          DestinationFolder="$(WebProjectOutputDir)\bin"
-          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(IntermediateAssembly)" DestinationFolder="$(WebProjectOutputDir)\bin" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(AddModules)" DestinationFolder="$(WebProjectOutputDir)\bin" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(IntermediateOutputPath)$(_SGenDllName)" DestinationFolder="$(WebProjectOutputDir)\%(Content.SubFolder)%(Content.RecursiveDir)" SkipUnchangedFiles="true" Condition="'$(_SGenDllCreated)'=='true'" />
+    <Copy SourceFiles="$(IntermediateOutputPath)$(TargetName).pdb" DestinationFolder="$(WebProjectOutputDir)\bin" SkipUnchangedFiles="true" Condition="'$(_DebugSymbolsProduced)'=='true'" />
+    <Copy SourceFiles="@(DocFileItem)" DestinationFolder="$(WebProjectOutputDir)\bin" SkipUnchangedFiles="true" Condition="'$(_DocumentationFileProduced)'=='true'" />
+    <Copy SourceFiles="@(IntermediateSatelliteAssembliesWithTargetPath)" DestinationFiles="@(IntermediateSatelliteAssembliesWithTargetPath->'$(WebProjectOutputDir)\bin\%(Culture)\$(TargetName).resources.dll')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(ReferenceComWrappersToCopyLocal); @(ResolvedIsolatedComModules); @(_DeploymentLooseManifestFile); @(NativeReferenceFile)" DestinationFolder="$(WebProjectOutputDir)\bin" SkipUnchangedFiles="true" />
     <!-- copy any referenced assemblies to _PublishedWebsites\app\bin folder -->
-    <Copy SourceFiles="@(ReferenceCopyLocalPaths)"
-          DestinationFolder="$(WebProjectOutputDir)\bin"
-          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(ReferenceCopyLocalPaths)" DestinationFolder="$(WebProjectOutputDir)\bin" SkipUnchangedFiles="true" />
     <!-- MODIFICATION HERE: Copy local content files (i.e. non-linked files) recursively to _PublishedWebsites\app\ folder -->
-    <Copy Condition=" '%(Content.Link)' == '' "
-          SourceFiles="%(Content.Identity)"
-          DestinationFolder="$(WebProjectOutputDir)\%(Content.RelativeDir)" />
+    <Copy Condition=" '%(Content.Link)' == '' " SourceFiles="%(Content.Identity)" DestinationFolder="$(WebProjectOutputDir)\%(Content.RelativeDir)" />
   </Target>
   <!--
   ============================================================
@@ -151,12 +134,9 @@
   -->
   <Target Name="CopyLinkedContentFiles">
     <!-- Remove any old copies of the files -->
-    <Delete Condition=" '%(Content.Link)' != '' AND Exists('$(WebProjectOutputDir)\%(Content.Link)') "
-            Files="$(WebProjectOutputDir)\%(Content.Link)" />
+    <Delete Condition=" '%(Content.Link)' != '' AND Exists('$(WebProjectOutputDir)\%(Content.Link)') " Files="$(WebProjectOutputDir)\%(Content.Link)" />
     <!-- Copy linked content files recursively to the project folder -->
-    <Copy Condition=" '%(Content.Link)' != '' "
-          SourceFiles="%(Content.Identity)"
-          DestinationFiles="$(WebProjectOutputDir)\%(Content.Link)" />
+    <Copy Condition=" '%(Content.Link)' != '' " SourceFiles="%(Content.Identity)" DestinationFiles="$(WebProjectOutputDir)\%(Content.Link)" />
   </Target>
   <!-- Override the default target dependencies to -->
   <!-- include the new _CopyLinkedContentFiles target. -->

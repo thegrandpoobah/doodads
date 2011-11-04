@@ -21,27 +21,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Script.Serialization;
-using System.Xml.Serialization;
 using System.Web.SessionState;
+using System.Xml.Serialization;
 
 namespace Vastardis.UI.Components
 {
     public class ComponentBuilder : IHttpHandler, IReadOnlySessionState
     {
-        private readonly static componentImport[] ValidationImports = new componentImport[] {  
-            new componentImport() { path = "~/Components/HintBox.component" }, 
-            new componentImport() { path = "~/JavaScript/ComponentLibrary/Validator.js" }
-        };
-
-        private readonly static componentStylesheet[] ValidationStylesheets = new componentStylesheet[] {  
-            new componentStylesheet() { path = "~/Style/CSS/ComponentLibrary/HintList.css" }, 
-        };
-
         public bool IsReusable
         {
             // Return false in case your Managed Handler cannot be reused for another request.
@@ -98,55 +91,12 @@ namespace Vastardis.UI.Components
                 JavaScriptSerializer serializer = new JavaScriptSerializer();
                 StringBuilder output = new StringBuilder();
 
-                if (c.validates)
-                {
-                    if (c.imports == null)
-                    {
-                        c.imports = ValidationImports;
-                    }
-                    else
-                    {
-                        // Add Validation Imports
-                        componentImport[] imports = c.imports;
-                        c.imports = new componentImport[imports.Length + ValidationImports.Length];
-                        imports.CopyTo(c.imports, 0);
-                        Array.Copy(ValidationImports, 0, c.imports, imports.Length, ValidationImports.Length);
-                    }
 
-                    if (c.stylesheets == null)
-                    {
-                        c.stylesheets = ValidationStylesheets;
-                    }
-                    else
-                    {
-                        // Add Validation StyleSheets
-                        componentStylesheet[] stylesheets = c.stylesheets ?? new componentStylesheet[0];
-                        c.stylesheets = new componentStylesheet[stylesheets.Length + ValidationStylesheets.Length];
-                        stylesheets.CopyTo(c.stylesheets, 0);
-                        Array.Copy(ValidationStylesheets, 0, c.stylesheets, stylesheets.Length, ValidationStylesheets.Length);
-                    }
-                }
-
-                if (c.imports != null)
-                {
-#if DEBUG
-                    output.AppendLine("/* Dependencies */");
-#endif
-
-                    foreach (componentImport jsDep in c.imports)
-                    {
-                        output.AppendFormat("Vastardis.UI.Components.ComponentFactory2._loadDependency({0});\n", serializer.Serialize(VirtualPathUtility.ToAbsolute(jsDep.path)));
-                    }
-                }
-
-                output.AppendLine("(function($, undefined) {");
-
-                output.AppendFormat("var cf = Vastardis.UI.Components.ComponentFactory2, absUrl = cf.canonicalize({0});\n", serializer.Serialize(context.Request.Path));
-                output.AppendLine("if (cf._loadedComponents[absUrl]) { return; }");
-                output.AppendFormat("var base = {0}.prototype;\n", c.inheritsFrom);
+                output.AppendLine("(function(definition) {");
+                output.AppendFormat("doodads.setup('{0}', definition);\n", context.Request.Path);
                 if (c.behaviour == null)
                 {
-                    output.AppendLine("function getComponentType() { return {}; }");
+                    output.AppendFormat("doodads.setup('{0}').complete();\n", context.Request.Path);
                 }
                 else
                 {
@@ -159,35 +109,36 @@ namespace Vastardis.UI.Components
                     }
 
                     context.Response.AddFileDependency(serverPath);
-                    output.AppendLine("var oldGetComponentType = window.getComponentType;");
 #if DEBUG
                     output.AppendFormat("/* BEGIN Behaviour file {0} */\n", c.behaviour.path);
 #endif
-                    output.AppendLine(File.ReadAllText(serverPath));
+                    Regex regex = new Regex("doodads\\s*\\.\\s*setup\\(\\)", RegexOptions.Multiline);
+                    string url = regex.Replace(File.ReadAllText(serverPath), string.Format("doodads.setup({0})", serializer.Serialize(context.Request.Path)));
+                    output.AppendLine(url);
 #if DEBUG
                     output.AppendFormat("/* END Behaviour file {0} */\n", c.behaviour.path);
 #endif
-                    output.AppendLine("var getComponentType = window.getComponentType;");
-                    output.AppendLine("window.getComponentType = oldGetComponentType;");
                 }
 
-                output.AppendLine("var type = getComponentType();");
+                output.AppendLine("})({");
 
-                output.AppendLine("var new_component = function(options, defaultOptions) {");
-                output.AppendLine("if (arguments.length === 0) { return; }");
-                output.AppendLine("base.constructor.call(this, $.extend({}, defaultOptions, options), new_component.defaultOptions);");
-                output.AppendLine("type.apply(this, []);");
-                output.AppendLine("}");
-                output.AppendLine("new_component.prototype = type.prototype;");
-                output.AppendLine("for (var key in type) {");
-                output.AppendLine("if (type.hasOwnProperty(key)) {");
-                output.AppendLine("new_component[key] = type[key];");
-                output.AppendLine("}");
-                output.AppendLine("}");
-                output.AppendLine("new_component.defaultOptions = new_component.defaultOptions || {};");
+                List<string> fields = new List<string>();
+
+                if (c.inheritsTemplates)
+                {
+                    fields.Add("inheritsTemplates: true");
+                }
+                if (c.validates)
+                {
+                    fields.Add("validates: true");
+                }
 
                 if (c.templates != null)
                 {
+                    StringBuilder templateOutput = new StringBuilder();
+
+                    templateOutput.AppendLine("templates: {");
+
                     string baseTemplate;
                     if (c.templates.@base == null || string.IsNullOrEmpty(c.templates.@base.path))
                     {
@@ -209,12 +160,7 @@ namespace Vastardis.UI.Components
                         }
                     }
 
-                    output.Append("new_component.defaultOptions.templates = $.extend(");
-                    if (c.inheritsTemplates)
-                    {
-                        output.Append("{}, base.constructor.defaultOptions.templates,");
-                    }
-                    output.AppendFormat("new_component.defaultOptions.templates, {{base: {0}", serializer.Serialize(baseTemplate));
+                    templateOutput.AppendFormat("base: {0}", serializer.Serialize(baseTemplate));
 
                     if (c.templates.partial != null && c.templates.partial.Length > 0)
                     {
@@ -228,66 +174,17 @@ namespace Vastardis.UI.Components
                                 return;
                             }
                             context.Response.AddFileDependency(path);
-                            output.AppendFormat(", {0}: {1}\n", serializer.Serialize(partial.name),
+                            templateOutput.AppendFormat(", {0}: {1}\n", serializer.Serialize(partial.name),
                                 serializer.Serialize(File.ReadAllText(path)));
                         }
                     }
-                    output.AppendLine("});");
-                }
-                if (c.validates)
-                {
-                    output.Append("Vastardis.UI.Components.Component.addValidationAPI(new_component);\n");
+
+                    templateOutput.AppendLine("}");
+                    fields.Add(templateOutput.ToString());
                 }
 
-                output.AppendLine("type.prototype.constructor = new_component;\n");
-
-
-                output.Append("$.extend(true, window, {}, ");
-                string[] namespaceSegments = c.type.Split(new char[] { '.' });
-                foreach (string namespaceSegment in namespaceSegments)
-                {
-                    output.AppendFormat("{{ {0} : ", namespaceSegment);
-                }
-
-                output.Append("new_component");
-
-                output.Append("}");
-
-                for (var i = 0; i < namespaceSegments.Length - 1; i++)
-                {
-                    output.Append("}");
-                }
-                output.AppendLine(");");
-
-                if (c.stylesheets != null)
-                {
-#if DEBUG
-                    output.AppendLine("/* CSS */");
-#endif
-                    foreach (componentStylesheet cssDep in c.stylesheets)
-                    {
-                        string path = context.Server.MapPath(cssDep.path);
-                        if (File.Exists(path))
-                        {
-                            context.Response.AddFileDependency(path);
-                            string serialized = serializer.Serialize(File.ReadAllText(path)).Trim(new char[] { '"' });
-#if DEBUG
-                            output.AppendFormat("cf._addStylesheet('{0}', '{1}'); // {2} \n", VirtualPathUtility.ToAbsolute(cssDep.path), serialized, cssDep.path);
-#else
-                            output.AppendFormat("cf._addStylesheet('{0}', '{1}');\n", VirtualPathUtility.ToAbsolute(cssDep.path), serialized);
-#endif
-                        }
-#if DEBUG
-                        else
-                        {
-                            output.AppendFormat("/* WARNING: Stylesheet \"{0}\" not found. */", cssDep.path);
-                        }
-#endif
-                    }
-                }
-
-                output.AppendFormat("cf._prepopulateResolutionCache(); cf._resolutionCache[absUrl] = true;\ncf._loadedComponents[absUrl] = new_component;\n");
-                output.AppendLine("})(jQuery);");
+                output.Append(string.Join(",", fields.ToArray()));
+                output.AppendLine("});");
 
 #if DEBUG
                 output.AppendFormat("\n//@ sourceURL={0}\n", context.Request.Path);

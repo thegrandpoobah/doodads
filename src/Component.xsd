@@ -1,27 +1,7 @@
-﻿<!--
-The MIT License
-
-Copyright (c) 2011 Vastardis Capital Services, http://www.vastcap.com/
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- To generate the matching CS file, use the following VS 2010 command:
+xsd Component.xsd /c /n:Vastardis.UI.Components
 -->
-<?xml version="1.0" encoding="utf-8"?>
 <xs:schema 
   attributeFormDefault="unqualified" 
   elementFormDefault="qualified" 
@@ -136,52 +116,7 @@ THE SOFTWARE.
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="imports" minOccurs="0" maxOccurs="1">
-          <xs:complexType>
-            <xs:annotation>
-              <xs:documentation>
-                Provides a mean to reference JavaScript resources on the server.
-              </xs:documentation>
-            </xs:annotation>
-            <xs:sequence>
-              <xs:element name="import" minOccurs="0" maxOccurs="unbounded">
-                <xs:complexType>
-                  <xs:annotation>
-                    <xs:documentation>
-                      Imports are JavaScript files that are required by a given component before it can function correctly.
-                      These include other components and arbitrary code files that would typically not be included in the initial load
-                      of a page.
-                    </xs:documentation>
-                  </xs:annotation>
-                  <xs:attribute name="path" type="xs:string" use="required">
-                    <xs:annotation>
-                      <xs:documentation>
-                        A URL to the JavaScript file which contais the behaviour class.
-                        NOTE: You can use the ~/ prefix to create a path relative to the base of the web application.
-                      </xs:documentation>
-                    </xs:annotation>
-                  </xs:attribute>
-                </xs:complexType>
-              </xs:element>
-            </xs:sequence>
-          </xs:complexType>
-        </xs:element>
       </xs:all>
-      <xs:attribute name="type" type="xs:string" use="required">
-        <xs:annotation>
-          <xs:documentation>
-            The fully-qualified JavaScript typename that will be used to reference this component from JS code.
-          </xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="inheritsFrom" type="xs:string" use="optional" default="Vastardis.UI.Components.Component">
-        <xs:annotation>
-          <xs:documentation>
-            The fully-qualified JavaScript typename of the base Component class to inherit functionality from. 
-            Defaults to Vastardis.UI.Components.Component
-          </xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
       <xs:attribute name="validates" type="xs:boolean" use="optional" default="false">
         <xs:annotation>
           <xs:documentation>
