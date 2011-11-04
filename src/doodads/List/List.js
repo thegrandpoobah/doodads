@@ -215,31 +215,16 @@ THE SOFTWARE.
             }
             return this._options.templates.__compiledTemplate(dataSet);
         }
-        , _computeValidityState: function List$_computeValidityState() {
-            base._computeValidityState.apply(this, arguments);
-
-            var isValid = this._isValid,
-                i, n, k, m,
-                children;
-
-            if (isValid && this.listenToChildrenValidity()) {
-                for (i = 0, n = this._dataSource.length; i < n; ++i) {
-                    children = this._itemMap[i].componentChildren || [];
-                    for (j = 0, m = children.length; j < m; ++j) {
-                        if (!children[j].valid()) {
-                            isValid = false;
-                            break;
-                        };
-                    }
-
-                    if (!isValid) {
-                        break;
-                    }
-                }
-            }
-
-            this._isValid = isValid;
-        }
+		, children: function List$children() {
+			var baseChildren = $.merge([], base.children.apply(this, arguments)), // create a "shallow" copy of the base children property
+				thisChildren = [];
+			
+		    $.each(this._itemMap, function () {
+		        thisChildren = $.merge(thisChildren, this.componentChildren || []);
+		    });
+			
+			return $.merge(thisChildren, baseChildren);
+		}
         , dataSource: function List$dataSource(/*newValue*/) {
             ///<summary>
             /// Getter/Setter.
@@ -338,6 +323,10 @@ THE SOFTWARE.
                 this._containerElement.append(domNode);
             }
 
+            $.each(wrappedItem.componentChildren || [], function () {
+                this.updateAttachment();
+            });
+			
             this.trigger_modelChanged();
         }
         , removeItem: function List$removeItem(argv) {
@@ -440,6 +429,10 @@ THE SOFTWARE.
                     this._containerElement.prepend(this._itemMap[index].domNode);
                 }
 
+				$.each(this._itemMap[index].componentChildren || [], function () {
+					this.updateAttachment();
+				});
+				
                 this.trigger_modelChanged();
             } else {
                 //get
