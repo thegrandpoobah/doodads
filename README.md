@@ -2,10 +2,10 @@
 
 Doodads is a set of JavaScript code blocks that provide a solid foundation to build modular UI Controls for use in Web 2.0+ applications. The overarching design of the infrastructure is the idea that all UI Controls are separable into four unique parts:
 
-1 - Structure (HTML, SVG, MathML, etc.)
-2 - Look (CSS)
-3 - Feel (Event Driven JavaScript)
-4 - Behavior (Logic implemented as JavaScript).
+* Structure (HTML, SVG, MathML, etc.)
+* Look (CSS)
+* Feel (Event Driven JavaScript)
+* Behavior (Logic implemented as JavaScript)
 
 Accordingly, the infrastructure completely separates these four parts into distinct code modules which allows for very low coupling and high cohesion (two highly desirable software engineering traits).
 
