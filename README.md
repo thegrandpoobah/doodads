@@ -1,5 +1,7 @@
 # doodads.js - Modular UI Construction Kit
 
+## Description
+
 Doodads is a set of JavaScript code blocks that provide a solid foundation to build modular UI Controls for use in Web 2.0+ applications. The overarching design of the infrastructure is the idea that all UI Controls are separable into four unique parts:
 
 1. Structure (HTML, SVG, MathML, etc.)
