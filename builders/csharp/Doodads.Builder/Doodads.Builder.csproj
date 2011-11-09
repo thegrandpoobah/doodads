@@ -39,16 +39,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\src\Component.xsd">
-      <Link>Component.xsd</Link>
+    <None Include="..\..\..\src\doodad.xsd">
+      <Link>doodad.xsd</Link>
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Component.cs">
-      <DependentUpon>Component.xsd</DependentUpon>
+    <Compile Include="Builder.cs" />
+    <Compile Include="doodad.cs">
+      <DependentUpon>doodad.xsd</DependentUpon>
     </Compile>
-    <Compile Include="ComponentBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

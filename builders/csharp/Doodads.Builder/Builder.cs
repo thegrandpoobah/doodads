@@ -31,9 +31,9 @@ using System.Web.Script.Serialization;
 using System.Web.SessionState;
 using System.Xml.Serialization;
 
-namespace Vastardis.UI.Components
+namespace Doodads.Builder
 {
-    public class ComponentBuilder : IHttpHandler, IReadOnlySessionState
+    public class Builder : IHttpHandler, IReadOnlySessionState
     {
         public bool IsReusable
         {
@@ -42,16 +42,16 @@ namespace Vastardis.UI.Components
             get { return true; }
         }
 
-        private component CreateComponentFromXml(string path)
+        private doodad CreateDoodadFromXml(string path)
         {
             using (StreamReader str = new StreamReader(path))
             {
-                XmlSerializer serializer = new XmlSerializer(typeof(component));
-                return (component)serializer.Deserialize(str);
+                XmlSerializer serializer = new XmlSerializer(typeof(doodad));
+                return (doodad)serializer.Deserialize(str);
             }
         }
 
-        public string GetComponentPath(string path)
+        public string GetDoodadPath(string path)
         {
             string mappedPath = HttpContext.Current.Server.MapPath(path);
             string directory = Path.GetDirectoryName(mappedPath);
@@ -69,14 +69,14 @@ namespace Vastardis.UI.Components
         {
             try
             {
-                if (!File.Exists(this.GetComponentPath(context.Request.Path)))
+                if (!File.Exists(this.GetDoodadPath(context.Request.Path)))
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
-                    context.Response.Output.WriteLine(string.Format("Component descriptor \"{0}\" not found.", Path.ChangeExtension(context.Request.Path, "xml")));
+                    context.Response.Output.WriteLine(string.Format("doodad descriptor \"{0}\" not found.", Path.ChangeExtension(context.Request.Path, "xml")));
                     return;
                 }
 
-                component c = this.CreateComponentFromXml(this.GetComponentPath(context.Request.Path));
+                doodad c = this.CreateDoodadFromXml(this.GetDoodadPath(context.Request.Path));
 
                 if (c == null)
                 {
@@ -85,7 +85,7 @@ namespace Vastardis.UI.Components
                 }
                 else
                 {
-                    context.Response.AddFileDependency(this.GetComponentPath(context.Request.Path));
+                    context.Response.AddFileDependency(this.GetDoodadPath(context.Request.Path));
                 }
 
                 JavaScriptSerializer serializer = new JavaScriptSerializer();
@@ -104,7 +104,7 @@ namespace Vastardis.UI.Components
                     if (!File.Exists(serverPath))
                     {
                         context.Response.StatusCode = (int)HttpStatusCode.NotFound;
-                        context.Response.Output.WriteLine(string.Format("Component behaviour \"{0}\" not found.", c.behaviour.path));
+                        context.Response.Output.WriteLine(string.Format("doodad behaviour \"{0}\" not found.", c.behaviour.path));
                         return;
                     }
 
@@ -164,7 +164,7 @@ namespace Vastardis.UI.Components
 
                     if (c.templates.partial != null && c.templates.partial.Length > 0)
                     {
-                        foreach (componentTemplatesPartial partial in c.templates.partial)
+                        foreach (doodadTemplatesPartial partial in c.templates.partial)
                         {
                             string path = context.Server.MapPath(partial.path);
                             if (!File.Exists(path))
@@ -187,7 +187,7 @@ namespace Vastardis.UI.Components
                 {
                     List<string> styleSet = new List<string>();
 
-                    foreach (componentStylesheet cssDep in c.stylesheets)
+                    foreach (doodadStylesheet cssDep in c.stylesheets)
                     {
                         string path = context.Server.MapPath(cssDep.path);
                         if (File.Exists(path))

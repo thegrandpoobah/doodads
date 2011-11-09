@@ -7,12 +7,12 @@
     <script type="text/javascript" src="JavaScript/doodads.js"></script>
     <script type="text/javascript">
         $(function () {
-            doodads.create('Derived.component', { text: '[DERIVED] From index.html' })
+           /* doodads.create('Derived.component', { text: '[DERIVED] From index.html' })
                 .done(function (component) {
                     component.render($(document.body));
-                });
+                }); */
 
-            doodads.create('TestDoodad.component', { text: '[TESTDOODAD] From index.html' })
+            doodads.create('TestDoodad.doodad', { text: '[TESTDOODAD] From index.html' })
                 .done(function (component) {
                     component.render($(document.body));
                 });

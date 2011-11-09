@@ -8,7 +8,7 @@ task('concatenate', function(params) {
 		'innershiv/innershiv.src.js'
 		, 'mustache/mustache.js'
 		, 'string-measurement/string-measurement.js'
-		, 'core/Component.js'
+		, 'core/doodad.js'
 		, 'core/builder.js'
 		, 'core/utils.js'
 		, 'core/capturingEvents.js'
@@ -16,13 +16,16 @@ task('concatenate', function(params) {
 		, 'core/HintBoxValidationListener.js'
 		, 'core/z-manager.js'
 	];
+	
+	// Add license and closure
+	files.unshift('core/pre.tmpl');
+	files.unshift('core/license.tmpl');
+	files.push('core/post.tmpl');
 
 	var all = '';
 	files.forEach(function(file, i) {
-		if (file.match(/^.*js$/)) {
-			all += fs.readFileSync('src/' + file).toString();
-			all += '\n';
-		}
+		all += fs.readFileSync('src/' + file).toString();
+		all += '\n';
 	});
 	
 	var out = fs.openSync('output/doodads.js', 'w+');

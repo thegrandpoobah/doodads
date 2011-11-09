@@ -1,17 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- To generate the matching CS file, use the following VS 2010 command:
-xsd Component.xsd /c /n:Vastardis.UI.Components
+xsd doodad.xsd /c /n:Doodads.Builder
 -->
 <xs:schema 
   attributeFormDefault="unqualified" 
   elementFormDefault="qualified" 
-  targetNamespace="http://schemas.vastcap.com/componentDefinition" 
+  targetNamespace="http://schemas.vastcap.com/doodadDefinition" 
   xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:element name="component">
+  <xs:element name="doodad">
     <xs:complexType>
       <xs:annotation>
         <xs:documentation>
-          The root element of the Component Descriptor XML Schema
+          The root element of the doodad Descriptor XML Schema
         </xs:documentation>
       </xs:annotation>
       <xs:all>
@@ -19,7 +19,7 @@ xsd Component.xsd /c /n:Vastardis.UI.Components
           <xs:complexType>
             <xs:annotation>
               <xs:documentation>
-                The Behaviour class of a component implements all of the necessary behavioural logic of a given component.
+                The Behaviour class of a doodad implements all of the necessary behavioural logic of a given doodad.
               </xs:documentation>
             </xs:annotation>
             <xs:attribute name="path" type="xs:string" use="required">
@@ -36,7 +36,7 @@ xsd Component.xsd /c /n:Vastardis.UI.Components
           <xs:complexType>
             <xs:annotation>
               <xs:documentation>
-                Templates are Mustache code files which define the HTML structure for a given component.
+                Templates are Mustache code files which define the HTML structure for a given doodad.
               </xs:documentation>
             </xs:annotation>
             <xs:sequence>
@@ -44,7 +44,7 @@ xsd Component.xsd /c /n:Vastardis.UI.Components
                 <xs:complexType>
                   <xs:annotation>
                     <xs:documentation>
-                      The Base Mustache template acts as the root of the HTML fragment for a given component.
+                      The Base Mustache template acts as the root of the HTML fragment for a given doodad.
                     </xs:documentation>
                   </xs:annotation>
                   <xs:attribute name="path" type="xs:string" use="required">
@@ -62,8 +62,8 @@ xsd Component.xsd /c /n:Vastardis.UI.Components
                 <xs:complexType>
                   <xs:annotation>
                     <xs:documentation>
-                      A Partial Mustache template for a component provides a means of separating complex HTML fragments into multiple template files.
-                      Partials also act as an easy extension point for a component by being overridable in descendant Components.
+                      A Partial Mustache template for a doodad provides a means of separating complex HTML fragments into multiple template files.
+                      Partials also act as an easy extension point for a doodad by being overridable in descendant doodads.
                     </xs:documentation>
                   </xs:annotation>
                   <xs:attribute name="name" type="xs:string" use="required">
@@ -99,7 +99,7 @@ xsd Component.xsd /c /n:Vastardis.UI.Components
                 <xs:complexType>
                   <xs:annotation>
                     <xs:documentation>
-                      Stylesheets are Cascading Stylesheets that provide the look for a given component.
+                      Stylesheets are Cascading Stylesheets that provide the look for a given doodad.
                     </xs:documentation>
                   </xs:annotation>
                   <xs:attribute name="path" type="xs:string" use="required">
@@ -120,14 +120,14 @@ xsd Component.xsd /c /n:Vastardis.UI.Components
       <xs:attribute name="validates" type="xs:boolean" use="optional" default="false">
         <xs:annotation>
           <xs:documentation>
-            Determines whether or not this Component should include support for the rule based validation facet of the Component Infrastructure.
+            Determines whether or not this doodad should include support for the rule based validation facet of the doodad Infrastructure.
           </xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="inheritsTemplates" type="xs:boolean" use="optional" default="false">
         <xs:annotation>
           <xs:documentation>
-            Determines whether or not this Component should inherit the Mustache templates of its base component.
+            Determines whether or not this doodad should inherit the Mustache templates of its base doodad.
             Defaults to false.
           </xs:documentation>
         </xs:annotation>
