@@ -47,8 +47,9 @@ THE SOFTWARE.
         if (arguments.length === 0) { return; }
 
         this._options = $.extend({}, Component.defaultOptions, defaultOptions, options);
-
-        this._parent = null;
+		this._jQueryCache = $(this);
+		
+		this._parent = null;
         this._children = [];
         this._autogenChildren = []; // the list of children that have private variables
         this._autogenUnbinds = []; // the list of events to auto-unbind
@@ -66,7 +67,7 @@ THE SOFTWARE.
         this._dataSource = null;
 
         this._hookedResize = false;
-        this.onWindowResize$proxy = $.proxy(this.onWindowResize, this);
+        this.onWindowResize$proxy = doodads.proxy(this.onWindowResize, this);
         this._onResize$debounced = $.debounce(this._onResize, DEBOUNCE_TIMEOUT, this);
 
         if (this._options.validates === false) {
@@ -597,7 +598,7 @@ THE SOFTWARE.
 						if (!self[proxyName]) {
 							// do not recreate the proxy if it already exists
 							// happens if/when you bind to events in a mustache loop
-							self[proxyName] = $.proxy(self[attr.nodeValue], self);
+							self[proxyName] = doodads.proxy(self[attr.nodeValue], self);
 						}
 						$component.bind(evtName, self[proxyName]);
 						self._autogenUnbinds.push({
@@ -1120,6 +1121,32 @@ THE SOFTWARE.
 		}
         /* END Validation Management*/
 
+		/* BEGIN Event Binding Helpers */
+		
+		, bind: function Component$bind() {
+			///<sumamry>
+			/// Same syntax as jQuery.bind
+			///</summary>
+			this._jQueryCache.bind.apply(this._jQueryCache, arguments);
+		}
+		, unbind: function Component$unbind() {
+			///<sumamry>
+			/// Same syntax as jQuery.unbind
+			///</summary>
+			this._jQueryCache.unbind.apply(this._jQueryCache, arguments);
+		}
+		, trigger: function Component$trigger() {
+			///<sumamry>
+			/// Maps unto jQuery.trigger.
+			///</summary>
+			var params = Array.prototype.slice.call(arguments),
+				evt = params.shift();
+			
+			this._jQueryCache.trigger(evt, params);
+		}
+		
+		/* END Event Binding Helpers */
+		
         /* BEGIN Component Life Cycle */
 
         , tearDownComponents: function Component$tearDownComponents() {
@@ -1215,32 +1242,4 @@ THE SOFTWARE.
     }
 
     /* END Static Methods */
-
-    $.fn.component = function () {
-        ///<summary>
-        /// Returns the components that back the elements in a particular jQuery list of elements.
-        /// This method is useful if you have a reference to the DOM elememt of a component,
-        /// but not the component itself.
-        ///</summary>
-        ///<returns>
-
-        /// If none of the elements have a backing component, then returns undefined.
-        /// If only one of the elements has a component, then that component is returned.
-        /// If some/all of the elements have a component, then the input array is mapped into an
-        /// array where elements have a component are populated
-        ///</returns>
-
-        var components = $.map(this, function (element, index) {
-            return $(element).data(DOMCOMPONENTMETA);
-        });
-
-        switch (components.length) {
-            case 0:
-                return undefined;
-            case 1:
-                return components[0];
-            default:
-                return components;
-        }
-    }
 })(jQuery);

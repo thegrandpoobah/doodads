@@ -10,6 +10,7 @@ task('concatenate', function(params) {
 		, 'string-measurement/string-measurement.js'
 		, 'core/Component.js'
 		, 'core/builder.js'
+		, 'core/utils.js'
 		, 'core/capturingEvents.js'
 		, 'core/Validator.js'
 		, 'core/HintBoxValidationListener.js'
@@ -30,12 +31,16 @@ task('concatenate', function(params) {
 
 desc('Obfuscation and Compression');
 task({'minify': ['concatenate']}, function(params) {
-	var all = fs.readFileSync('output/doodads.js').toString(),
-		out = fs.openSync('output/doodads.min.js', 'w+'),
-		ast = uglify.parser.parse(all);
+	try {
+		var all = fs.readFileSync('output/doodads.js').toString(),
+			out = fs.openSync('output/doodads.min.js', 'w+'),
+			ast = uglify.parser.parse(all);
 
-	ast = uglify.uglify.ast_mangle(ast);
-	ast = uglify.uglify.ast_squeeze(ast);
+		ast = uglify.uglify.ast_mangle(ast);
+		ast = uglify.uglify.ast_squeeze(ast);
 
-	fs.writeSync(out, uglify.uglify.gen_code(ast));
+		fs.writeSync(out, uglify.uglify.gen_code(ast));
+	} catch(e) {
+		console.error(e);
+	}
 });
