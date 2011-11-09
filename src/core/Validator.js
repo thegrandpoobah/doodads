@@ -21,38 +21,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 (function ($) {
-    $.extend(true, window, { Vastardis: { UI: { Components: {}}} });
-
-    // namespace alias
-    var vsc = Vastardis.UI.Components;
-
-    vsc.Component.addValidationAPI = function (component) {
+	doodads.validation = {};
+	
+    doodads.validation.add = function (doodad) {
         $.each(['valid', 'validationContext', 'isValidationContextEmpty', 'dispose'], function (index, item) {
-            component.prototype['_prototype_' + item] = component.prototype[item];
+            doodad.prototype['_prototype_' + item] = doodad.prototype[item];
         });
 
-        component.prototype.__validator = {};
+        doodad.prototype.__validator = {};
         for (var key in Validator) {
-            component.prototype.__validator[key] = component.prototype[key];
+            doodad.prototype.__validator[key] = doodad.prototype[key];
         }
 
-        $.extend(component.prototype, Validator);
-        component.defaultOptions = $.extend({
+        $.extend(doodad.prototype, Validator);
+        doodad.defaultOptions = $.extend({
             validates: true
 			, validationListeners: 'hintbox'
-        }, component.defaultOptions);
+        }, doodad.defaultOptions);
     }
 
-    vsc.Component.removeValidationAPI = function (component) {
+    doodads.validation.remove = function (doodad) {
         for (key in Validator) {
-            component[key] = component.__validator[key];
+            doodad[key] = doodad.__validator[key];
         }
 
         $.each(['valid', 'validationContext', 'isValidationContextEmpty', 'dispose'], function (index, item) {
             var prototypeFunction = '_prototype_' + item;
-            component[item] = component[prototypeFunction];
-            delete component[prototypeFunction];
-            component[prototypeFunction] = undefined;
+            doodad[item] = doodad[prototypeFunction];
+            delete doodad[prototypeFunction];
+            doodad[prototypeFunction] = undefined;
         });
     }
 
@@ -63,7 +60,7 @@ THE SOFTWARE.
     Validator = {
         addRule: function (value) {
             ///	<summary>
-            ///		Adds a rule to the list of rules the component must validate its context against.  The context is provided by "validationContext()"
+            ///		Adds a rule to the list of rules the doodad must validate its context against.  The context is provided by "validationContext()"
             ///	</summary>
             ///	<remarks>
             ///		To create a new rule, one can simply use the already defined available rules in the "ValidationRules" namespace.  
@@ -76,14 +73,14 @@ THE SOFTWARE.
             ///			- valid (type="Boolean"): States whether the context is valid.
             ///			- alwaysShow (type="Boolean", optional="true"):  If true, the message will appear in the hintbox even if valid is false.
             ///
-            ///		NOTE: When "alwaysShow" is set to true, the hintbox will always be displayed (when the component hasInputFocus() == true)
+            ///		NOTE: When "alwaysShow" is set to true, the hintbox will always be displayed (when the doodad hasInputFocus() == true)
             ///	</remarks>
             /// <param name="rule" type="Object|[Object]">A single rule or an array of rules</param>
 
             this._rules = $.merge(this._rules || [], value instanceof Array ? value : [value]);
         }
-		, addCallout: function (component) {
-		    this._callouts = $.merge(this._callouts || [], component instanceof Array ? component : [component]);
+		, addCallout: function (doodad) {
+		    this._callouts = $.merge(this._callouts || [], doodad instanceof Array ? doodad : [doodad]);
 		}
 		, ranValidation: function () {
 		    return this._ranValidation;
@@ -104,11 +101,11 @@ THE SOFTWARE.
 		}
 		, validationContext: function () {
 		    ///<summary>
-		    /// A JS object representation of the properties of this component that are needed
+		    /// A JS object representation of the properties of this doodad that are needed
 		    /// to test validity.
 		    ///</summary>
 		    ///<remarks>
-		    /// It is the responsibility of the component author to correctly expose a validationContext
+		    /// It is the responsibility of the doodad author to correctly expose a validationContext
 		    /// object bag to the validation infrastructure.
 		    ///</remarks>
 		    if (this._prototype_validationContext) {
@@ -174,17 +171,17 @@ THE SOFTWARE.
         }
         , required: function (/*isRequired, requirementRule*/) {
             /// <summary>
-            ///		1: required() - Indicates whethere the component is required or not.
-            ///		2: required(true, function(){...}) - Sets the component to required, and adds the requirement rule.
-            ///		3: required(true) - Set the component to required.
-            ///		4: required(false) - Set the component to not required.
+            ///		1: required() - Indicates whethere the doodad is required or not.
+            ///		2: required(true, function(){...}) - Sets the doodad to required, and adds the requirement rule.
+            ///		3: required(true) - Set the doodad to required.
+            ///		4: required(false) - Set the doodad to not required.
             /// </summary>
             /// <remarks>
             ///		If required() is called for the first time with isRequired being true, then requirementRule must be provided.
             /// </remarks>
             /// <param name="isRequired" type="Boolean" />
             /// <param name="requirementRule" type="function" optional="true">
-            ///		The rule the component must validate its context against/
+            ///		The rule the doodad must validate its context against/
             ///	</param>
             /// <returns type="Bool" />
 
@@ -348,17 +345,17 @@ THE SOFTWARE.
     }
 
     var validationListeners = [];
-    vsc.Component.registerValidationListener = function (listener) {
+    doodads.validation.registerListener = function (listener) {
         ///<summary>
         /// Adds a Validation Listener to the validation listener registry.
         /// Validation Listeners perform an action after every execution of the validate function
-        /// Typically, listeners modify the DOM to reflect the invalid state of a component.
+        /// Typically, listeners modify the DOM to reflect the invalid state of a doodad.
         ///</summary>
         ///<param name="listener">
         /// The Validation Listener to add to the registry
         /// The listener is a type with the following static methods:
-        ///  * canListen(component): determines if the listener is compatible with the given component
-        ///  * listen(component): hook unto the validation infrastructure to receive notifications on validation changes
+        ///  * canListen(doodad): determines if the listener is compatible with the given doodad
+        ///  * listen(doodad): hook unto the validation infrastructure to receive notifications on validation changes
         ///</param>
         validationListeners.push(listener);
     }
@@ -401,6 +398,5 @@ THE SOFTWARE.
 		, Email: /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/
     }
 
-    vsc.ValidationRules = ValidationRules;
-
+    doodads.validation.rules = ValidationRules;
 })(jQuery);

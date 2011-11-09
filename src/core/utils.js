@@ -1,29 +1,29 @@
 (function($, undefined) {
-    $.fn.component = function () {
+    $.fn.doodad = function () {
         ///<summary>
-        /// Returns the components that back the elements in a particular jQuery list of elements.
-        /// This method is useful if you have a reference to the DOM elememt of a component,
-        /// but not the component itself.
+        /// Returns the doodads that back the elements in a particular jQuery list of elements.
+        /// This method is useful if you have a reference to the DOM elememt of a doodad,
+        /// but not the doodad itself.
         ///</summary>
         ///<returns>
 
-        /// If none of the elements have a backing component, then returns undefined.
-        /// If only one of the elements has a component, then that component is returned.
-        /// If some/all of the elements have a component, then the input array is mapped into an
-        /// array where elements have a component are populated
+        /// If none of the elements have a backing doodad, then returns undefined.
+        /// If only one of the elements has a doodad, then that doodad is returned.
+        /// If some/all of the elements have a doodad, then the input array is mapped into an
+        /// array where elements have a doodad are populated
         ///</returns>
 
-        var components = $.map(this, function (element, index) {
-            return $(element).data(DOMCOMPONENTMETA);
+        var doodads = $.map(this, function (element, index) {
+            return $(element).data(DOMMETAKEY);
         });
 
-        switch (components.length) {
+        switch (doodads.length) {
             case 0:
                 return undefined;
             case 1:
-                return components[0];
+                return doodads[0];
             default:
-                return components;
+                return doodads;
         }
     }
 
