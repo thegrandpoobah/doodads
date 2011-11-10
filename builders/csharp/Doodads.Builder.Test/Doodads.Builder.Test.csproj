@@ -57,9 +57,6 @@
     <Content Include="..\..\..\src\support\jquery-1.6.4.js">
       <Link>JavaScript\jquery-1.6.4.js</Link>
     </Content>
-    <Content Include="..\..\..\src\support\jquery.debounce-1.0.5.js">
-      <Link>JavaScript\jquery.debounce-1.0.5.js</Link>
-    </Content>
     <Content Include="..\..\..\src\support\yepnope.js">
       <Link>JavaScript\yepnope.js</Link>
     </Content>

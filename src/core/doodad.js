@@ -44,7 +44,7 @@ var DOMMETAKEY = 'doodad'; // constant
 
 		this._hookedResize = false;
 		this.onWindowResize$proxy = doodads.proxy(this.onWindowResize, this);
-		this._onResize$debounced = $.debounce(this._onResize, DEBOUNCE_TIMEOUT, this);
+		this._onResize$debounced = doodads.debounce(this._onResize, DEBOUNCE_TIMEOUT, this);
 
 		if (this._options.validates === false) {
 			doodads.validation.add(this);
