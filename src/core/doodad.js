@@ -6,9 +6,6 @@ var DOMMETAKEY = 'doodad'; // constant
 
 	var $window = $(window); // cache $window, reused fairly frequently
 
-	// make sure that IE can render all of the custom tags we have
-	'doodad'.replace(/\w+/g, function (n) { document.createElement(n); });
-
 	var doodad = function (options, defaultOptions) {
 		///<summary>
 		/// Constructs an instance of doodad, configuring it based on the passed in <paramref name="options">options</paramref> parameter.
