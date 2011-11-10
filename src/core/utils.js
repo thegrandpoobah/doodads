@@ -30,22 +30,25 @@
 	// Adapted from Underscore.js (http://documentcloud.github.com/underscore/underscore.js)
 	// Used under the MIT license
 	doodads.proxy = function bind(func, context) {
-		var bound, args;
-		if (func.bind === Function.prototype.bind && Function.prototype.bind) {
-			return Function.prototype.bind.apply(func, Array.prototype.slice.call(arguments, 1));
+		var bound, args,
+			protoBind = Function.prototype.bind,
+			protoSlice = Array.prototype.slice;
+
+		if (func.bind === protoBind && protoBind) {
+			return protoBind.apply(func, protoSlice.call(arguments, 1));
 		}
 		if (!Object.toString.prototype.call(func) == '[object Function]') {
 			throw new TypeError;
 		}
-		args = Array.prototype.slice.call(arguments, 2);
+		args = protoSlice.call(arguments, 2);
 		return bound = function() {
 			if (!(this instanceof bound)) {
-				return func.apply(context, args.concat(Array.prototype.slice.call(arguments)));
+				return func.apply(context, args.concat(protoSlice.call(arguments)));
 			}
 			var ctor = function(){};
 			ctor.prototype = func.prototype;
-			var self = new ctor;
-			var result = func.apply(self, args.concat(Array.prototype.slice.call(arguments)));
+			var self = new ctor,
+				result = func.apply(self, args.concat(protoSlice.call(arguments)));
 			if (Object(result) === result) {
 				return result;
 			}

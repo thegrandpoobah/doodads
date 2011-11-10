@@ -1,35 +1,56 @@
 (function() {
-	doodads.validation = { listeners: {} };
 
-	doodads.validation.add = function (doodad) {
-		$.each(['valid', 'validationContext', 'isValidationContextEmpty', 'dispose'], function (index, item) {
-			doodad.prototype['_prototype_' + item] = doodad.prototype[item];
-		});
+	var validationListeners = [],
+		overrideMethods = ['valid', 'validationContext', 'isValidationContextEmpty', 'dispose'];
 
-		doodad.prototype.__validator = {};
-		for (var key in Validator) {
-			doodad.prototype.__validator[key] = doodad.prototype[key];
+	doodads.validation = { 
+		listeners: {},
+
+		add: function (doodad) {
+			$.each(overrideMethods, function (index, item) {
+				doodad.prototype['_prototype_' + item] = doodad.prototype[item];
+			});
+
+			doodad.prototype.__validator = {};
+			for (var key in Validator) {
+				doodad.prototype.__validator[key] = doodad.prototype[key];
+			}
+
+			$.extend(doodad.prototype, Validator);
+			doodad.defaultOptions = $.extend({
+				validates: true
+				, validationListeners: 'hintbox'
+			}, doodad.defaultOptions);
+		},
+
+		remove: function (doodad) {
+			for (key in Validator) {
+				doodad[key] = doodad.__validator[key];
+			}
+
+			$.each(overrideMethods, function (index, item) {
+				var prototypeFunction = '_prototype_' + item;
+				doodad[item] = doodad[prototypeFunction];
+				delete doodad[prototypeFunction];
+				doodad[prototypeFunction] = undefined;
+			});
+		},
+
+		registerListener : function (listener) {
+			///<summary>
+			/// Adds a Validation Listener to the validation listener registry.
+			/// Validation Listeners perform an action after every execution of the validate function
+			/// Typically, listeners modify the DOM to reflect the invalid state of a doodad.
+			///</summary>
+			///<param name="listener">
+			/// The Validation Listener to add to the registry
+			/// The listener is a type with the following static methods:
+			///  * canListen(doodad): determines if the listener is compatible with the given doodad
+			///  * listen(doodad): hook unto the validation infrastructure to receive notifications on validation changes
+			///</param>
+			validationListeners.push(listener);
 		}
-
-		$.extend(doodad.prototype, Validator);
-		doodad.defaultOptions = $.extend({
-			validates: true
-			, validationListeners: 'hintbox'
-		}, doodad.defaultOptions);
-	}
-
-	doodads.validation.remove = function (doodad) {
-		for (key in Validator) {
-			doodad[key] = doodad.__validator[key];
-		}
-
-		$.each(['valid', 'validationContext', 'isValidationContextEmpty', 'dispose'], function (index, item) {
-			var prototypeFunction = '_prototype_' + item;
-			doodad[item] = doodad[prototypeFunction];
-			delete doodad[prototypeFunction];
-			doodad[prototypeFunction] = undefined;
-		});
-	}
+	};
 
 	// determines how long the validator waits for an async rule to callback before
 	// showing the user a message.
@@ -320,21 +341,5 @@
 				/* possibly others */
 			});
 		}
-	}
-
-	var validationListeners = [];
-	doodads.validation.registerListener = function (listener) {
-		///<summary>
-		/// Adds a Validation Listener to the validation listener registry.
-		/// Validation Listeners perform an action after every execution of the validate function
-		/// Typically, listeners modify the DOM to reflect the invalid state of a doodad.
-		///</summary>
-		///<param name="listener">
-		/// The Validation Listener to add to the registry
-		/// The listener is a type with the following static methods:
-		///  * canListen(doodad): determines if the listener is compatible with the given doodad
-		///  * listen(doodad): hook unto the validation infrastructure to receive notifications on validation changes
-		///</param>
-		validationListeners.push(listener);
 	}
 })();
