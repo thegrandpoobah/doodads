@@ -17,19 +17,24 @@ task('concatenate', function(params) {
 		, 'core/z-manager.js'
 	];
 	
-	// Add license and closure
-	files.unshift('core/pre.tmpl');
-	files.unshift('core/license.tmpl');
-	files.push('core/post.tmpl');
+	var output = '',
+		license = fs.readFileSync('src/core/license.tmpl').toString(),
+		template = fs.readFileSync('src/core/result.tmpl').toString();
+
+	output += license;
 
 	var all = '';
 	files.forEach(function(file, i) {
 		all += fs.readFileSync('src/' + file).toString();
 		all += '\n';
 	});
+
+	output += template.replace('{{CONTENT}}', all)
+
+	fs.openSync('output/doodads.js', 'w+');
 	
 	var out = fs.openSync('output/doodads.js', 'w+');
-	fs.writeSync(out, all);
+	fs.writeSync(out, output);
 });
 
 desc('Obfuscation and Compression');
