@@ -1,7 +1,8 @@
+var DOMMETAKEY = 'doodad'; // constant
+
 (function() {
 	// constants
-	var DOMMETAKEY = 'doodad',
-		DEBOUNCE_TIMEOUT = 50; // in milliseconds
+	var DEBOUNCE_TIMEOUT = 50; // in milliseconds
 
 	var $window = $(window); // cache $window, reused fairly frequently
 
