@@ -5,8 +5,7 @@ var fs = require('fs'),
 desc('Concatenation');
 task('concatenate', function(params) {
 	var files = [
-		'innershiv/innershiv.src.js'
-		, 'mustache/mustache.js'
+		'mustache/mustache.js'
 		, 'string-measurement/string-measurement.js'
 		, 'core/doodad.js'
 		, 'core/builder.js'
