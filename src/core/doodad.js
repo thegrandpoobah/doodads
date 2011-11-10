@@ -688,13 +688,9 @@ var DOMMETAKEY = 'doodad'; // constant
 				domFrag,
 				self = this;
 
-			if ($.browser.msie) {
-				domFrag = innerShiv(htmlFrag);
-			} else {
-				domFrag = document.createDocumentFragment();
-				$.each($.clean([htmlFrag.trim()], undefined, null, null),
-					function (index, element) { domFrag.appendChild(element); });
-			}
+			domFrag = document.createDocumentFragment();
+			$.each($.clean([htmlFrag.trim()], undefined, null, null),
+				function (index, element) { domFrag.appendChild(element); });
 
 			if (domFrag.firstChild != domFrag.lastChild) {
 				// this is more of a guard condition. doodads *must* have a single topmost node
