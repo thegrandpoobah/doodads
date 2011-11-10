@@ -337,44 +337,4 @@
 		///</param>
 		validationListeners.push(listener);
 	}
-
-	// Validation Rules
-	var ValidationRules = {};
-
-	ValidationRules.Regex = function (regex, message) {
-		this.validate = function (text) {
-			return {
-				message: message
-				, valid: regex.test(text)
-			};
-		};
-	}
-
-	ValidationRules.Regex.Predefined = {
-		Number: function (message) {
-			return new ValidationRules.Regex(ValidationRules.Regexes.Number, message);
-		}
-		, PositiveNumber: function (message) {
-			return new ValidationRules.Regex(ValidationRules.Regexes.PositiveNumber, message);
-		}
-		, Percentage: function (message) {
-			return new ValidationRules.Regex(ValidationRules.Regexes.Percentage, message);
-		}
-		, Date: function (message) {
-			return new ValidationRules.Regex(ValidationRules.Regexes.Date, message);
-		}
-		, Email: function (message) {
-			return new ValidationRules.Regex(ValidationRules.Regexes.Email, message);
-		}
-	}
-
-	ValidationRules.Regexes = {
-		Number: /^\-?([1-9]{1}[0-9]{0,2}(\,\d{3})*(\.\d{0,})?|[1-9]{1}\d{0,}(\.\d{0,})?|0(\.\d{0,})?|(\.\d{0,}))$|^\-?([1-9]{1}\d*(\,\d{3})*(\.\d{0,})?|[1-9]{1}\d{0,}(\.\d{0,})?|0(\.\d{0,})?|(\.\d{0,}))$|^\(([1-9]{1}\d{0,2}(\,\d{3})*(\.\d{0,})?|[1-9]{1}\d{0,}(\.\d{0,})?|0(\.\d{0,})?|(\.\d{0,}))\)$/
-		, PositiveNumber: /^([1-9]{1}[0-9]{0,2}(\,\d{3})*(\.\d{1,})?|[1-9]{1}\d{0,}(\.\d{1,})?|0(\.\d{1,})?|(\.\d{1,}))$|^([1-9]{1}\d*(\,\d{3})*(\.\d{1,})?|[1-9]{1}\d{0,}(\.\d{1,})?|0(\.\d{1,})?|(\.\d{1,}))$|^\(([1-9]{1}\d{0,2}(\,\d{3})*(\.\d{1,})?|[1-9]{1}\d{0,}(\.\d{1,})?|0(\.\d{1,})?|(\.\d{1,}))\)$/
-		, Percentage: /^(100|100\.0*)\%?$|^([1-9]{1}[0-9]{1}(\.\d{0,})?\%?|[1-9]{1}(\.\d{0,})?\%?|0(\.\d{0,})?\%?|(\.\d{0,}))\%?$|^([1-9]{1,2}(\.\d{0,})?\%?|[1-9]{1}(\.\d{1,})?\%?|0(\.\d{0,})?\%?|(\.\d{0,}))$|^([1-9]{1}\d{0,1}(\.\d{0,})?\%?|0(\.\d{0,})?\%?|(\.\d{0,}))$/
-		, Date: /^(?=\d)(?:(?:(?:(?:(?:0?[13578]|1[02])(\/|-|\.)31)\1|(?:(?:0?[1,3-9]|1[0-2])(\/|-|\.)(?:29|30)\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})|(?:0?2(\/|-|\.)29\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))|(?:(?:0?[1-9])|(?:1[0-2]))(\/|-|\.)(?:0?[1-9]|1\d|2[0-8])\4(?:(?:1[6-9]|[2-9]\d)?\d{2}))($|\ (?=\d)))?(((0?[1-9]|1[012])(:[0-5]\d){0,2}(\ [AP]M))|([01]\d|2[0-3])(:[0-5]\d){1,2})?$/
-		, Email: /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/
-	}
-
-	doodads.validation.rules = ValidationRules;
 })();
