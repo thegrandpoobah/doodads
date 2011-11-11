@@ -2,16 +2,7 @@ var fs = require('fs'),
 	sys = require('sys'),
 	uglify = require('uglify-js');
 
-desc('Concatenation');
-task('concatenate', function(params) {
-	var files = [
-		'core/doodad.js'
-		, 'core/builder.js'
-		, 'core/utils.js'
-		, 'core/Validator.js'
-		, 'core/HintBoxValidationListener.js'
-	];
-	
+function concatenate(files, outputFile, withPreamble) {
 	var output = '',
 		license = fs.readFileSync('src/core/license.tmpl').toString(),
 		template = fs.readFileSync('src/core/result.tmpl').toString();
@@ -22,27 +13,56 @@ task('concatenate', function(params) {
 		all += '\n';
 	});
 
-	output += license;
-	output += template.replace('{{CONTENT}}', all);
+	if (withPreamble) {
+		output += license;
+		output += template.replace('{{CONTENT}}', all);
+	} else {
+		output = all;
+	}
 
-	fs.openSync('output/doodads.js', 'w+');
+	fs.openSync('output/' + outputFile, 'w+');
 	
-	var out = fs.openSync('output/doodads.js', 'w+');
+	var out = fs.openSync('output/' + outputFile, 'w+');
 	fs.writeSync(out, output);
+}
+
+desc('Library tools');
+task('tools', function(params) {
+	concatenate([
+		'events-capture/events-capture.js'
+		, 'z-manager/z-manager.js'
+		, 'string-measurement/string-measurement.js'
+	], 'doodads.tools.js');
+});
+
+desc('Concatenation');
+task('concatenate', function(params) {
+	concatenate([
+		'core/doodad.js'
+		, 'core/builder.js'
+		, 'core/utils.js'
+		, 'core/Validator.js'
+		, 'core/HintBoxValidationListener.js'
+	], 'doodads.js', true);
 });
 
 desc('Obfuscation and Compression');
-task({'minify': ['concatenate']}, function(params) {
-	try {
-		var all = fs.readFileSync('output/doodads.js').toString(),
-			out = fs.openSync('output/doodads.min.js', 'w+'),
-			ast = uglify.parser.parse(all);
+task({'minify': ['concatenate', 'tools']}, function(params) {
+	function minify(inputFile, outputFile) {
+		try {
+			var all = fs.readFileSync('output/' + inputFile).toString(),
+				out = fs.openSync('output/' + outputFile, 'w+'),
+				ast = uglify.parser.parse(all);
 
-		ast = uglify.uglify.ast_mangle(ast);
-		ast = uglify.uglify.ast_squeeze(ast);
+			ast = uglify.uglify.ast_mangle(ast);
+			ast = uglify.uglify.ast_squeeze(ast);
 
-		fs.writeSync(out, uglify.uglify.gen_code(ast));
-	} catch(e) {
-		console.error(e);
+			fs.writeSync(out, uglify.uglify.gen_code(ast));
+		} catch(e) {
+			console.error(e);
+		}
 	}
+
+	minify('doodads.js', 'doodads.min.js');
+	minify('doodads.tools.js', 'doodads.tools.min.js');
 });
