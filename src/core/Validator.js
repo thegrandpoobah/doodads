@@ -75,10 +75,10 @@
 			///	</remarks>
 			/// <param name="rule" type="Object|[Object]">A single rule or an array of rules</param>
 
-			this._rules = $.merge(this._rules || [], value instanceof Array ? value : [value]);
+			this._rules = $.merge(this._rules || [], $.isArray(value) ? value : [value]);
 		}
 		, addCallout: function (doodad) {
-			this._callouts = $.merge(this._callouts || [], doodad instanceof Array ? doodad : [doodad]);
+			this._callouts = $.merge(this._callouts || [], $.isArray(doodad) ? doodad : [doodad]);
 		}
 		, ranValidation: function () {
 			return this._ranValidation;
@@ -286,7 +286,7 @@
 
 			// if result.message is not an array, turn it into an array
 			var messages;
-			if (Object.prototype.toString.call(result.message) !== '[object Array]') {
+			if ($.isArray(result.message)) {
 				messages = [result.message];
 			} else {
 				messages = result.message;
