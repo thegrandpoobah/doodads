@@ -1,5 +1,4 @@
 output/*
-support/*
 builders/csharp/**/obj
 builders/csharp/**/bin
 builders/csharp/*.suo

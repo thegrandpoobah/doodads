@@ -4,3 +4,10 @@
 [submodule "src/string-measurement"]
 	path = src/string-measurement
 	url = git@github.com:doodads/string-measurement.git
+[submodule "src/events-capture"]
+	path = src/events-capture
+	url = git@github.com:doodads/events-capture.git
+[submodule "src/z-manager"]
+	path = src/z-manager
+	url = git@github.com:doodads/z-manager.git
+
