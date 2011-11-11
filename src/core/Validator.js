@@ -1,10 +1,13 @@
 (function() {
+	// determines how long the validator waits for an async rule to callback before
+	// showing the user a message.
+	var ASYNC_GRACE_PERIOD = 100;
 
 	var validationListeners = [],
 		overrideMethods = ['valid', 'validationContext', 'isValidationContextEmpty', 'dispose'];
 
 	doodads.validation = { 
-		listeners: {},
+		listeners: {}, // namespace for the validation listeners
 
 		add: function (doodad) {
 			$.each(overrideMethods, function (index, item) {
@@ -51,10 +54,6 @@
 			validationListeners.push(listener);
 		}
 	};
-
-	// determines how long the validator waits for an async rule to callback before
-	// showing the user a message.
-	var ASYNC_GRACE_PERIOD = 100;
 
 	Validator = {
 		addRule: function (value) {
@@ -335,7 +334,7 @@
 			}
 		}
 		, trigger_validationApplied: function () {
-			$(this).trigger('validationApplied', {
+			this.trigger('validationApplied', {
 				messages: this._backList
 				, isValid: this._computedValidity
 				/* possibly others */
