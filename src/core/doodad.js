@@ -20,26 +20,32 @@ var DOMMETAKEY = 'doodad'; // constant
 		if (arguments.length === 0) { return; }
 
 		this._options = $.extend({}, doodad.defaultOptions, defaultOptions, options);
-		this._jQueryCache = $(this);
 		
-		this._parent = null;
-		this._children = [];
-		this._autogenChildren = []; // the list of children that have private variables
-		this._autogenUnbinds = []; // the list of events to auto-unbind
-		this._autogenRefs = []; // the list of DOM elements with references
-		this._source = null;
-		this._id = this._options.id;
-		this._cssClassOverrides = this._options.cssClass;
-		this._tabIndex = this._options.tabIndex;
-		this._isAttached = false;
-		this._isValid = true;
-		this._disposing = false;
+		$.extend(this, {
+			_jQueryCache: $(this)
+			
+			, _id: this._options.id
+			, _cssClassOverrides: this._options.cssClass
+			, _tabIndex: this._options.tabIndex
+			
+			, _parent: null
+			, _children: []
+			, _autogenChildren: [] // the list of children that have private variables
+			, _autogenUnbinds: [] // the list of events to auto-unbind
+			, _autogenRefs: [] // the list of DOM elements with references
+			, _source: null
+			, _dataSource: null
+			
+			, _isAttached: false
+			
+			, _isValid: true
+			, _listenToChildrenValidity: true
 
-		this._listenToChildrenValidity = true;
-
-		this._dataSource = null;
-
-		this._hookedResize = false;
+			, _hookedResize: false
+			
+			, _disposing: false
+		});
+		
 		this.onWindowResize$proxy = doodads.proxy(this.onWindowResize, this);
 		this._onResize$debounced = doodads.debounce(this._onResize, DEBOUNCE_TIMEOUT, this);
 
