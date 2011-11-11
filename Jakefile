@@ -5,22 +5,16 @@ var fs = require('fs'),
 desc('Concatenation');
 task('concatenate', function(params) {
 	var files = [
-		'mustache/mustache.js'
-		, 'string-measurement/string-measurement.js'
-		, 'core/doodad.js'
+		'core/doodad.js'
 		, 'core/builder.js'
 		, 'core/utils.js'
-		, 'core/capturingEvents.js'
 		, 'core/Validator.js'
 		, 'core/HintBoxValidationListener.js'
-		, 'core/z-manager.js'
 	];
 	
 	var output = '',
 		license = fs.readFileSync('src/core/license.tmpl').toString(),
 		template = fs.readFileSync('src/core/result.tmpl').toString();
-
-	output += license;
 
 	var all = '';
 	files.forEach(function(file, i) {
@@ -28,7 +22,8 @@ task('concatenate', function(params) {
 		all += '\n';
 	});
 
-	output += template.replace('{{CONTENT}}', all)
+	output += license;
+	output += template.replace('{{CONTENT}}', all);
 
 	fs.openSync('output/doodads.js', 'w+');
 	
