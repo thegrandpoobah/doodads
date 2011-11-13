@@ -588,7 +588,7 @@ var DOMMETAKEY = 'doodad'; // constant
 				});
 				
 				return completionDfd.promise();
-			});
+			}).get();
 			
 			$.when.apply(null, dfds)
 				.done(function() {
