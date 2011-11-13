@@ -21,13 +21,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
-<?xml version="1.0" encoding="utf-8" ?>
-<component xmlns="http://schemas.vastcap.com/componentDefinition"
-           type="Vastardis.UI.Components.Generics.List"
-           inheritsFrom="Vastardis.UI.Components.Component">
-  <behaviour path="~/Components/List/List.js" />
+<doodad xmlns="http://schemas.vastcap.com/doodadDefinition"
+           type="doodads.library.list"
+           inheritsFrom="doodads.doodad"
+           validates="true">
+  <behaviour path="~/doodads/List/List.js" />
   <templates>
-    <base path="~/Components/List/List.html"/>
-    <partial name="item" path="~/Components/List/List.item.html"/>
+    <base path="~/doodads/List/List.html"/>
+    <partial name="item" path="~/doodads/List/List.item.html"/>
   </templates>
-</component>
+</doodad>

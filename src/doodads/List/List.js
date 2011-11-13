@@ -20,41 +20,51 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-(function ($, undefined) {
-    // to make better sense of this class, please be aware that the model for the generic list
-    // is basically decorated with extra metadata that maintains information about DOM nodes and indexing.
-    // To preserve the user's data and not add any new properties onto it,
-    // this decoration is handled through a mapping between user data and list data.
-    // The component maintains a bidirectional mapping between the DOM and the users data, so it is
-    // possible to get at one if you have the other.
-    // From data to DOM: this._itemMap[this.indexOf(data)].domNode
-    // From DOM to data: $(domElement).data('metadata')
-    // The data -> DOM mapping is intentionally obtuse since it should only be used by a derived control
-    // and not exposed to component users. Generally speaking, in the few places you need access to the DOM representation
-    // of an item, it is available to you automatically, so the data -> DOM mapping is not really necessary to begin with.
 
-    // EVENTS:
-    // This component exposes two events (in addition to any inherited via Component):
-    //  * itemRendered
-    //   - This event is triggered whenever an item in the model gets rendered to the DOM.
-    //     The event has the following object literal associated with it: { item: {}, domNode: HtmlElement }
-    //     where item represents the model item and domNode represents the rendered representation of the model item.
-    //  * modelChanged
-    //   - This event is triggered whenever the underlying model (dataSource) for the component changes
-    //     for any reason (either through directly setting dataSource or via the manipulation methods).
-    ///    Note that this event is only concerned about changes to the List model, not the individual item model.
-    //     so changes to an individual item do not trigger a modelChanged event.
-    // In almost all scenarios where the model is manipulated, both modelChanged and itemRendered will get
-    // triggered in tandem, but it is possible to get only itemRendered to trigger, so do not rely on this.
-    // For example, if you call List.rerender, all the items will rerender (and trigger itemRendered), but no modelChanged
-    // event will be triggered.
+// to make better sense of this class, please be aware that the model for the generic list
+// is basically decorated with extra metadata that maintains information about DOM nodes and indexing.
+// To preserve the user's data and not add any new properties onto it,
+// this decoration is handled through a mapping between user data and list data.
+// The component maintains a bidirectional mapping between the DOM and the users data, so it is
+// possible to get at one if you have the other.
+// From data to DOM: this._itemMap[this.indexOf(data)].domNode
+// From DOM to data: $(domElement).data('metadata')
+// The data -> DOM mapping is intentionally obtuse since it should only be used by a derived control
+// and not exposed to component users. Generally speaking, in the few places you need access to the DOM representation
+// of an item, it is available to you automatically, so the data -> DOM mapping is not really necessary to begin with.
 
-    // Examples of EVENTS:
-    // var list = new vscG.List({});
-    // $(list).bind('modelChanged', function(eventArgs) { /* at this point, the underlying model for the component has changed */ });
-    // $(list).bind('itemRendered', function(eventArgs, parameters) { /* parameters.item is the model, parameters.domNode is the html element. */ });
+// EVENTS:
+// This component exposes two events (in addition to any inherited via Component):
+//  * itemRendered
+//   - This event is triggered whenever an item in the model gets rendered to the DOM.
+//     The event has the following object literal associated with it: { item: {}, domNode: HtmlElement }
+//     where item represents the model item and domNode represents the rendered representation of the model item.
+//  * modelChanged
+//   - This event is triggered whenever the underlying model (dataSource) for the component changes
+//     for any reason (either through directly setting dataSource or via the manipulation methods).
+///    Note that this event is only concerned about changes to the List model, not the individual item model.
+//     so changes to an individual item do not trigger a modelChanged event.
+// In almost all scenarios where the model is manipulated, both modelChanged and itemRendered will get
+// triggered in tandem, but it is possible to get only itemRendered to trigger, so do not rely on this.
+// For example, if you call List.rerender, all the items will rerender (and trigger itemRendered), but no modelChanged
+// event will be triggered.
 
-    var List = function () {
+// Examples of EVENTS:
+// var list = new vscG.List({});
+// $(list).bind('modelChanged', function(eventArgs) { /* at this point, the underlying model for the component has changed */ });
+// $(list).bind('itemRendered', function(eventArgs, parameters) { /* parameters.item is the model, parameters.domNode is the html element. */ });
+
+String.format = function() {
+    var s = arguments[0];
+    for (var i = 0; i < arguments.length - 1; i++) {       
+        var reg = new RegExp("\\{" + i + "\\}", "gm");             
+        s = s.replace(reg, arguments[i + 1]);
+    }
+    return s;
+}
+
+doodads.setup()
+    .constructor(function () {
         ///<summary>
         /// The Generic List serves as a convenient base class for list-oriented Components like Menus.
         /// The class provides methods to manipulate the list model and reflect the changes in the DOM
@@ -66,8 +76,8 @@ THE SOFTWARE.
         this._containerElement = null;
         this._singleItemTemplate = null;
         this._guid = 0;
-    }
-    List.prototype = $.extend(new base.constructor(), {
+    })
+    .proto({
         constructElement: function List$constructElement() {
             ///<summary>
             /// Constructs the Generic list component's DOM fragment.
@@ -95,12 +105,12 @@ THE SOFTWARE.
                 }
             }, this));
 
-            base._generateDOMReferences.call(this);
+            this.base._generateDOMReferences.call(this);
         }
         , _instantiateChildComponents: function List$_instantiateChildComponents() {
             // override the base implementation to trigger itemRendered *after* all 
             // autogenerated nodes are ready.
-            base._instantiateChildComponents.apply(this, arguments);
+            this.base._instantiateChildComponents.apply(this, arguments);
 
             $.each(this._itemMap, $.proxy(function (i, mapRef) {
                 this.trigger_itemRendered(mapRef.data, mapRef.domNode);
@@ -161,8 +171,8 @@ THE SOFTWARE.
             oldChildren = this._children;
             this._children = [];
 
-            base._instantiateChildComponents.call(this);
-            base._generateDOMReferences.call(this);
+            this.base._instantiateChildComponents.call(this);
+            this.base._generateDOMReferences.call(this);
 
             wrappedItem.componentChildren = this._children;
             this._children = oldChildren;
@@ -215,16 +225,16 @@ THE SOFTWARE.
             }
             return this._options.templates.__compiledTemplate(dataSet);
         }
-		, children: function List$children() {
-			var baseChildren = $.merge([], base.children.apply(this, arguments)), // create a "shallow" copy of the base children property
-				thisChildren = [];
-			
-		    $.each(this._itemMap, function () {
-		        thisChildren = $.merge(thisChildren, this.componentChildren || []);
-		    });
-			
-			return $.merge(thisChildren, baseChildren);
-		}
+    	, children: function List$children() {
+    		var baseChildren = $.merge([], this.base.children.apply(this, arguments)), // create a "shallow" copy of the base children property
+    			thisChildren = [];
+    		
+    	    $.each(this._itemMap, function () {
+    	        thisChildren = $.merge(thisChildren, this.componentChildren || []);
+    	    });
+    		
+    		return $.merge(thisChildren, baseChildren);
+    	}
         , dataSource: function List$dataSource(/*newValue*/) {
             ///<summary>
             /// Getter/Setter.
@@ -326,7 +336,7 @@ THE SOFTWARE.
             $.each(wrappedItem.componentChildren || [], function () {
                 this.updateAttachment();
             });
-			
+    		
             this.trigger_modelChanged();
         }
         , removeItem: function List$removeItem(argv) {
@@ -429,10 +439,10 @@ THE SOFTWARE.
                     this._containerElement.prepend(this._itemMap[index].domNode);
                 }
 
-				$.each(this._itemMap[index].componentChildren || [], function () {
-					this.updateAttachment();
-				});
-				
+    			$.each(this._itemMap[index].componentChildren || [], function () {
+    				this.updateAttachment();
+    			});
+    			
                 this.trigger_modelChanged();
             } else {
                 //get
@@ -445,10 +455,5 @@ THE SOFTWARE.
         , trigger_itemRendered: function List$trigger_itemRendered(data, domNode) {
             $(this).trigger('itemRendered', { item: data, domNode: domNode });
         }
-    });
-
-    window.getComponentType = function () {
-        return List;
-    }
-
-})(jQuery);
+    })
+    .complete();
