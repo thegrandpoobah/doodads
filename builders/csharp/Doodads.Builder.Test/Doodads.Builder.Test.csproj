@@ -94,6 +94,32 @@
       <Link>doodads\NumericTextBox\NumericTextBox.xml</Link>
     </Content>
 
+    <Content Include="..\..\..\src\doodads\List\List.js">
+      <Link>doodads\List\List.js</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\List\List.html">
+      <Link>doodads\List\List.html</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\List\List.item.html">
+      <Link>doodads\List\List.item.html</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\List\List.xml">
+      <Link>doodads\List\List.xml</Link>
+    </Content>
+
+    <Content Include="..\..\..\src\doodads\HintBox\HintBox.js">
+      <Link>doodads\HintBox\HintBox.js</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\HintBox\HintBox.html">
+      <Link>doodads\HintBox\HintBox.html</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\HintBox\HintBox.css">
+      <Link>doodads\HintBox\HintBox.css</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\HintBox\HintBox.xml">
+      <Link>doodads\HintBox\HintBox.xml</Link>
+    </Content>
+    
     <Content Include="Default.html" />
     <Content Include="JavaScript\jquery.debounce-1.0.5.js" />
     <Content Include="Web.config">
