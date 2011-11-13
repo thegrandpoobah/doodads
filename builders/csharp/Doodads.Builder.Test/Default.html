@@ -2,25 +2,62 @@
 <head>
     <title></title>
     <script type="text/javascript" src="JavaScript/jquery-1.6.4.js"></script>
+    <script type="text/javascript" src="JavaScript/jquery.debounce-1.0.5.js"></script>
     <script type="text/javascript" src="JavaScript/yepnope.js"></script>
     <script type="text/javascript" src="JavaScript/mustache.js"></script>
     <script type="text/javascript" src="JavaScript/doodads.js"></script>
     <script type="text/javascript" src="JavaScript/doodads.tools.js"></script>
     <script type="text/javascript">
         $(function () {
-           /* doodads.create('Derived.component', { text: '[DERIVED] From index.html' })
+        /*
+            doodads.create('/doodads/Derived.doodad', { text: '[DERIVED] From index.html' })
                 .done(function (component) {
                     component.render($(document.body));
-                }); */
+                });
 
-            doodads.create('TestDoodad.doodad', { text: '[TESTDOODAD] From index.html' })
+            doodads.create('/doodads/TestDoodad.doodad', { text: '[TESTDOODAD] From index.html' })
                 .done(function (component) {
                     component.render($(document.body));
+                });
+
+            
+            doodads.create('/doodads/TextBox.doodad', { text: 'HELLO', required: true })
+                .done(function (component) {
+                    component.render($(document.body));
+
+                    component.bind('changing', function () {
+                        console.log(arguments);
+                    });
+
+                    component.bind('valid', function () {
+                        console.log('valid');
+                    });
+
+                    component.bind('invalid', function () {
+                        console.log('invalid');
+                    });
+                });
+            */
+
+            doodads.create('/doodads/NumericTextBox.doodad', { text: 'HELLO', required: true })
+                .done(function (component) {
+                    component.render($(document.body));
+
+                    component.bind('changing', function () {
+                        console.log(arguments);
+                    });
+
+                    component.bind('valid', function () {
+                        console.log('valid');
+                    });
+
+                    component.bind('invalid', function () {
+                        console.log('invalid');
+                    });
                 });
         });
     </script>
 </head>
 <body>
-
 </body>
 </html>

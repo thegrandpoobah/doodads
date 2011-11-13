@@ -66,14 +66,22 @@
     <Content Include="..\..\..\src\mustache\mustache.js">
       <Link>JavaScript\mustache.js</Link>
     </Content>
-    <Content Include="Derived\Derived.html" />
-    <Content Include="Derived\Derived.js" />
-    <Content Include="Derived\Derived.xml" />
+    <Content Include="doodads\Derived\Derived.html" />
+    <Content Include="doodads\Derived\Derived.js" />
+    <Content Include="doodads\Derived\Derived.xml" />
     <Content Include="Default.html" />
-    <Content Include="TestDoodad\TestDoodad.css" />
-    <Content Include="TestDoodad\TestDoodad.html" />
-    <Content Include="TestDoodad\TestDoodad.js" />
-    <Content Include="TestDoodad\TestDoodad.xml" />
+    <Content Include="doodads\NumericTextBox\NumericTextBox.css" />
+    <Content Include="doodads\NumericTextBox\NumericTextBox.html" />
+    <Content Include="doodads\NumericTextBox\NumericTextBox.js" />
+    <Content Include="doodads\NumericTextBox\NumericTextBox.xml" />
+    <Content Include="doodads\TextBox\TextBox.css" />
+    <Content Include="doodads\TextBox\TextBox.html" />
+    <Content Include="doodads\TextBox\TextBox.js" />
+    <Content Include="doodads\TextBox\TextBox.xml" />
+    <Content Include="doodads\TestDoodad\TestDoodad.css" />
+    <Content Include="doodads\TestDoodad\TestDoodad.html" />
+    <Content Include="doodads\TestDoodad\TestDoodad.js" />
+    <Content Include="doodads\TestDoodad\TestDoodad.xml" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
