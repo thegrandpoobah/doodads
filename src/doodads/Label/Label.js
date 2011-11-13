@@ -20,21 +20,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-(function ($, undefined) {
-    var Label = function () {
+doodads.setup()
+    .constructor(function () {
         this._text = this._options.text;
-    }
-    Label.defaultOptions = {
+    })
+    .defaultOptions({
         text: ''
-    };
-    Label.prototype = $.extend(new base.constructor(), {
+    })
+    .proto({
         templateData: function () {
             return { text: this._text };
         }
-        , cssClassPrefix: function () {
-            return 'c_label';
-        }
-        , text: function (/*text*/) {
+        text: function (/*text*/) {
             if (arguments.length === 0) {
                 return this._text;
             } else {
@@ -42,10 +39,5 @@ THE SOFTWARE.
                 this.element().text(this._text);
             }
         }
-    });
-    Label.prototype.dataSource = Label.prototype.text; // alias text to dataSource
-
-    window.getComponentType = function () {
-        return Label;
-    }
-})(jQuery);
+    })
+    .complete();

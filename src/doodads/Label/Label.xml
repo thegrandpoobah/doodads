@@ -22,11 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 <?xml version="1.0" encoding="utf-8" ?>
-<component xmlns="http://schemas.vastcap.com/componentDefinition"
-           type="Vastardis.UI.Components.Label"
-           inheritsFrom="Vastardis.UI.Components.Component">
+<doodad xmlns="http://schemas.vastcap.com/doodadDefinition"
+           type="doodads.library.label"
+           inheritsFrom="doodads.doodad">
   <behaviour path="~/Components/Label/Label.js" />
   <templates>
     <base path="~/Components/Label/Label.html"/>
   </templates>
-</component>
+</doodad>
