@@ -21,16 +21,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
-<?xml version="1.0" encoding="utf-8" ?>
-<component xmlns="http://schemas.vastcap.com/componentDefinition"
-           type="Vastardis.UI.Components.TextBox2"
-           inheritsFrom="Vastardis.UI.Components.Component"
+<doodad xmlns="http://schemas.vastcap.com/doodadDefinition"
+           type="doodads.library.textBox"
+           inheritsFrom="doodads.doodad"
            validates="true">
-  <behaviour path="~/Components/Textbox/TextBox.js" />
+  <behaviour path="~/doodads/TextBox/TextBox.js" />
   <templates>
-    <base path="~/Components/TextBox/TextBox.html"/>
+    <base path="~/doodads/TextBox/TextBox.html"/>
   </templates>
   <stylesheets>
-    <stylesheet path="~/Components/TextBox/TextBox.css"/>
+    <stylesheet path="~/doodads/TextBox/TextBox.css"/>
   </stylesheets>
-</component>
+</doodad>

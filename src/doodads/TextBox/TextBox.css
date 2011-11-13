@@ -32,10 +32,3 @@ span.textbox {
 span.textbox input.watermarked {
     color: Gray;
 }
-span.textbox .star {
-    color: Red;
-    font-size: large;
-    padding-right: 4px;
-    vertical-align: middle;
-    height: 10px;
-}

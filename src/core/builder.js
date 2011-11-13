@@ -190,7 +190,7 @@
 				new_doodad.prototype.constructor = new_doodad;
 				
 				if (setupObject.validates) {
-					Vastardis.UI.Components.Component.addValidationAPI(new_doodad);
+					doodads.validation.add(new_doodad);
 				}
 				
 				for (key in setupObject.statics) {
