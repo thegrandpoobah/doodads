@@ -86,16 +86,25 @@
 		}
 
 		, showHintBox: function HintBoxValidationListener$showHintBox() {
-			var target = this._doodad ? this._doodad.validationTarget() : null;
+			var target = this._doodad ? this._doodad.validationTarget() : null,
+				self = this;
 
 			if (target) {
-				this.hintList().dataSource(this._validationState.messages);
+
+				this.hintList().done(function(hlist) {
+					hlist.dataSource(self._validationState.messages);
+				});
+
 				// set the color
 				if (this._validationState.messages.length > 0) {
 					if (this._doodad.valid()) {
-						this.hintBox().element().addClass('infobox');
+						this.hintBox().done(function(hbx) {
+							hbx.element().addClass('infobox');
+						});
 					} else {
-						this.hintBox().element().removeClass('infobox');
+						this.hintBox().done(function(hbx) {
+							hbx.element().removeClass('infobox');
+						});
 					}
 				}
 			}
@@ -103,10 +112,11 @@
 			if (!hintBoxVisible) {
 				hintBoxVisible = true;
 
-				this.hintBox().show(target,
-					this._doodad._options.hintBoxOrientation || 'bottom right',
-					this._doodad._options.hintBoxDirection || 'down right');
-
+				this.hintBox().done(function (hbx) {
+					hbx.show(target,
+						self._doodad._options.hintBoxOrientation || 'bottom right',
+						self._doodad._options.hintBoxDirection || 'down right');
+				});
 				captureEvent('mousedown', this._doodad.element(), this.onCapturedMouseDown$proxy);
 			}
 		}
@@ -114,25 +124,46 @@
 			if (hintBoxVisible) {
 				hintBoxVisible = false;
 
-				this.hintBox().hide();
+				this.hintBox().done(function (hbx) { 
+					hbx.hide();
+				});
 
 				releaseEvent('mousedown');
 			}
 		}
 
 		, hintList: function HintBoxValidationListener$hintList() {
-			if (!sharedHintList) {
-				sharedHintList = doodads.create('/Doodads/List.doodad', { cssClass: 'hintlist' });
-				this.hintBox().addChild(sharedHintList);
+			var dfd = $.Deferred();
+
+			if (sharedHintList) {
+				return dfd.resolve(sharedHintList).promise();
 			}
-			return sharedHintList;
+
+			var self = this;
+			doodads.create('/doodads/List.doodad', { cssClass: 'hintlist' }).done(function(cmp) {
+				sharedHintList = cmp;
+				self.hintBox().done(function (hbx) {
+					hbx.addChild(sharedHintList);
+				});
+				dfd.resolve(sharedHintList);
+			});
+		
+			return dfd.promise();
 		}
 		, hintBox: function HintBoxValidationListener$hintBox() {
-			if (!sharedHintBox) {
-				sharedHintBox = doodads.create('/Doodads/HintBox.doodad');
-				sharedHintBox.render($(document.body));
+			var dfd = $.Deferred();
+
+			if (sharedHintBox) {
+				return dfd.resolve(sharedHintBox).promise();		
 			}
-			return sharedHintBox;
+
+			doodads.create('/doodads/HintBox.doodad').done(function(cmp) {
+				sharedHintBox = cmp;
+				sharedHintBox.render($(document.body));			
+				dfd.resolve(sharedHintBox);
+			});
+
+			return dfd.promise();
 		}
 
 		, dispose: function HintBoxValidationListener$dispose(doodad) {
