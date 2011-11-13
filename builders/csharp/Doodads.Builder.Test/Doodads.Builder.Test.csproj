@@ -57,6 +57,30 @@
     <Content Include="..\..\..\output\doodads.tools.js">
       <Link>JavaScript\doodads.tools.js</Link>
     </Content>
+    <Content Include="..\..\..\src\doodads\NumericTextBox\NumericTextBox.css">
+      <Link>doodads\NumericTextBox\NumericTextBox.css</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\NumericTextBox\NumericTextBox.html">
+      <Link>doodads\NumericTextBox\NumericTextBox.html</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\NumericTextBox\NumericTextBox.js">
+      <Link>doodads\NumericTextBox\NumericTextBox.js</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\NumericTextBox\NumericTextBox.xml">
+      <Link>doodads\NumericTextBox\NumericTextBox.xml</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\TextBox\TextBox.css">
+      <Link>doodads\TextBox\TextBox.css</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\TextBox\TextBox.html">
+      <Link>doodads\TextBox\TextBox.html</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\TextBox\TextBox.js">
+      <Link>doodads\TextBox\TextBox.js</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\TextBox\TextBox.xml">
+      <Link>doodads\TextBox\TextBox.xml</Link>
+    </Content>
     <Content Include="..\..\..\src\support\jquery-1.6.4.js">
       <Link>JavaScript\jquery-1.6.4.js</Link>
     </Content>
@@ -70,18 +94,11 @@
     <Content Include="doodads\Derived\Derived.js" />
     <Content Include="doodads\Derived\Derived.xml" />
     <Content Include="Default.html" />
-    <Content Include="doodads\NumericTextBox\NumericTextBox.css" />
-    <Content Include="doodads\NumericTextBox\NumericTextBox.html" />
-    <Content Include="doodads\NumericTextBox\NumericTextBox.js" />
-    <Content Include="doodads\NumericTextBox\NumericTextBox.xml" />
-    <Content Include="doodads\TextBox\TextBox.css" />
-    <Content Include="doodads\TextBox\TextBox.html" />
-    <Content Include="doodads\TextBox\TextBox.js" />
-    <Content Include="doodads\TextBox\TextBox.xml" />
     <Content Include="doodads\TestDoodad\TestDoodad.css" />
     <Content Include="doodads\TestDoodad\TestDoodad.html" />
     <Content Include="doodads\TestDoodad\TestDoodad.js" />
     <Content Include="doodads\TestDoodad\TestDoodad.xml" />
+    <Content Include="JavaScript\jquery.debounce-1.0.5.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
