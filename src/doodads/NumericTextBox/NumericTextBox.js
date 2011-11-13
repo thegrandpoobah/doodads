@@ -41,116 +41,126 @@ THE SOFTWARE.
         };
     };
 
-    var addCommaFormat = function (number, dec_places, no_value, prefix, suffix) {
-        if (no_value == null) no_value = '';
-        if (number == null) return no_value;
-        var new_number = '';
-        var i = 0; //Just used in loops
-        var sign = ""; //If negative, a minus sign will be prefixed to the result
-        var number = number.toString(); //We need to operate on and return a string, not a number
-        // Handle cases when number is in the exp form, such as "6e-7".
-        // In this case, we actually want the expanded form, that is "-0.0000006"
-        exp = number.indexOf('e');
-        if (exp > -1) {
-            var str = number.substring(exp + 1);
-            var num = number.substring(0, exp).replace(/-|\./g, '');
-            var dec = parseInt(number.substring(exp + 2)) - 1;
-            var str = (num.charAt(0) == '-') ? '-0.' : '0.';
-            for (var i = 0; i < dec; i++) {
-                str += '0';
+    var formatters = {
+        addComma : function (number, dec_places, no_value, prefix, suffix) {
+            if (no_value == null) no_value = '';
+            if (number == null) return no_value;
+            var new_number = '';
+            var i = 0; //Just used in loops
+            var sign = ""; //If negative, a minus sign will be prefixed to the result
+            var number = number.toString(); //We need to operate on and return a string, not a number
+            // Handle cases when number is in the exp form, such as "6e-7".
+            // In this case, we actually want the expanded form, that is "-0.0000006"
+            exp = number.indexOf('e');
+            if (exp > -1) {
+                var str = number.substring(exp + 1);
+                var num = number.substring(0, exp).replace(/-|\./g, '');
+                var dec = parseInt(number.substring(exp + 2)) - 1;
+                var str = (num.charAt(0) == '-') ? '-0.' : '0.';
+                for (var i = 0; i < dec; i++) {
+                    str += '0';
+                }
+                number = str + num;
             }
-            number = str + num;
-        }
-        //Remove any excess white space
-        number = number.replace(/^\s+|\s+$/g, '');
-        //Do we have a negative number?
-        if (number.charAt(0) == '-') //minus sign
-        {
-            sign = '-';
-            number = number.substring(1);
-        }
-        dec_places = parseInt(dec_places);
-        dec_point_pos = number.lastIndexOf('.');
-        //If there is nothing before the decimal point, prefix with a zero
-        if (dec_point_pos == 0) {
-            number = '0' + number;
-            dec_point_pos = 1;
-        }
-        //Is number an integer?
-        if (dec_point_pos == -1 || dec_point_pos == number.length - 1) {
-            if (dec_places > 0) {
-                new_number = number + '.';
-                for (i = 0; i < dec_places; i++) {
-                    new_number += '0';
-                }
-                if (new_number == 0) {
-                    sign = '';
-                }
-                str = sign + new_number;
-            } else {
-                str = sign + number;
+            //Remove any excess white space
+            number = number.replace(/^\s+|\s+$/g, '');
+            //Do we have a negative number?
+            if (number.charAt(0) == '-') //minus sign
+            {
+                sign = '-';
+                number = number.substring(1);
             }
-        } else {
-            var existing_places = (number.length - 1) - dec_point_pos;
-            if (existing_places == dec_places) {
-                //Do we already have the right number of decimal places?
-                str = sign + number;
-            } else if (existing_places < dec_places) {
-                //Do we already have less than the number of decimal places we want?
-                //If so, pad out with zeros
-                new_number = number;
-                for (i = existing_places; i < dec_places; i++) {
-                    new_number += '0';
+            dec_places = parseInt(dec_places);
+            dec_point_pos = number.lastIndexOf('.');
+            //If there is nothing before the decimal point, prefix with a zero
+            if (dec_point_pos == 0) {
+                number = '0' + number;
+                dec_point_pos = 1;
+            }
+            //Is number an integer?
+            if (dec_point_pos == -1 || dec_point_pos == number.length - 1) {
+                if (dec_places > 0) {
+                    new_number = number + '.';
+                    for (i = 0; i < dec_places; i++) {
+                        new_number += '0';
+                    }
+                    if (new_number == 0) {
+                        sign = '';
+                    }
+                    str = sign + new_number;
+                } else {
+                    str = sign + number;
                 }
-                if (new_number == 0) sign = '';
-                str = sign + new_number;
             } else {
-                //Work out whether to round up or not
-                var end_pos = (dec_point_pos * 1) + dec_places;
-                //Whether or not to round up (add 1 to) the next digit along
-                var round_up = (number.charAt(end_pos + 1) * 1) > 4;
-                //Record each digit in an array for easier manipulation
-                var digit_array = [];
-                for (i = 0; i <= end_pos; i++) {
-                    digit_array[i] = number.charAt(i);
-                }
-                //Round up the last digit if required, and continue until no more 9's are found
-                if (round_up) {
-                    for (i = digit_array.length - 1; i >= 0; i--) {
-                        if (digit_array[i] != '.') {
-                            digit_array[i]++;
-                            if (digit_array[i] < 10) {
-                                break;
+                var existing_places = (number.length - 1) - dec_point_pos;
+                if (existing_places == dec_places) {
+                    //Do we already have the right number of decimal places?
+                    str = sign + number;
+                } else if (existing_places < dec_places) {
+                    //Do we already have less than the number of decimal places we want?
+                    //If so, pad out with zeros
+                    new_number = number;
+                    for (i = existing_places; i < dec_places; i++) {
+                        new_number += '0';
+                    }
+                    if (new_number == 0) sign = '';
+                    str = sign + new_number;
+                } else {
+                    //Work out whether to round up or not
+                    var end_pos = (dec_point_pos * 1) + dec_places;
+                    //Whether or not to round up (add 1 to) the next digit along
+                    var round_up = (number.charAt(end_pos + 1) * 1) > 4;
+                    //Record each digit in an array for easier manipulation
+                    var digit_array = [];
+                    for (i = 0; i <= end_pos; i++) {
+                        digit_array[i] = number.charAt(i);
+                    }
+                    //Round up the last digit if required, and continue until no more 9's are found
+                    if (round_up) {
+                        for (i = digit_array.length - 1; i >= 0; i--) {
+                            if (digit_array[i] != '.') {
+                                digit_array[i]++;
+                                if (digit_array[i] < 10) {
+                                    break;
+                                }
                             }
                         }
                     }
+                    //Reconstruct the string, converting any 10's to 0's (except for first digit which can stay as a 10)
+                    for (i = 0; i <= end_pos; i++) {
+                        new_number += (digit_array[i] == "." || digit_array[i] < 10 || i == 0) ? digit_array[i] : '0';
+                    }
+                    //If there are no decimal places, we don't need a decimal point
+                    if (dec_places == 0) new_number = new_number.replace('.', '');
+                    if (new_number == 0) sign = '';
+                    str = sign + new_number;
                 }
-                //Reconstruct the string, converting any 10's to 0's (except for first digit which can stay as a 10)
-                for (i = 0; i <= end_pos; i++) {
-                    new_number += (digit_array[i] == "." || digit_array[i] < 10 || i == 0) ? digit_array[i] : '0';
-                }
-                //If there are no decimal places, we don't need a decimal point
-                if (dec_places == 0) new_number = new_number.replace('.', '');
-                if (new_number == 0) sign = '';
-                str = sign + new_number;
             }
+            // Add commas
+            strArray = str.split('.');
+            x1 = strArray[0];
+            x2 = strArray.length > 1 ? '.' + strArray[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            x1 = x1 + x2;
+            if (prefix) {
+                x1 = prefix + x1;
+            }
+            if (suffix) {
+                x1 = x1 + suffix;
+            }
+            return x1;
+        },
+        removeComma: function(value) {
+            var sign = '';
+            if (value.charAt(0) === '(') {
+                sign = '-';
+            }
+            value = sign + value.replace(/[\(\)-,%]/g, '');
+            return value;
         }
-        // Add commas
-        strArray = str.split('.');
-        x1 = strArray[0];
-        x2 = strArray.length > 1 ? '.' + strArray[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        x1 = x1 + x2;
-        if (prefix) {
-            x1 = prefix + x1;
-        }
-        if (suffix) {
-            x1 = x1 + suffix;
-        }
-        return x1;
     }
 
     doodads.setup()
@@ -161,7 +171,7 @@ THE SOFTWARE.
             var valueDecimals = this._options.valueDecimals;
 
             this._formatText = function (val) {
-                return addCommaFormat(val, textDecimals);
+                return formatters.addComma(val, textDecimals);
             };
             this._formatValue = function (val) {
                 var raise = Math.pow(10, valueDecimals);
@@ -345,7 +355,7 @@ THE SOFTWARE.
                     value;
 
                 if (NUMREGEX.test(text)) {
-                    this._underlyingValue(parseFloat(Vastardis.Utility.RemoveCommaFormat(text)), true);
+                    this._underlyingValue(parseFloat(formatters.removeComma(text)), true);
                 } else {
                     this._underlyingValue(null, true);
                 }
