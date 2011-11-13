@@ -54,11 +54,17 @@
     <Content Include="..\..\..\output\doodads.js">
       <Link>JavaScript\doodads.js</Link>
     </Content>
+    <Content Include="..\..\..\output\doodads.tools.js">
+      <Link>JavaScript\doodads.tools.js</Link>
+    </Content>
     <Content Include="..\..\..\src\support\jquery-1.6.4.js">
       <Link>JavaScript\jquery-1.6.4.js</Link>
     </Content>
     <Content Include="..\..\..\src\support\yepnope.js">
       <Link>JavaScript\yepnope.js</Link>
+    </Content>
+    <Content Include="..\..\..\src\mustache\mustache.js">
+      <Link>JavaScript\mustache.js</Link>
     </Content>
     <Content Include="Derived\Derived.html" />
     <Content Include="Derived\Derived.js" />

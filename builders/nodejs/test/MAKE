@@ -1,3 +1,6 @@
 mkdir -p javascript
 cp ../../../output/doodads.js javascript
+cp ../../../output/doodads.tools.js javascript
+cp ../../../output/doodads.tools.js javascript
+cp ../../../src/mustache/mustache.min.js javascript
 cp ../../../src/support/* javascript
