@@ -50,7 +50,7 @@ var DOMMETAKEY = 'doodad'; // constant
 		this._onResize$debounced = doodads.debounce(this._onResize, DEBOUNCE_TIMEOUT, this);
 
 		if (this._options.validates === false) {
-			doodads.validation.add(this);
+			doodads.validation.remove(this);
 		}
 	}
 	doodad.instantiationSibling = $(document.createElement('div'));
