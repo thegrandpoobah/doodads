@@ -240,11 +240,14 @@
 
 		, _initializeValidationListeners: function () {
 			var i, n, listener;
+
+		    this._listeners = [];
+		    privateMethods.tearDownValidationListeners.call(this);				
+
 			for (i = 0, n = validationListeners.length; i < n; ++i) {
 				listener = validationListeners[i];
 
 				if (listener.canListen(this)) {
-					this._listeners = this._listeners || [];
 					this._listeners.push(listener.listen(this));
 				}
 			}
