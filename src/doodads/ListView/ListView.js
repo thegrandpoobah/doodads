@@ -1,5 +1,6 @@
 ﻿(function () {
 	var FILTER_RESET_DEBOUNCE_TIME = 1000; // in ms
+	
 	doodads.setup().inheritsFrom('/doodads/List.doodad').constructor(function () {
 		this._selectionSet = [];
 

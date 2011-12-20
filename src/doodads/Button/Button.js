@@ -69,13 +69,24 @@
 			}
 		},
 		bindEvents: function () {
-			this.element().one('mouseover', this._bindEventsInitial$proxy).focus(this.onFocus$proxy).blur(this.onBlur$proxy).keydown(this.onKeyDown$proxy).keyup(this.onKeyUp$proxy);
+			this.element()
+				.one('mouseover', this._bindEventsInitial$proxy)
+				.focus(this.onFocus$proxy)
+				.blur(this.onBlur$proxy)
+				.keydown(this.onKeyDown$proxy)
+				.keyup(this.onKeyUp$proxy);
 		},
 		_bindEventsInitial: function () {
 			this.onMouseOver.apply(this, arguments);
-			this.element().mouseover(this.onMouseOver$proxy).mousedown(this.onMouseDown$proxy).mouseup(this.onMouseUp$proxy).mouseout(this.onMouseOut$proxy).bind('selectstart', function (e) {
-				e.preventDefault();
-			}); // disable text selection in IE
+			
+			this.element()
+				.mouseover(this.onMouseOver$proxy)
+				.mousedown(this.onMouseDown$proxy)
+				.mouseup(this.onMouseUp$proxy)
+				.mouseout(this.onMouseOut$proxy)
+				.bind('selectstart', function (e) {
+					e.preventDefault();
+				}); // disable text selection in IE
 		},
 		_updateCssClass: function () {
 			this.cssClass(this.cssClass());
@@ -172,37 +183,37 @@
 		onKeyDown: function (e) {
 			if (this.enabled()) {
 				switch (e.which) {
-				case doodads.keyCode.ENTER:
-					this.trigger('click');
+					case doodads.keyCode.ENTER:
+						this.trigger('click');
 
-					e.preventDefault();
-					e.stopPropagation();
+						e.preventDefault();
+						e.stopPropagation();
 
-					break;
-				case doodads.keyCode.SPACE:
-					this._active = true;
-					this._updateCssClass();
+						break;
+					case doodads.keyCode.SPACE:
+						this._active = true;
+						this._updateCssClass();
 
-					e.preventDefault();
-					e.stopPropagation();
+						e.preventDefault();
+						e.stopPropagation();
 
-					break;
+						break;
 				}
 			}
 		},
 		onKeyUp: function (e) {
 			if (this.enabled()) {
 				switch (e.which) {
-				case doodads.keyCode.SPACE:
-					this._active = false;
-					this._updateCssClass();
+					case doodads.keyCode.SPACE:
+						this._active = false;
+						this._updateCssClass();
 
-					this.trigger('click');
+						this.trigger('click');
 
-					e.preventDefault();
-					e.stopPropagation();
+						e.preventDefault();
+						e.stopPropagation();
 
-					break;
+						break;
 				}
 			}
 		},

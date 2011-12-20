@@ -516,10 +516,10 @@
 		},
 		trigger_changing: function DropDown$trigger_changing(currentSelection, newSelection) {
 			var evt = $.Event('changing');
-			$(this).trigger(evt, [{
+			this.trigger(evt, {
 				currentSelection: currentSelection,
 				newSelection: newSelection
-			}]);
+			});
 			return !evt.isDefaultPrevented();
 		} /* END Events */
 
