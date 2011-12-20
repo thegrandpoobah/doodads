@@ -4,13 +4,49 @@
 	// * hasInputFocus
 	// * validationTarget
 	// * focus event
-	// * blur event	
+	// * blur event
 
 	// To optimize DOM usage, the HintBox validation listener shares an instance of the
 	// hint box and hint list doodads
-	var sharedHintBox,
-		sharedHintList,
-		hintBoxDOMTarget = null;
+	var tipsyBox, 
+		template = Mustache.compile('<ul>{{#messages}}<li>{{text}}</li>{{/messages}}</ul>');
+		
+	$(function() {
+		$('head').append(
+			'<style type="text/css">' +
+				'.doodads-tipsy .tipsy-inner {' +
+					'background-color: white;' +
+					'color: black;' +
+					'text-align: left;' +
+				'}' +
+				'.doodads-tipsy-error .tipsy-inner { border: 2px solid red; }' +
+				'.doodads-tipsy-error .tipsy-arrow-n { border-bottom-color: red; }' +
+				'.doodads-tipsy-error .tipsy-arrow-s { border-top-color: red; }' +
+				'.doodads-tipsy-error .tipsy-arrow-e { border-left-color: red; }' +
+				'.doodads-tipsy-error .tipsy-arrow-w { border-right-color: red; }' +
+				'.doodads-tipsy-info .tipsy-inner { border: 2px solid blue; }' +
+				'.doodads-tipsy-info .tipsy-arrow-n { border-bottom-color: blue; }' +
+				'.doodads-tipsy-info .tipsy-arrow-s { border-top-color: blue; }' +
+				'.doodads-tipsy-info .tipsy-arrow-e { border-left-color: blue; }' +
+				'.doodads-tipsy-info .tipsy-arrow-w { border-right-color: blue; }' +
+				'.doodads-tipsy ul {' +
+					'list-style: none;' +
+					'margin: 0;' +
+					'padding: 0;' +
+				'}' +
+				'.doodads-tipsy ul li {' +
+					'margin: 0;' +
+					'padding: 0;' +
+				'}' +
+			'</style>');
+		$(document).tipsy({
+			trigger:'manual',
+			html: true,
+			className: 'doodads-tipsy',
+			gravity: 'w'
+		});
+		tipsyBox = $(document).tipsy(true);
+	});
 
 	var HintBoxValidationListener = function (doodad) {
 		if (arguments.length === 0) { return; }
@@ -32,8 +68,8 @@
 	}
 	HintBoxValidationListener.canListen = function (doodad) {
 		if (doodad._options.validationListeners.indexOf('hintbox') !== -1 && // the doodad *wants* the hint-list
-			$.isFunction(doodad.validationTarget)) { // and the doodad implements the IHintBoxListenerSource interface
-
+			$.isFunction(doodad.validationTarget)) // and the doodad implements the IHintBoxListenerSource interface
+		{
 			return true;
 		} else {
 			return false;
@@ -89,82 +125,29 @@
 			var target = this._doodad ? this._doodad.validationTarget() : null,
 				self = this;
 
+			tipsyBox.options.title = function() {
+				return template(self._validationState);
+			};
+			
 			if (target) {
-				this.hintList().done(function(hlist) {
-					hlist.dataSource(self._validationState.messages);
-				});
-
-				// set the color
-				if (this._validationState.messages.length > 0) {
-					if (this._doodad.valid()) {
-						this.hintBox().done(function(hbx) {
-							hbx.element().addClass('infobox');
-						});
-					} else {
-						this.hintBox().done(function(hbx) {
-							hbx.element().removeClass('infobox');
-						});
-					}
-				}
+				tipsyBox.$element = target;
 			}
 
-			if (hintBoxDOMTarget !== target) {
-				hintBoxDOMTarget = target;
-
-				this.hintBox().done(function (hbx) {
-					hbx.show(target,
-						self._doodad._options.hintBoxOrientation || 'bottom right',
-						self._doodad._options.hintBoxDirection || 'down right');
-				});
-				captureEvent('mousedown', this._doodad.element(), this.onCapturedMouseDown$proxy);
+			// set the color
+			if (this._validationState.isValid) {
+				tipsyBox.options.className = 'doodads-tipsy doodads-tipsy-info';
+			} else {
+				tipsyBox.options.className = 'doodads-tipsy doodads-tipsy-error';
 			}
+
+			tipsyBox.show();
+			
+			window.captureEvent('mousedown', this._doodad.element(), this.onCapturedMouseDown$proxy);
 		}
 		, hideHintBox: function HintBoxValidationListener$hideHintBox() {
-			var target = this._doodad ? this._doodad.validationTarget() : null;
-			
-			if (hintBoxDOMTarget === target) {
-				hintBoxDOMTarget = null;
+			tipsyBox.hide();
 
-				this.hintBox().done(function (hbx) { 
-					hbx.hide();
-				});
-
-				releaseEvent('mousedown');
-			}
-		}
-
-		, hintList: function HintBoxValidationListener$hintList() {
-			var dfd = $.Deferred();
-
-			if (sharedHintList) {
-				return dfd.resolve(sharedHintList).promise();
-			}
-
-			var self = this;
-			doodads.create('/doodads/List.doodad', { cssClass: 'hintlist' }).done(function(cmp) {
-				sharedHintList = cmp;
-				self.hintBox().done(function (hbx) {
-					hbx.addChild(sharedHintList);
-				});
-				dfd.resolve(sharedHintList);
-			});
-		
-			return dfd.promise();
-		}
-		, hintBox: function HintBoxValidationListener$hintBox() {
-			var dfd = $.Deferred();
-
-			if (sharedHintBox) {
-				return dfd.resolve(sharedHintBox).promise();
-			}
-
-			doodads.create('/doodads/HintBox.doodad').done(function(cmp) {
-				sharedHintBox = cmp;
-				sharedHintBox.render($(document.body));	
-				dfd.resolve(sharedHintBox);
-			});
-
-			return dfd.promise();
+			window.releaseEvent('mousedown');
 		}
 
 		, dispose: function HintBoxValidationListener$dispose(doodad) {
