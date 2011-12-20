@@ -179,7 +179,7 @@
 			/// </remarks>
 			/// <param name="isRequired" type="Boolean" />
 			/// <param name="requirementRule" type="function" optional="true">
-			///		The rule the doodad must validate its context against/
+			///		The rule the doodad must validate its context against
 			///	</param>
 			/// <returns type="Bool" />
 
@@ -289,7 +289,7 @@
 
 			// if result.message is not an array, turn it into an array
 			var messages;
-			if ($.isArray(result.message)) {
+			if (!$.isArray(result.message)) {
 				messages = [result.message];
 			} else {
 				messages = result.message;
