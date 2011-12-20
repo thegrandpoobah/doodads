@@ -110,6 +110,11 @@
 	});
 	
 	$.extend(doodads, {
+		/* 
+		Taken from jQuery UI 
+		https://github.com/jquery/jquery-ui/blob/master/ui/jquery.ui.core.js
+		Used under the MIT License
+		*/
 		keyCode: {
 			ALT: 18,
 			BACKSPACE: 8,
