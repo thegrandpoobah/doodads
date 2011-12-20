@@ -2,8 +2,8 @@
 <doodad xmlns="http://schemas.vastcap.com/doodadDefinition"
            type="doodads.library.label"
            inheritsFrom="doodads.doodad">
-  <behaviour path="~/Components/Label/Label.js" />
+  <behaviour path="~/doodads/Label/Label.js" />
   <templates>
-    <base path="~/Components/Label/Label.html"/>
+    <base path="~/doodads/Label/Label.html"/>
   </templates>
 </doodad>
