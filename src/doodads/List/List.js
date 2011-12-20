@@ -1,27 +1,4 @@
-﻿/* The MIT License
-
-Copyright (c) 2011 Vastardis Capital Services, http://www.vastcap.com/
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-*/
-
-// to make better sense of this class, please be aware that the model for the generic list
+﻿// to make better sense of this class, please be aware that the model for the generic list
 // is basically decorated with extra metadata that maintains information about DOM nodes and indexing.
 // To preserve the user's data and not add any new properties onto it,
 // this decoration is handled through a mapping between user data and list data.
@@ -42,7 +19,7 @@ THE SOFTWARE.
 //  * modelChanged
 //   - This event is triggered whenever the underlying model (dataSource) for the component changes
 //     for any reason (either through directly setting dataSource or via the manipulation methods).
-///    Note that this event is only concerned about changes to the List model, not the individual item model.
+//    Note that this event is only concerned about changes to the List model, not the individual item model.
 //     so changes to an individual item do not trigger a modelChanged event.
 // In almost all scenarios where the model is manipulated, both modelChanged and itemRendered will get
 // triggered in tandem, but it is possible to get only itemRendered to trigger, so do not rely on this.
