@@ -1,13 +1,8 @@
-﻿.c_checkBox
-{
-}
-
-.c_checkBox label
+﻿.checkBox label
 {
 	margin-left: 0.5em;
 }
-
-.c_checkBox input
+.checkBox input
 {
 	position: relative;
 	top: 2px;
