@@ -1,5 +1,5 @@
 ﻿<doodad xmlns="http://schemas.vastcap.com/doodadDefinition"
-           type="doodads.library.list"
+           type="doodads.library.generics.list"
            inheritsFrom="doodads.doodad"
            validates="true">
   <behaviour path="~/doodads/List/List.js" />
