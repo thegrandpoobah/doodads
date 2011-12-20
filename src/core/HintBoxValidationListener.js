@@ -10,7 +10,7 @@
 	// hint box and hint list doodads
 	var sharedHintBox,
 		sharedHintList,
-		hintBoxVisible = false;
+		hintBoxDOMTarget = null;
 
 	var HintBoxValidationListener = function (doodad) {
 		if (arguments.length === 0) { return; }
@@ -90,7 +90,6 @@
 				self = this;
 
 			if (target) {
-
 				this.hintList().done(function(hlist) {
 					hlist.dataSource(self._validationState.messages);
 				});
@@ -109,8 +108,8 @@
 				}
 			}
 
-			if (!hintBoxVisible) {
-				hintBoxVisible = true;
+			if (hintBoxDOMTarget !== target) {
+				hintBoxDOMTarget = target;
 
 				this.hintBox().done(function (hbx) {
 					hbx.show(target,
@@ -121,8 +120,10 @@
 			}
 		}
 		, hideHintBox: function HintBoxValidationListener$hideHintBox() {
-			if (hintBoxVisible) {
-				hintBoxVisible = false;
+			var target = this._doodad ? this._doodad.validationTarget() : null;
+			
+			if (hintBoxDOMTarget === target) {
+				hintBoxDOMTarget = null;
 
 				this.hintBox().done(function (hbx) { 
 					hbx.hide();
@@ -154,12 +155,12 @@
 			var dfd = $.Deferred();
 
 			if (sharedHintBox) {
-				return dfd.resolve(sharedHintBox).promise();		
+				return dfd.resolve(sharedHintBox).promise();
 			}
 
 			doodads.create('/doodads/HintBox.doodad').done(function(cmp) {
 				sharedHintBox = cmp;
-				sharedHintBox.render($(document.body));			
+				sharedHintBox.render($(document.body));	
 				dfd.resolve(sharedHintBox);
 			});
 
