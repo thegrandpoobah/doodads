@@ -142,7 +142,7 @@
 			}, this);
 
 			$.each(this._rules || [], $.proxy(function (index, rule) {
-				var result = rule.validate(context, {
+				var result = rule(context, {
 					computedValidity: this._computedValidity,
 					isCallout: traversalHistory ? true : false,
 					callback: callback,

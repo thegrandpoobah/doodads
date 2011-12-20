@@ -2,22 +2,18 @@
     var EPSILON = 1e-10,
         NUMREGEX = /^\-?([1-9]{1}[0-9]{0,2}(\,\d{3})*(\.\d{0,})?|[1-9]{1}\d{0,}(\.\d{0,})?|0(\.\d{0,})?|(\.\d{0,}))$|^\-?([1-9]{1}\d*(\,\d{3})*(\.\d{0,})?|[1-9]{1}\d{0,}(\.\d{0,})?|0(\.\d{0,})?|(\.\d{0,}))$|^\(([1-9]{1}\d{0,2}(\,\d{3})*(\.\d{0,})?|[1-9]{1}\d{0,}(\.\d{0,})?|0(\.\d{0,})?|(\.\d{0,}))\)$/;
 
-    var defaultRequiredRule = new function () {
-        this.validate = function (context) {
-            return {
-                valid: true
-            };
-        }
-    };
+    var defaultRequiredRule = function (context) {
+		return {
+			valid: true
+		};
+	};
 
-    var defaultValidationRule = new function () {
-        this.validate = function (context, args) {
-            return {
-                valid: NUMREGEX.test(context)
-                , message: 'Please enter a valid number'
-            };
-        };
-    };
+    var defaultValidationRule = function (context, args) {
+		return {
+			valid: NUMREGEX.test(context)
+			, message: 'Please enter a valid number'
+		};
+	};
 
     var formatters = {
         addComma : function (number, dec_places, no_value, prefix, suffix) {

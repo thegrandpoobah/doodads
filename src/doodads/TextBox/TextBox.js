@@ -1,12 +1,10 @@
 ﻿(function () {
-	var defaultRequiredRule = function () {
-			this.validate = function (content) {
-				return {
-					valid: content.trim().length > 0,
-					message: ''
-				}
-			}
-		};
+	var defaultRequiredRule = function (content) {
+		return {
+			valid: content.trim().length > 0,
+			message: ''
+		}
+	};
 
 	doodads.setup().constructor(function () {
 		this.onTextAreaKeyDown$proxy = doodads.proxy(this.onTextAreaKeyDown, this);

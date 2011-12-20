@@ -47,14 +47,12 @@
 		, watermark: ''
     };
     DropDown3.CreateDefaultRequiredRule = function (invalidValue, message) {
-        return new (function () {
-            this.validate = function (context) {
-                return {
-                    valid: context.index !== -1 && context.value !== invalidValue
-				    , message: message
-                };
-            }
-        })();
+        return function (context) {
+			return {
+				valid: context.index !== -1 && context.value !== invalidValue
+				, message: message
+			};
+		};
     }
     DropDown3._activeDropDown = null;
 
