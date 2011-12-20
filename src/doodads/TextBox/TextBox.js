@@ -35,7 +35,7 @@
 			this.base.onReady.apply(this, arguments);
 
 			if (this._options.required && this._options.validates) {
-				this.required(true, new defaultRequiredRule());
+				this.required(true, defaultRequiredRule);
 			}
 		},
 		constructElement: function () {
