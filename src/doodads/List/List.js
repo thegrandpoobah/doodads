@@ -30,16 +30,6 @@
 // var list = new vscG.List({});
 // $(list).bind('modelChanged', function(eventArgs) { /* at this point, the underlying model for the component has changed */ });
 // $(list).bind('itemRendered', function(eventArgs, parameters) { /* parameters.item is the model, parameters.domNode is the html element. */ });
-
-String.format = function() {
-    var s = arguments[0];
-    for (var i = 0; i < arguments.length - 1; i++) {       
-        var reg = new RegExp("\\{" + i + "\\}", "gm");             
-        s = s.replace(reg, arguments[i + 1]);
-    }
-    return s;
-}
-
 doodads.setup()
     .constructor(function () {
         ///<summary>
