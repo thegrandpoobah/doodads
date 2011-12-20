@@ -58,7 +58,7 @@
 				this._source = $(this._processTemplates(transformedData));
 
 				$.each(transformedData.items, $.proxy(function (index, item) {
-					var domNode = $(String.format('[data-guid=\'{0}\']', item.__guid), this.element());
+					var domNode = $(Mustache.format('[data-guid=\'{{0}}\']', item.__guid), this.element());
 
 					this._containerElement = domNode.parent();
 					if (item.__empty) {

@@ -29,7 +29,7 @@
 		_setDomId: function () {
 			this.base._setDomId.apply(this, arguments);
 
-			var computedId = String.format('{0}_radiobutton', this.computedId()),
+			var computedId = Mustache.format('{{0}}_radiobutton', this.computedId()),
 				parent = this.parent();
 
 			this._input.attr('id', computedId);

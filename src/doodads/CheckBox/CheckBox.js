@@ -42,7 +42,7 @@
 		_setDomId: function () {
 			this.base._setDomId.apply(this, arguments);
 
-			var computedId = String.format('{0}_checkbox', this.computedId());
+			var computedId = Mustache.format('{{0}}_checkbox', this.computedId());
 
 			this._input.attr('id', computedId);
 			this._label.attr('for', computedId);

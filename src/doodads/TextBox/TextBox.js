@@ -49,7 +49,7 @@
 					this.validate = function (context) {
 						return {
 							valid: context.toString().length <= self._options.maxlength,
-							message: String.format('Character count {0} of {1}', context.length, self._options.maxlength),
+							message: Mustache.format('Character count {{0}} of {{1}}', context.length, self._options.maxlength),
 							alwaysShow: true
 						};
 					};
