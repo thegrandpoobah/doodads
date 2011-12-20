@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <doodad xmlns="http://schemas.vastcap.com/doodadDefinition"
-           type="doodads.library.button"
-           inheritsFrom="doodads.doodad">
+           type="doodads.library.button">
   <behaviour path="~/doodads/Button/Button.js" />
   <templates>
     <base path="~/doodads/Button/Button.html"/>

@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <doodad xmlns="http://schemas.vastcap.com/doodadDefinition"
-           type="doodads.library.label"
-           inheritsFrom="doodads.doodad">
+           type="doodads.library.label">
   <behaviour path="~/doodads/Label/Label.js" />
   <templates>
     <base path="~/doodads/Label/Label.html"/>
