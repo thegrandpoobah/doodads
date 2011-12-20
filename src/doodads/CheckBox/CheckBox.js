@@ -27,7 +27,7 @@
 			this.enabled(this._options.enabled);
 		},
 		onReady: function () {
-			this.base.onComponentReady.apply(this, arguments);
+			this.base.onReady.apply(this, arguments);
 
 			if (this._options.required && this._options.validates) {
 				this.required(true, defaultRequiredRule);
@@ -51,7 +51,10 @@
 			return 'checkBox';
 		},
 		bindEvents: function () {
-			this._input.bind('click', this.onClick$proxy).bind('focus', this.onFocus$proxy).bind('blur', this.onBlur$proxy);
+			this._input
+				.bind('click', this.onClick$proxy)
+				.bind('focus', this.onFocus$proxy)
+				.bind('blur', this.onBlur$proxy);
 		},
 		checked: function ( /*checked, trigger*/ ) {
 			if (arguments.length === 0) {
@@ -96,7 +99,11 @@
 			} else {
 				this._enabled = arguments[0];
 				this.ensureElement();
-				this._input.enable(this._enabled);
+				if (this._enabled) {
+					this._input.removeAttr('disabled');
+				} else {
+					this._input.attr('disabled', true);
+				}
 			}
 		},
 		focus: function () {
