@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<component xmlns="http://schemas.vastcap.com/componentDefinition"
-           type="Vastardis.UI.Components.Button"
-           inheritsFrom="Vastardis.UI.Components.Component">
-  <behaviour path="~/Components/Button/Button.js" />
+<doodad xmlns="http://schemas.vastcap.com/doodadDefinition"
+           type="doodads.library.button"
+           inheritsFrom="doodads.doodad">
+  <behaviour path="~/doodads/Button/Button.js" />
   <templates>
-    <base path="~/Components/Button/Button.html" />
+    <base path="~/doodads/Button/Button.html"/>
   </templates>
   <stylesheets>
-    <stylesheet path="~/Components/Button/Button.css" />
+    <stylesheet path="~/doodads/Button/Button.css"/>
   </stylesheets>
-</component>
+</doodad>

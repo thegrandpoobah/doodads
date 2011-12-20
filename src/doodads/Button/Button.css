@@ -1,5 +1,5 @@
 ﻿/* Button */
-.c_button
+.button
 {
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
@@ -38,7 +38,7 @@
 	*display: inline;
 }
 
-.c_buttonDisabled
+.buttonDisabled
 {
 	background: #B2C2D1; /* Old browsers */
     background: -moz-linear-gradient(top, #eeeeee 1%, #b2c2d1 20%, #b2c2d1 80%, #6c8399 100%); /* FF3.6+ */
@@ -50,7 +50,7 @@
     background: linear-gradient(top, #eeeeee 1%,#b2c2d1 20%,#b2c2d1 80%,#6c8399 100%); /* W3C */	
 }
 
-.c_buttonHover 
+.buttonHover 
 {
 	background: #78421C; /* Old browsers */
     background: -moz-linear-gradient(top, #eeeeee 1%, #6ea7d8 20%, #6ea7d8 80%, #4d7493 100%); /* FF3.6+ */
@@ -62,7 +62,7 @@
     background: linear-gradient(top, #eeeeee 1%,#6ea7d8 20%,#6ea7d8 80%,#4d7493 100%); /* W3C */
 }
 
-.c_buttonTracking
+.buttonTracking
 {
 	background: #78421C; /* Old browsers */
     background: -moz-linear-gradient(top, #4d7493 1%, #6ea7d8 20%, #6ea7d8 80%, #a1bfda 100%); /* FF3.6+ */
@@ -74,7 +74,7 @@
     background: linear-gradient(top, #4d7493 1%,#6ea7d8 20%,#6ea7d8 80%,#a1bfda 100%); /* W3C */		
 }
 
-.c_buttonTracking span
+.buttonTracking span
 {
 	position: relative;
 	top: 1px;
