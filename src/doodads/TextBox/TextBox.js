@@ -8,7 +8,7 @@
 
 	doodads.setup().constructor(function () {
 		this.onTextAreaKeyDown$proxy = doodads.proxy(this.onTextAreaKeyDown, this);
-		this.onKeyUp$debounced = $.debounce(this.onKeyUp, 10, this);
+		this.onKeyUp$debounced = doodads.debounce(this.onKeyUp, 10, this);
 		this.onFocus$proxy = doodads.proxy(this.onFocus, this);
 		this.onBlur$proxy = doodads.proxy(this.onBlur, this);
 		this.onRequiredChanged$proxy = doodads.proxy(this.onRequiredChanged, this);
