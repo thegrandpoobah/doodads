@@ -83,7 +83,7 @@ ul.dropdown li.active  {
 	color: White;
 }
 span.dropdown span.arrow {
-	background-image: url("/Style/images/section_arrow_toc_open.png");
+	background-image: url(/doodads/DropDown/Images/arrow_on.png);
 	background-position: center;
 	background-repeat: no-repeat;
 	width: 8px;
@@ -92,7 +92,7 @@ span.dropdown span.arrow {
 }
 span.dropdownDisabled span.arrow 
 {
-	background-image: url("/Style/images/section_arrow_toc_open_disabled.png");	
+	background-image: url(/doodads/DropDown/Images/arrow_off.png);
 }
 span.dropdown span.arrow > span {
 	visibility: hidden;

@@ -1,5 +1,5 @@
-﻿(function () {
-	doodads.setup().constructor(function () {
+﻿doodads.setup().inherits()(function(base) {
+	this.constructor(function () {
 		this._text = this._options.text;
 		this._checked = this._options.checked;
 		this._enabled = true;
@@ -13,7 +13,7 @@
 		group: ''
 	}).proto({
 		constructElement: function () {
-			this.base.constructElement.apply(this, arguments);
+			base.constructElement.apply(this, arguments);
 
 			this._label = this.element().find('label');
 			this._input = this.element().find('#radiobutton');
@@ -27,7 +27,7 @@
 			};
 		},
 		_setDomId: function () {
-			this.base._setDomId.apply(this, arguments);
+			base._setDomId.apply(this, arguments);
 
 			var computedId = Mustache.format('{{0}}_radiobutton', this.computedId()),
 				parent = this.parent();
@@ -81,7 +81,11 @@
 			} else {
 				this._enabled = arguments[0];
 				this.ensureElement();
-				this._input.enable(this._enabled);
+				if (this._enabled) {
+					this._input.removeAttr('disabled');
+				} else {
+					this._input.attr('disabled', true);
+				}
 			}
 		},
 		onClick: function (e) {
@@ -91,4 +95,4 @@
 			e.stopPropagation();
 		}
 	}).complete();
-})();
+});

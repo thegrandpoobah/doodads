@@ -1,7 +1,7 @@
-﻿(function () {
+﻿doodads.setup().inherits('/doodads/List.doodad')(function(base) {
 	var FILTER_RESET_DEBOUNCE_TIME = 1000; // in ms
 	
-	doodads.setup().inheritsFrom('/doodads/List.doodad').constructor(function () {
+	this.constructor(function () {
 		this._selectionSet = [];
 
 		this._modifierComboMode = '_addToSelection';
@@ -44,7 +44,7 @@
 			this.bind('modelChanged', this.onModelChanged$proxy);
 		},
 		dataSource: function ListView$dataSource() {
-			var retVal = this.base.dataSource.apply(this, arguments);
+			var retVal = base.dataSource.apply(this, arguments);
 
 			if (arguments.length > 0 && this.count() > 0) {
 				// if we set, and the number of elements is greater than 0, update the kayboard nav item
@@ -570,7 +570,7 @@
 		dispose: function ListView$dispose() {
 			this.unbind('modelChanged', this.onModelChanged$proxy);
 
-			this.base.dispose.apply(this);
+			base.dispose.apply(this);
 		}
 	}).complete();
-})();
+});

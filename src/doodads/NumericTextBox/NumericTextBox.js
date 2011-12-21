@@ -1,4 +1,4 @@
-﻿(function () {
+﻿doodads.setup().inherits()(function(base) {
 	var EPSILON = 1e-10,
 		NUMREGEX = /^\-?([1-9]{1}[0-9]{0,2}(\,\d{3})*(\.\d{0,})?|[1-9]{1}\d{0,}(\.\d{0,})?|0(\.\d{0,})?|(\.\d{0,}))$|^\-?([1-9]{1}\d*(\,\d{3})*(\.\d{0,})?|[1-9]{1}\d{0,}(\.\d{0,})?|0(\.\d{0,})?|(\.\d{0,}))$|^\(([1-9]{1}\d{0,2}(\,\d{3})*(\.\d{0,})?|[1-9]{1}\d{0,}(\.\d{0,})?|0(\.\d{0,})?|(\.\d{0,}))\)$/;
 
@@ -7,7 +7,7 @@
 			valid: true
 		};
 	};
-
+	
 	var defaultValidationRule = function (context, args) {
 		return {
 			valid: NUMREGEX.test(context),
@@ -137,7 +137,7 @@
 		}
 	}
 
-	doodads.setup().constructor(function () {
+	this.constructor(function () {
 		this._backValue = this._frontValue = this._options.value;
 
 		var textDecimals = this._options.textDecimals;
@@ -159,7 +159,7 @@
 		validationListeners: 'hintbox outline'
 	}).proto({
 		onReady: function NumericTextBox$onReady() {
-			this.base.onReady.apply(this, arguments);
+			base.onReady.apply(this, arguments);
 
 			if (this._options.validates) {
 				this.addRule(defaultValidationRule);
@@ -350,4 +350,4 @@
 			this._input._input.val(text);
 		}
 	}).complete();
-})(jQuery);
+});

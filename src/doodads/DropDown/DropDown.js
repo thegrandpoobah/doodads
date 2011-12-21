@@ -1,4 +1,4 @@
-﻿(function () {
+﻿doodads.setup().inherits('/doodads/List.doodad')(function(base) {
 	var FILTER_RESET_DEBOUNCE_TIME = 1000; // in ms
 	var activeDropDown = null;
 
@@ -11,7 +11,7 @@
 		};
 	};
 
-	doodads.setup().inheritsFrom('/doodads/List.doodad').constructor(function () {
+	this.constructor(function () {
 		this._affordanceText = null;
 		this._focused = false;
 		this._enabled = true;
@@ -55,8 +55,8 @@
 		showAfter: 500, // in ms
 		watermark: ''
 	}).proto({
-		onReady: function DropDown$onComponentReady() {
-			this.base.onComponentReady.apply(this, arguments);
+		onReady: function DropDown$onReady() {
+			base.onReady.apply(this, arguments);
 
 			if (this._options.required && this._options.validates) {
 				this.required(true, createDefaultRequiredRule(this._options.invalidValue, ''));
@@ -69,7 +69,7 @@
 			this._list.attr('class', this.element().attr('class')).appendTo($(document.body)); // the list needs to get the same classnames as the parent
 		},
 		constructElement: function DropDown$constructElement() {
-			this.base.constructElement.apply(this, arguments);
+			base.constructElement.apply(this, arguments);
 
 			this._affordance = this.element().find('span.affordance');
 			this._affordanceText = this._affordance.find('span.itemContainer');
@@ -77,7 +77,7 @@
 			this._list = this.element().find('ul');
 		},
 		_templateData: function DropDown$_templateData() {
-			return $.extend(this.base._templateData.apply(this, arguments), {
+			return $.extend(base._templateData.apply(this, arguments), {
 				showOnHover: this._options.showOnHover
 			});
 		},
@@ -87,7 +87,7 @@
 				this._selectedIndex = undefined;
 			}
 
-			var result = this.base.dataSource.apply(this, arguments);
+			var result = base.dataSource.apply(this, arguments);
 
 			if (result === undefined) {
 				this._updateItemContainer();
@@ -168,7 +168,7 @@
 			if (this._source && this._list) {
 				this._list.appendTo(this.element());
 			}
-			this.base.rerender.apply(this, arguments);
+			base.rerender.apply(this, arguments);
 		},
 		/* BEGIN Properties */
 		watermark: function DropDown$watermark( /*text*/ ) {
@@ -239,11 +239,11 @@
 			}
 		},
 		_hasCustomItem: function DropDown$_hasCustomItem() {
-			return this._options.templates.item !== DropDown3.defaultOptions.templates.item;
+			return this._options.templates.item !== doodads.getType('/doodads/DropDown.doodad').defaultOptions.templates.item;
 		},
 		_ellipsesText: function DropDown$_ellipsesText(itemText) {
 			// The minus is for the arrow... i think
-			return Vastardis.UI.Components.Component.cropString(itemText, this._affordance.width() - 20, this._affordanceText[0]);
+			return itemText.crop(this._affordance.width() - 20, this._affordanceText[0]);
 		},
 		enabled: function DropDown$enabled( /*enabled*/ ) {
 			if (arguments.length === 0) {
@@ -295,6 +295,8 @@
 					this.show();
 				}
 			}
+			
+			e.stopImmediatePropagation();
 		},
 		onAffordanceMouseOver: function DropDown$onAffordanceMouseOver(e) {
 			if (!this.enabled()) return;
@@ -458,60 +460,59 @@
 			var key = e.keyCode || e.which;
 
 			switch (key) {
-			case doodads.keyCode.TAB:
-			case doodads.keyCode.ESCAPE:
-				this.hide();
+				case doodads.keyCode.TAB:
+				case doodads.keyCode.ESCAPE:
+					this.hide();
 
-				e.stopPropagation();
-				break;
-			case doodads.keyCode.ENTER:
-				if (this._options.showOnHover) {
-					this.selectedIndex(this._list.find('li.active').index(), true);
-				}
+					e.stopPropagation();
+					break;
+				case doodads.keyCode.ENTER:
+					if (this._options.showOnHover) {
+						this.selectedIndex(this._list.find('li.active').index(), true);
+					}
 
-				this.hide();
+					this.hide();
 
-				if (this._options.showOnHover) {
-					this.focus();
-				}
+					if (this._options.showOnHover) {
+						this.focus();
+					}
 
-				e.preventDefault();
-				e.stopPropagation();
-				break;
-			case doodads.keyCode.UP:
-				if (this._options.showOnHover) {
-					this._isListPinned = true;
-					this.show();
-				}
-				this._moveSelectedItem(-1);
+					e.preventDefault();
+					e.stopPropagation();
+					break;
+				case doodads.keyCode.UP:
+					if (this._options.showOnHover) {
+						this._isListPinned = true;
+						this.show();
+					}
+					this._moveSelectedItem(-1);
 
-				e.preventDefault();
-				e.stopPropagation();
-				break;
-			case doodads.keyCode.DOWN:
-				if (this._options.showOnHover) {
-					this._isListPinned = true;
-					this.show();
-				}
-				this._moveSelectedItem(1);
+					e.preventDefault();
+					e.stopPropagation();
+					break;
+				case doodads.keyCode.DOWN:
+					if (this._options.showOnHover) {
+						this._isListPinned = true;
+						this.show();
+					}
+					this._moveSelectedItem(1);
 
-				e.preventDefault();
-				e.stopPropagation();
-				break;
-			default:
-				var ch = String.fromCharCode(key);
+					e.preventDefault();
+					e.stopPropagation();
+					break;
+				default:
+					var ch = String.fromCharCode(key);
 
-				if (/\w|\s/.test(ch)) {
-					this._filter(ch);
-					this.killFilter$debounced(e);
-				} else {
-					this.killFilter(e);
-				}
+					if (/\w|\s/.test(ch)) {
+						this._filter(ch);
+						this.killFilter$debounced(e);
+					} else {
+						this.killFilter(e);
+					}
 
-				e.preventDefault();
-				e.stopPropagation();
-				break;
-
+					e.preventDefault();
+					e.stopPropagation();
+					break;
 			}
 		},
 		trigger_changing: function DropDown$trigger_changing(currentSelection, newSelection) {
@@ -669,7 +670,7 @@
 		},
 		tabIndex: function DropDown$tabIndex() {
 			if (arguments.length === 0) {
-				return this.base.tabIndex.apply(this, arguments);
+				return base.tabIndex.apply(this, arguments);
 			} else {
 				this.ensureElement();
 
@@ -703,10 +704,10 @@
 				this._list.appendTo(this.element());
 			}
 
-			this.base.dispose.apply(this, arguments);
+			base.dispose.apply(this, arguments);
 
 			this.unbind('itemRendered', this.onItemRendered$proxy);
 			this.unbind('modelChanged', this.onModelChanged$proxy);
 		}
 	}).complete();
-})();
+});

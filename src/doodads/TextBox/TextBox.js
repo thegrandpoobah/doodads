@@ -1,4 +1,4 @@
-﻿(function () {
+﻿doodads.setup().inherits()(function(base) {
 	var defaultRequiredRule = function (content) {
 		return {
 			valid: content.trim().length > 0,
@@ -6,7 +6,7 @@
 		}
 	};
 
-	doodads.setup().constructor(function () {
+	this.constructor(function () {
 		this.onTextAreaKeyDown$proxy = doodads.proxy(this.onTextAreaKeyDown, this);
 		this.onKeyUp$debounced = doodads.debounce(this.onKeyUp, 10, this);
 		this.onFocus$proxy = doodads.proxy(this.onFocus, this);
@@ -32,14 +32,14 @@
 		cols: 40
 	}).proto({
 		onReady: function () {
-			this.base.onReady.apply(this, arguments);
+			base.onReady.apply(this, arguments);
 
 			if (this._options.required && this._options.validates) {
 				this.required(true, defaultRequiredRule);
 			}
 		},
 		constructElement: function () {
-			this.base.constructElement.apply(this, arguments);
+			base.constructElement.apply(this, arguments);
 
 			this._input = this._source.find('input, textarea');
 
@@ -74,7 +74,7 @@
 			this.bind('required', this.onRequiredChanged$proxy);
 		},
 		render: function () {
-			this.base.render.apply(this, arguments);
+			base.render.apply(this, arguments);
 
 			if (this._options.text.trim() !== '') {
 				this.text(this._options.text);
@@ -303,7 +303,7 @@
 		dispose: function () {
 			this.unbind('required', this.onRequiredChanged$proxy);
 
-			this.base.dispose.apply(this, arguments);
+			base.dispose.apply(this, arguments);
 		}
 	}).complete();
-})();
+});

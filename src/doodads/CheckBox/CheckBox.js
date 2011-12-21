@@ -1,12 +1,12 @@
-﻿(function () {
+﻿doodads.setup().inherits()(function(base) {
 	var defaultRequiredRule = function (checked) {
-			return {
-				valid: checked,
-				message: ''
-			}
-		};
-
-	doodads.setup().constructor(function () {
+		return {
+			valid: checked,
+			message: ''
+		}
+	};
+		
+	this.constructor(function () {
 		this._text = this._options.text;
 		this._checked = this._options.checked;
 		this._enabled = true;
@@ -20,14 +20,14 @@
 		checked: false
 	}).proto({
 		constructElement: function () {
-			this.base.constructElement.apply(this, arguments);
+			base.constructElement.apply(this, arguments);
 
 			this._label = this.element().find('label');
 			this._input = this.element().find('#checkbox');
 			this.enabled(this._options.enabled);
 		},
 		onReady: function () {
-			this.base.onReady.apply(this, arguments);
+			base.onReady.apply(this, arguments);
 
 			if (this._options.required && this._options.validates) {
 				this.required(true, defaultRequiredRule);
@@ -40,7 +40,7 @@
 			};
 		},
 		_setDomId: function () {
-			this.base._setDomId.apply(this, arguments);
+			base._setDomId.apply(this, arguments);
 
 			var computedId = Mustache.format('{{0}}_checkbox', this.computedId());
 
@@ -123,4 +123,4 @@
 			this.trigger('click', this._checked);
 		}
 	}).complete();
-})();
+});

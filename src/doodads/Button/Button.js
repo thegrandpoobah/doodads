@@ -1,5 +1,5 @@
-﻿(function () {
-	doodads.setup().constructor(function () {
+﻿doodads.setup().inherits()(function(base) {
+	this.constructor(function () {
 		this._textElement = null;
 
 		this._text = this._options.text;
@@ -32,7 +32,7 @@
 		activeCssClass: 'buttonTracking'
 	}).proto({
 		constructElement: function () {
-			this.base.constructElement.apply(this, arguments);
+			base.constructElement.apply(this, arguments);
 
 			this._textElement = this.element().find('span');
 
@@ -65,7 +65,7 @@
 				}
 
 				this._cssClassOverrides = classes.join(' ');
-				this.base._updateCssClass.call(this);
+				base._updateCssClass.call(this);
 			}
 		},
 		bindEvents: function () {
@@ -90,7 +90,7 @@
 		},
 		_updateCssClass: function () {
 			this.cssClass(this.cssClass());
-			this.base._updateCssClass.apply(this, arguments);
+			base._updateCssClass.apply(this, arguments);
 		},
 		text: function ( /*text*/ ) {
 			if (arguments.length === 0) {
@@ -219,4 +219,4 @@
 		},
 		// END event handlers
 	}).complete();
-})();
+});
