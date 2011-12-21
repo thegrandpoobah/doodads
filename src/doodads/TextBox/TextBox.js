@@ -10,7 +10,7 @@
 
 	this.constructor(function () {
 		this.onTextAreaKeyDown$proxy = doodads.proxy(this.onTextAreaKeyDown, this);
-		this.onKeyUp$debounced = doodads.debounce(this.onKeyUp, KEYUP_DEBOUNCE_PERIOD, this);
+		this.onInputChanged$debounced = doodads.debounce(this.onInputChanged, KEYUP_DEBOUNCE_PERIOD, this);
 		this.onFocus$proxy = doodads.proxy(this.onFocus, this);
 		this.onBlur$proxy = doodads.proxy(this.onBlur, this);
 
@@ -59,7 +59,7 @@
 		},
 		bindEvents: function () {
 			this._input
-				.bind('input propertychange', this.onKeyUp$debounced)
+				.bind('input propertychange', this.onInputChanged$debounced)
 				.bind('focus.cmp', this.onFocus$proxy)
 				.bind('blur.cmp', this.onBlur$proxy);
 
@@ -238,7 +238,7 @@
 		},
 
 		/* BEGIN Event handling */
-		onKeyUp: function (e) {
+		onInputChanged: function (e) {
 			var val;
 			if (this._watermarkOn) {
 				val = '';
