@@ -105,11 +105,6 @@
 		};
 	}
 	builder.prototype = {
-		inheritsFrom: function(inheritsFrom) {
-			this.setupObject.base = inheritsFrom;
-			
-			return this;
-		},
 		constructor: function(func) {
 			this.setupObject.init = func;
 			
@@ -150,65 +145,47 @@
 			return this;
 		},
 		complete: function() {
-			var baseDfd = $.Deferred(), 
-				baseType,
-				setupObject = this.setupObject, 
-				name = this.name;
+			var setupObject = this.setupObject, 
+				baseType = setupObject.base,
+				name = this.name,
+				key,
+				new_doodad;
 
-			if (setupObject.base) {
-				baseType = doodads.getType(setupObject.base);
+			new_doodad = function(options, defaultOptions) {
+				if (arguments.length === 0) { return; }
 				
-				if (!baseType) {
-					utils.require(setupObject.base).done(function() {
-						baseDfd.resolve(doodads.getType(setupObject.base).prototype);
-					});
-				} else {
-					baseDfd.resolve(baseType.prototype);
-				}
-			} else {
-				baseDfd.resolve(doodads.doodad.prototype);
+                baseType.constructor.call(this, $.extend({}, defaultOptions, options), new_doodad.defaultOptions);
+				setupObject.init.apply(this, []);
+			};
+			
+			new_doodad.defaultOptions = setupObject.defaultOptions || {};
+			new_doodad.defaultOptions.templates = $.extend({}, 
+				setupObject.inheritsTemplates ? baseType.constructor.defaultOptions.templates : {},  
+				new_doodad.defaultOptions.templates,
+				setupObject.templates);
+				
+			new_doodad.prototype = $.extend(new baseType.constructor(), setupObject.proto);
+			new_doodad.prototype.constructor = new_doodad;
+			
+			if (setupObject.validates) {
+				doodads.validation.add(new_doodad);
 			}
 			
-			baseDfd.promise().done(function(baseType) {
-				var key;
-				var new_doodad = function(options, defaultOptions) {
-					if (arguments.length === 0) { return; }
-					
-					this.base = baseType;
-					this.base.constructor.call(this, $.extend({}, defaultOptions, options), new_doodad.defaultOptions);
-					
-					setupObject.init.apply(this, []);
-				};
-				
-				new_doodad.defaultOptions = setupObject.defaultOptions || {};
-				new_doodad.defaultOptions.templates = $.extend({}, 
-					setupObject.inheritsTemplates ? baseType.constructor.defaultOptions.templates : {},  
-					new_doodad.defaultOptions.templates,
-					setupObject.templates);
-					
-				new_doodad.prototype = $.extend(new baseType.constructor(), setupObject.proto);
-				new_doodad.prototype.constructor = new_doodad;
-				
-				if (setupObject.validates) {
-					doodads.validation.add(new_doodad);
+			for (key in setupObject.statics) {
+				if (setupObject.statics.hasOwnProperty(key)) {
+					new_doodad[key] = setupObject.statics[key];
 				}
-				
-				for (key in setupObject.statics) {
-					if (setupObject.statics.hasOwnProperty(key)) {
-						new_doodad[key] = setupObject.statics[key];
-					}
-				}
+			}
 
-				for (key in setupObject.stylesheets) {
-					if (setupObject.stylesheets.hasOwnProperty(key)) {
-						utils.addStylesheet(key, setupObject.stylesheets[key]);
-					}
+			for (key in setupObject.stylesheets) {
+				if (setupObject.stylesheets.hasOwnProperty(key)) {
+					utils.addStylesheet(key, setupObject.stylesheets[key]);
 				}
-				
-				// after everything is done..
-				utils.getResponseFunc(name)(new_doodad);
-				delete cache.constructions[name];
-			});
+			}
+			
+			// after everything is done..
+			utils.getResponseFunc(name)(new_doodad);
+			delete cache.constructions[name];
 		}
 	}
 
@@ -235,17 +212,43 @@
 				.templates(definition.templates, definition.inheritsTemplates)
 				.stylesheets(definition.stylesheets);
 			
-			cache.constructions[name] = constructor;
+			cache.constructions[name] = {
+				inherits: function(from) {
+					var baseDfd = $.Deferred(),
+						baseType;
+					
+					if (from) {
+						baseType = doodads.getType(from);
+						
+						if (!baseType) {
+							utils.require(from).done(function() {
+								baseDfd.resolve(doodads.getType(from).prototype);
+							});
+						} else {
+							baseDfd.resolve(baseType.prototype);
+						}
+					} else {
+						baseDfd.resolve(doodads.doodad.prototype);
+					}
+					
+					return function(fn) {
+						baseDfd.promise().done(function(baseType) {
+							constructor.setupObject.base = baseType;
+							fn.call(constructor, baseType);
+						});
+					};
+				}
+			};
 			
-			return constructor;
-		},		
+			return cache.constructions[name];
+		},
 		create: function(url, options) {
 			var dfd = $.Deferred(), type = doodads.getType(url);
 			
 			options = options || {};
 			
 			if (!type) {
-				utils.require(url).done(function() {					
+				utils.require(url).done(function() {
 					type = doodads.getType(url);
 					dfd.resolve(new type(options));
 				});
