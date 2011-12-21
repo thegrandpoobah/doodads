@@ -76,6 +76,8 @@
 			/// <param name="rule" type="Object|[Object]">A single rule or an array of rules</param>
 
 			this._rules = $.merge(this._rules || [], $.isArray(value) ? value : [value]);
+			
+			this.validate();
 		}
 		, addCallout: function (doodad) {
 			this._callouts = $.merge(this._callouts || [], $.isArray(doodad) ? doodad : [doodad]);
