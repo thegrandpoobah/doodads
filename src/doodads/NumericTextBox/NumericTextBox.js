@@ -155,11 +155,12 @@
 		required: false,
 		enabled: true,
 		textDecimals: 2,
-		valueDecimals: 4,
-		validationListeners: 'hintbox outline'
+		valueDecimals: 4
 	}).proto({
-		onReady: function NumericTextBox$onReady() {
-			base.onReady.apply(this, arguments);
+		onChildrenReady: function NumericTextBox$onChildrenReady() {
+			base.onChildrenReady.apply(this, arguments);
+			
+			this._input.watermarkingEnabled(false);
 
 			if (this._options.validates) {
 				this.addRule(defaultValidationRule);
@@ -169,11 +170,8 @@
 				}
 			}
 		},
-		onChildrenReady: function NumericTextBox$onChildrenReady() {
-			this._input.watermarkingEnabled(false);
-		},
 		cssClassPrefix: function () {
-			return 'numericTextBox'
+			return 'numericTextBox';
 		},
 		templateData: function NumericTextBox$templateData() {
 			return {

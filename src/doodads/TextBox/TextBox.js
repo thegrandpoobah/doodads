@@ -59,7 +59,7 @@
 		},
 		bindEvents: function () {
 			this._input
-				.bind('keyup', this.onKeyUp$debounced)
+				.bind('input propertychange', this.onKeyUp$debounced)
 				.bind('focus.cmp', this.onFocus$proxy)
 				.bind('blur.cmp', this.onBlur$proxy);
 
