@@ -15,6 +15,9 @@
 	$(function() {
 		$('head').append(
 			'<style type="text/css">' +
+				'.doodads-tipsy {' +
+					'font-size: 9pt;' +
+				'}' +
 				'.doodads-tipsy .tipsy-inner {' +
 					'background-color: white;' +
 					'color: black;' +
