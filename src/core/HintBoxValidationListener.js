@@ -9,6 +9,7 @@
 	// To optimize DOM usage, the HintBox validation listener shares an instance of the
 	// hint box and hint list doodads
 	var tipsyBox, 
+		isBoxVisible = false, 
 		template = Mustache.compile('<ul>{{#messages}}<li>{{text}}</li>{{/messages}}</ul>');
 		
 	$(function() {
@@ -43,7 +44,8 @@
 			trigger:'manual',
 			html: true,
 			className: 'doodads-tipsy',
-			gravity: 'w'
+			gravity: 'w',
+			opacity: 1
 		});
 		tipsyBox = $(document).tipsy(true);
 	});
@@ -139,13 +141,21 @@
 			} else {
 				tipsyBox.options.className = 'doodads-tipsy doodads-tipsy-error';
 			}
-
+			
 			tipsyBox.show();
+			
+			isBoxVisible = true;
 			
 			window.captureEvent('mousedown', this._doodad.element(), this.onCapturedMouseDown$proxy);
 		}
 		, hideHintBox: function HintBoxValidationListener$hideHintBox() {
+			if (!isBoxVisible) {
+				return;
+			}
+			
 			tipsyBox.hide();
+			
+			isBoxVisible = false;
 
 			window.releaseEvent('mousedown');
 		}
