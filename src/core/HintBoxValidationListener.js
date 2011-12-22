@@ -13,6 +13,7 @@
 		template = Mustache.compile('<ul>{{#messages}}<li>{{text}}</li>{{/messages}}</ul>');
 		
 	$(function() {
+		// add the doodads specific tipsy stylesheets
 		$('head').append(
 			'<style type="text/css">' +
 				'.doodads-tipsy {' +
@@ -43,8 +44,9 @@
 					'padding: 0;' +
 				'}' +
 			'</style>');
+
 		$(document).tipsy({
-			trigger:'manual',
+			trigger: 'manual',
 			html: true,
 			className: 'doodads-tipsy',
 			gravity: 'w',
