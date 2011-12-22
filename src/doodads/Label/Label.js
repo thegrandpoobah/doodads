@@ -6,10 +6,10 @@
 		text: ''
 	})
 	.proto({
-		templateData: function () {
+		templateData: function Label$templateData() {
 			return { text: this._text };
 		},
-		text: function (/*text*/) {
+		text: function Label$text(/*text*/) {
 			if (arguments.length === 0) {
 				return this._text;
 			} else {

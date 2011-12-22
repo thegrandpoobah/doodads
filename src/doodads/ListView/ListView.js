@@ -165,8 +165,7 @@
 			}
 		}
 
-		,
-		_filter: function (ch) {
+		,_filter: function ListView$_filter(ch) {
 			var i;
 
 			if (ch === this._filterStr) {
@@ -201,7 +200,7 @@
 				this._scrollKeyboardNavItemIntoView();
 			}
 		},
-		killFilter: function DropDown$killFilter() {
+		killFilter: function ListView$killFilter() {
 			this._filterStr = '';
 			this._filterRepeatCount = 0;
 		},

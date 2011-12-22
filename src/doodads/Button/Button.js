@@ -1,4 +1,4 @@
-﻿doodads.setup().inherits()(function(base) {
+﻿doodads.setup().inherits()(function (base) {
 	this.constructor(function () {
 		this._textElement = null;
 
@@ -31,23 +31,23 @@
 		trackingCssClass: 'buttonHover',
 		activeCssClass: 'buttonTracking'
 	}).proto({
-		constructElement: function () {
+		constructElement: function Button$constructElement() {
 			base.constructElement.apply(this, arguments);
 
 			this._textElement = this.element().find('span');
 
 			this.enabled(this._enabled);
 		},
-		templateData: function () {
+		templateData: function Button$templateData() {
 			return {
 				tooltip: this._tooltip,
 				text: this._text
 			};
 		},
-		cssClassPrefix: function () {
+		cssClassPrefix: function Button$cssClassPrefix() {
 			return 'button';
 		},
-		cssClass: function ( /*cssClass*/ ) {
+		cssClass: function Button$cssClass( /*cssClass*/ ) {
 			if (arguments.length === 0) {
 				return this._baseCssClass;
 			} else {
@@ -68,7 +68,7 @@
 				base._updateCssClass.call(this);
 			}
 		},
-		bindEvents: function () {
+		bindEvents: function Button$bindEvents() {
 			this.element()
 				.one('mouseover', this._bindEventsInitial$proxy)
 				.focus(this.onFocus$proxy)
@@ -76,7 +76,7 @@
 				.keydown(this.onKeyDown$proxy)
 				.keyup(this.onKeyUp$proxy);
 		},
-		_bindEventsInitial: function () {
+		_bindEventsInitial: function Button$_bindEventsInitial() {
 			this.onMouseOver.apply(this, arguments);
 			
 			this.element()
@@ -88,11 +88,11 @@
 					e.preventDefault();
 				}); // disable text selection in IE
 		},
-		_updateCssClass: function () {
+		_updateCssClass: function Button$_updateCssClass() {
 			this.cssClass(this.cssClass());
 			base._updateCssClass.apply(this, arguments);
 		},
-		text: function ( /*text*/ ) {
+		text: function Button$text( /*text*/ ) {
 			if (arguments.length === 0) {
 				return this._text;
 			} else {
@@ -100,7 +100,7 @@
 				this._textElement.text(this._text);
 			}
 		},
-		tooltip: function ( /*tooltip*/ ) {
+		tooltip: function Button$tooltip( /*tooltip*/ ) {
 			if (arguments.length === 0) {
 				return this._tooltip;
 			} else {
@@ -112,7 +112,7 @@
 				}
 			}
 		},
-		enabled: function ( /*enable*/ ) {
+		enabled: function Button$enabled( /*enable*/ ) {
 			if (arguments.length === 0) {
 				return this._enabled;
 			} else {
@@ -121,21 +121,21 @@
 			}
 		},
 		// BEGIN event handlers
-		onMouseOver: function (e) {
+		onMouseOver: function Button$onMouseOver(e) {
 			if (this.enabled()) {
 				this._tracking = true;
 				this._updateCssClass();
 			}
 			e.stopPropagation();
 		},
-		onMouseOut: function (e) {
+		onMouseOut: function Button$onMouseOut(e) {
 			if (this.enabled()) {
 				this._tracking = false;
 				this._updateCssClass();
 			}
 			e.stopPropagation();
 		},
-		onMouseDown: function (e) {
+		onMouseDown: function Button$onMouseDown(e) {
 			if (e.which !== doodads.mouseCode.left) {
 				return;
 			}
@@ -147,7 +147,7 @@
 			}
 			e.stopPropagation();
 		},
-		onMouseUp: function (e) {
+		onMouseUp: function Button$onMouseUp(e) {
 			if (e.which !== doodads.mouseCode.left) {
 				return;
 			}
@@ -160,7 +160,7 @@
 			}
 			e.stopPropagation();
 		},
-		onDocumentMouseUp: function () {
+		onDocumentMouseUp: function Button$onDocumentMouseUp() {
 			if (this.enabled() && this._active) {
 				this._active = false;
 				this._updateCssClass();
@@ -168,19 +168,19 @@
 			}
 		},
 
-		onFocus: function (e) {
+		onFocus: function Button$onFocus(e) {
 			if (this.enabled()) {
 				this._hasFocus = true;
 				this._updateCssClass();
 			}
 		},
-		onBlur: function (e) {
+		onBlur: function Button$onBlur(e) {
 			if (this.enabled()) {
 				this._hasFocus = false;
 				this._updateCssClass();
 			}
 		},
-		onKeyDown: function (e) {
+		onKeyDown: function Button$onKeyDown(e) {
 			if (this.enabled()) {
 				switch (e.which) {
 					case doodads.keyCode.ENTER:
@@ -201,7 +201,7 @@
 				}
 			}
 		},
-		onKeyUp: function (e) {
+		onKeyUp: function Button$onKeyUp(e) {
 			if (this.enabled()) {
 				switch (e.which) {
 					case doodads.keyCode.SPACE:

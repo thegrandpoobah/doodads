@@ -1,5 +1,6 @@
 ﻿doodads.setup().inherits('/doodads/List.doodad')(function(base) {
 	var FILTER_RESET_DEBOUNCE_TIME = 1000; // in ms
+	
 	var activeDropDown = null;
 
 	var createDefaultRequiredRule = function (invalidValue, message) {
@@ -170,6 +171,7 @@
 			}
 			base.rerender.apply(this, arguments);
 		},
+		
 		/* BEGIN Properties */
 		watermark: function DropDown$watermark( /*text*/ ) {
 			if (arguments.length === 0) {
@@ -418,7 +420,7 @@
 				this.selectedIndex(item.index(), true);
 			}
 		},
-		_filter: function (ch) {
+		_filter: function DropDown$_filter(ch) {
 			var i;
 
 			if (ch === this._filterStr) {
@@ -522,9 +524,8 @@
 				newSelection: newSelection
 			});
 			return !evt.isDefaultPrevented();
-		} /* END Events */
+		}, /* END Events */
 
-		,
 		show: function DropDown$show() {
 			if (this._isListVisible) return;
 
@@ -654,10 +655,9 @@
 
 			this._isListPinned = false;
 			this._hidingTimeout = null;
-		}
+		},
 
 		/* BEGIN Focus Management */
-		,
 		focus: function DropDown$focus() {
 			if (this.isAttached()) {
 				this._affordance.focus();
@@ -681,10 +681,10 @@
 					this._affordance.removeAttr('tabIndex');
 				}
 			}
-		} /* END Focus Management */
+		},
+		/* END Focus Management */
 
 		/* BEGIN Validation Framework Requirements */
-		,
 		validationContext: function DropDown$validationContext() {
 			return $.extend({}, this.selected() || {}, {
 				index: this.selectedIndex()
@@ -696,9 +696,9 @@
 		},
 		hasInputFocus: function DropDown$hasInputFocus() {
 			return this._focused && !this._isListVisible;
-		} /* END Validation Framework Requirements */
+		},
+		/* END Validation Framework Requirements */
 
-		,
 		dispose: function DropDown$dispose() {
 			if (this._source && this._list) {
 				this._list.appendTo(this.element());

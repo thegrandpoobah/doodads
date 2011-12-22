@@ -19,27 +19,27 @@
 		enabled: true,
 		checked: false
 	}).proto({
-		constructElement: function () {
+		constructElement: function CheckBox$constructElement() {
 			base.constructElement.apply(this, arguments);
 
 			this._label = this.element().find('label');
 			this._input = this.element().find('#checkbox');
 			this.enabled(this._options.enabled);
 		},
-		onReady: function () {
+		onReady: function CheckBox$onReady() {
 			base.onReady.apply(this, arguments);
 
 			if (this._options.required && this._options.validates) {
 				this.required(true, defaultRequiredRule);
 			}
 		},
-		templateData: function () {
+		templateData: function CheckBox$templateData() {
 			return {
 				text: this._text,
 				checked: this._checked
 			};
 		},
-		_setDomId: function () {
+		_setDomId: function CheckBox_setDomId() {
 			base._setDomId.apply(this, arguments);
 
 			var computedId = Mustache.format('{{0}}_checkbox', this.computedId());
@@ -47,16 +47,16 @@
 			this._input.attr('id', computedId);
 			this._label.attr('for', computedId);
 		},
-		cssClassPrefix: function () {
+		cssClassPrefix: function CheckBox$cssClassPrefix() {
 			return 'checkBox';
 		},
-		bindEvents: function () {
+		bindEvents: function CheckBox$bindEvents() {
 			this._input
 				.bind('click', this.onClick$proxy)
 				.bind('focus', this.onFocus$proxy)
 				.bind('blur', this.onBlur$proxy);
 		},
-		checked: function ( /*checked, trigger*/ ) {
+		checked: function CheckBox$checked( /*checked, trigger*/ ) {
 			if (arguments.length === 0) {
 				return this._checked;
 			} else {
@@ -74,7 +74,7 @@
 				}
 			}
 		},
-		text: function ( /*text*/ ) {
+		text: function CheckBox$text( /*text*/ ) {
 			if (arguments.length === 0) {
 				return this._text;
 			} else {
@@ -84,16 +84,16 @@
 				this._label.text(this._text);
 			}
 		},
-		validationContext: function () {
+		validationContext: function CheckBox$validationContext() {
 			return this.checked();
 		},
-		validationTarget: function () {
+		validationTarget: function CheckBox$validationTarget() {
 			return this._input;
 		},
-		hasInputFocus: function () {
+		hasInputFocus: function CheckBox$hasInputFocus() {
 			return this._focused;
 		},
-		enabled: function ( /*enable*/ ) {
+		enabled: function CheckBox$enabled( /*enable*/ ) {
 			if (arguments.length === 0) {
 				return this._enabled;
 			} else {
@@ -106,18 +106,18 @@
 				}
 			}
 		},
-		focus: function () {
+		focus: function CheckBox$focus() {
 			this._input.focus();
 		},
-		onFocus: function (e) {
+		onFocus: function CheckBox$onFocus(e) {
 			this._focused = true;
 			this.trigger('focus');
 		},
-		onBlur: function (e) {
+		onBlur: function CheckBox$onBlur(e) {
 			this._focused = false;
 			this.trigger('blur');
 		},
-		onClick: function () {
+		onClick: function CheckBox$onClick() {
 			this._checked = this._input[0].checked;
 			this.validate();
 			this.trigger('click', this._checked);

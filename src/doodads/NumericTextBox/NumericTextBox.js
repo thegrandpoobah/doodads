@@ -170,7 +170,7 @@
 				}
 			}
 		},
-		cssClassPrefix: function () {
+		cssClassPrefix: function NumericTextBox$cssClassPrefix() {
 			return 'numericTextBox';
 		},
 		templateData: function NumericTextBox$templateData() {

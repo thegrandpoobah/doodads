@@ -9,7 +9,7 @@
 	};
 
 	this.constructor(function () {
-		this.onTextAreaKeyDown$proxy = doodads.proxy(this.onTextAreaKeyDown, this);
+		this.onTextAreaKeyPress$proxy = doodads.proxy(this.onTextAreaKeyPress, this);
 		this.onInputChanged$debounced = doodads.debounce(this.onInputChanged, KEYUP_DEBOUNCE_PERIOD, this);
 		this.onFocus$proxy = doodads.proxy(this.onFocus, this);
 		this.onBlur$proxy = doodads.proxy(this.onBlur, this);
@@ -31,14 +31,14 @@
 		rows: 4,
 		cols: 40
 	}).proto({
-		onReady: function () {
+		onReady: function TextBox$onReady() {
 			base.onReady.apply(this, arguments);
 
 			if (this._options.required && this._options.validates) {
 				this.required(true, defaultRequiredRule);
 			}
 		},
-		constructElement: function () {
+		constructElement: function TextBox$constructElement() {
 			base.constructElement.apply(this, arguments);
 
 			this._input = this._source.find('input, textarea');
@@ -54,20 +54,20 @@
 				});
 			}
 		},
-		cssClassPrefix: function () {
+		cssClassPrefix: function TextBox$cssClassPrefix() {
 			return 'textbox';
 		},
-		bindEvents: function () {
+		bindEvents: function TextBox$bindEvents() {
 			this._input
 				.bind('input propertychange', this.onInputChanged$debounced)
 				.bind('focus.cmp', this.onFocus$proxy)
 				.bind('blur.cmp', this.onBlur$proxy);
 
 			if (this._options.multiline) {
-				this._input.bind('keydown', this.onTextAreaKeyDown$proxy);
+				this._input.bind('keypress', this.onTextAreaKeyPress$proxy);
 			}
 		},
-		render: function () {
+		render: function TextBox$render() {
 			base.render.apply(this, arguments);
 
 			if (this._options.text.trim() !== '') {
@@ -78,7 +78,7 @@
 
 			this.enabled(this._options.enabled);
 		},
-		watermarkingEnabled: function () {
+		watermarkingEnabled: function TextBox$watermarkingEnabled() {
 			if (arguments.length === 0) {
 				return this._watermarkingEnabled;
 			} else {
@@ -88,21 +88,21 @@
 				this._addWatermark();
 			}
 		},
-		_addWatermark: function () {
+		_addWatermark: function TextBox$_addWatermark() {
 			if (this.watermarkingEnabled() && !this._watermarkOn && this._input.val().length === 0) {
 				this._input.addClass('watermarked');
 				this._input.val(this._options.watermark);
 				this._watermarkOn = true;
 			}
 		},
-		_removeWatermark: function () {
+		_removeWatermark: function TextBox$_removeWatermark() {
 			if (this.watermarkingEnabled() && this._watermarkOn) {
 				this._input.val('');
 				this._watermarkOn = false;
 			}
 			this._input.removeClass('watermarked');
 		},
-		_setCaretPosition: function (pos) {
+		_setCaretPosition: function TextBox$_setCaretPosition(pos) {
 			var ctrl = this._input[0]; // need the actual DOM element (not jQuery)
 			if (ctrl.setSelectionRange) {
 				ctrl.focus();
@@ -115,7 +115,7 @@
 				range.select();
 			}
 		},
-		templateData: function () {
+		templateData: function TextBox$templateData() {
 			var obj = {};
 
 			if (this._options.multiline) {
@@ -141,13 +141,13 @@
 				}
 			}
 		},
-		validationContext: function () {
+		validationContext: function TextBox$validationContext() {
 			return this.text();
 		},
-		validationTarget: function () {
+		validationTarget: function TextBox$validationTarget() {
 			return this._input;
 		},
-		text: function ( /*value, triggerEvents*/) {
+		text: function TextBox$text( /*value, triggerEvents*/ ) {
 			///	<summary>
 			///		1: text() - returns the text.
 			///		2: text(value) - Sets the text to value.
@@ -192,14 +192,15 @@
 				}
 			}
 		},
-		focus: function () {
+		focus: function TextBox$focus() {
 			this._input.focus();
 		},
-		hasInputFocus: function () {
+		hasInputFocus: function TextBox$hasInputFocus() {
 			return this._focused;
 		},
+		
 		/* BEGIN Enable/Disable management */
-		enabled: function ( /*value*/) {
+		enabled: function TextBox$enabled( /*value*/) {
 			///	<summary>
 			///		1: enabled() - Indicates whether the component is enabled.
 			///		2: enabled(true) - Enable the component.
@@ -223,7 +224,7 @@
 				}
 			}
 		},
-		disabled: function ( /*value*/) {
+		disabled: function TextBox$disabled( /*value*/) {
 			///	<summary>
 			///		1: disabled() - Indicates whether the component is disabled.
 			///		2: disabled(true) - Disable the component.
@@ -238,7 +239,7 @@
 		},
 
 		/* BEGIN Event handling */
-		onInputChanged: function (e) {
+		onInputChanged: function TextBox$onInputChanged(e) {
 			var val;
 			if (this._watermarkOn) {
 				val = '';
@@ -247,7 +248,7 @@
 			}
 			this.text(val, true);
 		},
-		onFocus: function (e) {
+		onFocus: function TextBox$onFocus(e) {
 			this._focused = true;
 			this._removeWatermark();
 
@@ -274,16 +275,14 @@
 			}, 0);
 			// END: WORKAROUND for bug 524360
 		},
-		onBlur: function (e) {
+		onBlur: function TextBox$onBlur(e) {
 			this._addWatermark();
 			this.trigger('blur');
 			this._focused = false;
 		},
-		onTextAreaKeyDown: function (e) {
-			var key = e.keyCode || e.which;
-			var value = e.target.value;
-			if (key >= 32 && key < 127 && this._options.maxlength !== -1 && value.length >= this._options.maxlength) {
-				e.target.value = value.substring(0, this._options.maxlength);
+		onTextAreaKeyPress: function TextBox$onTextAreaKeyDown(e) {
+			if (e.which !== 0 && this._options.maxlength !== -1 && e.target.value >= this._options.maxlength) {
+				e.target.value = e.target.value.substring(0, this._options.maxlength);
 				e.preventDefault();
 			}
 		}

@@ -12,21 +12,21 @@
 		checked: false,
 		group: ''
 	}).proto({
-		constructElement: function () {
+		constructElement: function RadioButton$constructElement() {
 			base.constructElement.apply(this, arguments);
 
 			this._label = this.element().find('label');
 			this._input = this.element().find('#radiobutton');
 			this.enabled(this._options.enabled);
 		},
-		templateData: function () {
+		templateData: function RadioButton$templateData() {
 			return {
 				text: this._text,
 				checked: this._checked,
 				group: this._group
 			};
 		},
-		_setDomId: function () {
+		_setDomId: function RadioButton$_setDomId() {
 			base._setDomId.apply(this, arguments);
 
 			var computedId = Mustache.format('{{0}}_radiobutton', this.computedId()),
@@ -49,13 +49,13 @@
 				this._input.attr('name', this._group);
 			}
 		},
-		cssClassPrefix: function () {
+		cssClassPrefix: function RadioButton$cssClassPrefix() {
 			return 'radioButton';
 		},
-		bindEvents: function () {
+		bindEvents: function RadioButton$bindEvents() {
 			this._input.bind('click', this.onClick$proxy);
 		},
-		checked: function ( /*checked*/ ) {
+		checked: function RadioButton$checked( /*checked*/ ) {
 			if (arguments.length === 0) {
 				return this._input[0].checked;
 			} else {
@@ -65,7 +65,7 @@
 				this._input[0].checked = this._checked;
 			}
 		},
-		text: function ( /*text*/ ) {
+		text: function RadioButton$text( /*text*/ ) {
 			if (arguments.length === 0) {
 				return this._text;
 			} else {
@@ -75,7 +75,7 @@
 				this._label.text(this._text);
 			}
 		},
-		enabled: function ( /*enable*/ ) {
+		enabled: function RadioButton$enabled( /*enable*/ ) {
 			if (arguments.length === 0) {
 				return this._enabled;
 			} else {
@@ -88,7 +88,7 @@
 				}
 			}
 		},
-		onClick: function (e) {
+		onClick: function RadioButton$onClick(e) {
 			this._checked = this._input[0].checked;
 			this.trigger('click', this._checked);
 
