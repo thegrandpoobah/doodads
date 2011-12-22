@@ -43,6 +43,7 @@ task('concatenate', function(params) {
 		, 'core/utils.js'
 		, 'core/Validator.js'
 		, 'core/HintBoxValidationListener.js'
+		, 'core/config.js'
 	], 'doodads.js', true);
 });
 

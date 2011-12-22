@@ -1,5 +1,3 @@
-var DOMMETAKEY = 'doodad'; // constant
-
 (function() {
 	// constants
 	var DEBOUNCE_TIMEOUT = 50; // in milliseconds
@@ -727,7 +725,7 @@ var DOMMETAKEY = 'doodad'; // constant
 				this._hookWindowResize();
 
 				// create a two-way relationship between the doodad and the DOM
-				this._source.data(DOMMETAKEY, this);
+				this._source.data(doodads.config.domDataKey, this);
 
 				if (this._options.validates) {
 					this._initializeValidationListeners();

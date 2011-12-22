@@ -12,7 +12,7 @@
 		/// array where elements have a doodad are populated
 		///</returns>
 		var doodads = $.map(this, function (element, index) {
-			return $(element).data(DOMMETAKEY);
+			return $(element).data(doodads.config.domDataKey);
 		});
 
 		switch (doodads.length) {
