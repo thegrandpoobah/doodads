@@ -1,16 +1,22 @@
 (function() {
-	// determines how long the validator waits for an async rule to callback before
-	// showing the user a message.
-	var ASYNC_GRACE_PERIOD = 100;
-
-	var validationListeners = [],
-		overrideMethods = ['valid', 'validationContext', 'isValidationContextEmpty', 'dispose'];
+		// determines how long the validator waits for an async rule to callback before
+		// showing the user a message.
+	var ASYNC_GRACE_PERIOD = 100,
+		// The list of methods to override on the prototype to get correct behaviour
+		OVERRIDEMETHODS = ['valid', 'validationContext', 'isValidationContextEmpty', 'dispose'];
+		
+	var validationListeners = [];
+		
 
 	doodads.validation = { 
 		listeners: {}, // namespace for the validation listeners
 
-		add: function (doodad) {
-			$.each(overrideMethods, function (index, item) {
+		add: function validation$add(doodad) {
+			///<summary>
+			/// Adds validation support on to the given doodad object.
+			///</summary>
+			///<param name="doodad">The doodad to add validation support onto</param>
+			$.each(OVERRIDEMETHODS, function (index, item) {
 				doodad.prototype['_prototype_' + item] = doodad.prototype[item];
 			});
 
@@ -26,12 +32,16 @@
 			}, doodad.defaultOptions);
 		},
 
-		remove: function (doodad) {
+		remove: function validation$remove(doodad) {
+			///<summary>
+			/// Removes validation support from the given doodad object.
+			///</summary>
+			///<param name="doodad">The doodad to remove validation support from</param>
 			for (key in Validator) {
 				doodad[key] = doodad.__validator[key];
 			}
 
-			$.each(overrideMethods, function (index, item) {
+			$.each(OVERRIDEMETHODS, function (index, item) {
 				var prototypeFunction = '_prototype_' + item;
 				doodad[item] = doodad[prototypeFunction];
 				delete doodad[prototypeFunction];
@@ -39,7 +49,7 @@
 			});
 		},
 
-		registerListener : function (listener) {
+		registerListener : function valdation$registerListener(listener) {
 			///<summary>
 			/// Adds a Validation Listener to the validation listener registry.
 			/// Validation Listeners perform an action after every execution of the validate function
@@ -55,51 +65,78 @@
 		}
 	};
 
+	// The validator class gets mixed with the doodad class using the doodads.validation.add method
+	// In the vast majority of cases, this is done automatically via the doodads.setup family of functions.
 	Validator = {
-		addRule: function (value) {
-			///	<summary>
-			///		Adds a rule to the list of rules the doodad must validate its context against.  The context is provided by "validationContext()"
-			///	</summary>
-			///	<remarks>
-			///		To create a new rule, one can simply use the already defined available rules in the "ValidationRules" namespace.  
+		addRule: function Validator$addRule(value) {
+			///<summary>
+			/// Adds a rule to the list of rules the doodad must validate against. Can optionally add a set of rules if the
+			/// passed in "value" argument is an array.
+			/// The context is provided by the "validationContext" function.
+			///</summary>
+			///<param name="rule" type="function|[function]">
+			/// A single rule or an array of rules.
+			/// A rule is a function that has the following signature:
 			///
-			///		Alternatively, a new rule can be created by defining a new object.  This object must contain 
-			///		a "validate" function, itself receiving as (optional) parameter the current context, and which
-			///		returns an object literal defined as:
+			///  function(context, args)
 			///
-			///			- message (type="String"):  The message to display in the hintbox.
-			///			- valid (type="Boolean"): States whether the context is valid.
-			///			- alwaysShow (type="Boolean", optional="true"):  If true, the message will appear in the hintbox even if valid is false.
+			/// where "context" is the validation context of the doodad
+			/// and "args" is an object containing methods and flags for advanced validation rules.
+			/// The return value of the function is an object that matches the following "schema":
 			///
-			///		NOTE: When "alwaysShow" is set to true, the hintbox will always be displayed (when the doodad hasInputFocus() == true)
-			///	</remarks>
-			/// <param name="rule" type="Object|[Object]">A single rule or an array of rules</param>
-
+			///  * message (type="String"):  The message to display in the hintbox.
+			///  * valid (type="Boolean"): States whether the context is valid.
+			///  * alwaysShow (type="Boolean", optional="true"):  If true, the message will appear in the hintbox even if valid is false.
+			///</param>
+			///<remarks>
+			/// Each doodad has a set of pre-built rules that can be used for the common validation cases. These are each
+			/// documented with their respective doodad.
+			///</remarks>
 			this._rules = $.merge(this._rules || [], $.isArray(value) ? value : [value]);
 			
 			this.validate();
 		}
-		, addCallout: function (doodad) {
+		, addCallout: function Validator$addCallout(doodad) {
+			///<summary>
+			/// Adds a callout to the list of callouts the doodad must invoke when validating its context. Can optionally add a 
+			/// set of callouts if the passed in "doodad" argument is an array.
+			///
+			/// A callout is another doodad that will invoke validate after this doodad validates. The purpose of callouts is to
+			/// aid in building a validation graph for each set of doodads on a page.
+			///</summary>
+			///<param name="doodad" type="doodad|[doodad]">
+			/// A single doodad or an array of doodads.
+			///</param>
 			this._callouts = $.merge(this._callouts || [], $.isArray(doodad) ? doodad : [doodad]);
 		}
-		, ranValidation: function () {
+		, ranValidation: function Validator$ranValidation() {
+			///<summary>
+			/// Determines if validation has ever been invoked on this doodad.
+			///</summary>
 			return this._ranValidation;
 		}
-		, valid: function () {
+		, valid: function function Validator$valid() {
 			if (arguments.length === 0 && this._source && !this._ranValidation) {
 				this.validate();
 			}
 			return this._prototype_valid.apply(this, arguments);
 		}
 
-		, isValidationContextEmpty: function (context) {
+		, isValidationContextEmpty: function Validator$isValidationContextEmpty(context) {
+			///<summary>
+			/// Determines if the validation context for a doodad should be considered "empty" or not
+			/// This is doodad specific and must be overridden by doodads to provide the correct functionality.
+			///</summary>
+			///<remarks>
+			/// By default, the validation context for a doodad is considered empty if it is null or the empty string.
+			///</remarks>
 			if (this._prototype_isValidationContextEmpty) {
 				return this._prototype_isValidationContextEmpty.apply(this, arguments);
 			} else {
 				return (context === null || context === '');
 			}
 		}
-		, validationContext: function () {
+		, validationContext: function Validator$validationContext() {
 			///<summary>
 			/// A JS object representation of the properties of this doodad that are needed
 			/// to test validity.
@@ -115,9 +152,11 @@
 			}
 		}
 
-		, validate: function (/*traversalHistory*/) {
+		, validate: function Validator$validate(/*traversalHistory*/) {
 			///<summary>
-			///
+			/// Validates this doodad's validation context against the set of rules associated with it.
+			/// Optionally triggers the validate function of other doodad's if they are part of the callout
+			/// list for this doodad.
 			///</summary>
 			var context = this.validationContext();
 			var traversalHistory = arguments[0];
@@ -169,7 +208,7 @@
 
 			privateMethods.afterRulesRan.call(this, traversalHistory || [this]);
 		}
-		, required: function (/*isRequired, requirementRule*/) {
+		, required: function Validator$required(/*isRequired, requirementRule*/) {
 			/// <summary>
 			///		1: required() - Indicates whethere the doodad is required or not.
 			///		2: required(true, function(){...}) - Sets the doodad to required, and adds the requirement rule.
@@ -230,21 +269,24 @@
 				this.validate();
 			}
 		}
-		, suspendValidation: function () {
+		, suspendValidation: function Validator$suspendValidation() {
 			///<summary>Temporarily stops the validation code from triggering</summary>
 			this._validationSuspended = true;
 		}
-		, resumeValidation: function () {
+		, resumeValidation: function Validator$resumeValidation() {
 			///<summary>Re-enables validation code and forces a validation event to run</summary>
 			this._validationSuspended = false;
 			this.validate();
 		}
 
-		, _initializeValidationListeners: function () {
+		, _initializeValidationListeners: function Validator$_initializeValidationListeners() {
+			///<summary>
+			/// PRIVATE METHOD: Initializes the set of validation listeners for this doodad.
+			///</summary>
 			var i, n, listener;
 
-		    this._listeners = [];
-		    privateMethods.tearDownValidationListeners.call(this);				
+			this._listeners = [];
+			privateMethods.tearDownValidationListeners.call(this);
 
 			for (i = 0, n = validationListeners.length; i < n; ++i) {
 				listener = validationListeners[i];
@@ -255,7 +297,17 @@
 			}
 		}
 
-		, getValidationListener: function (type) {
+		, getValidationListener: function Validator$getValidationListener(type) {
+			///<summary>
+			/// Given a class type, returns the validation listener associated with this doodad
+			/// that matches that class type if it exists.
+			///</summary>
+			///<param name="type">
+			/// A class type to retrieve.
+			///</param>
+			///<returns type="object">
+			/// A validation listener object or undefined if none could be found.
+			///</returns>
 			var listener;
 
 			$.each(this._listeners, function () {
@@ -268,7 +320,7 @@
 			return listener;
 		}
 		
-		, dispose: function () {
+		, dispose: function Validator$dispose() {
 			privateMethods.tearDownValidationListeners.call(this);
 
 			return this._prototype_dispose.apply(this, arguments);
@@ -276,13 +328,19 @@
 	};
 
 	var privateMethods = {
-		tearDownValidationListeners: function () {
+		tearDownValidationListeners: function Validator$tearDownValidationListeners() {
+			///<summary>
+			/// Disposes of all validation listeners as necessary
+			///</summary>
 			$.each(this._listeners || [], function () {
 				this.dispose();
 			});
 		}
 
-		, ruleCallback: function (result, passId, traversalHistory) {
+		, ruleCallback: function Validator$ruleCallback(result, passId, traversalHistory) {
+			///<summary>
+			/// Called after each rule has executed.
+			///</summary>
 			if (this._passId !== passId) {
 				return;
 			}
@@ -313,37 +371,45 @@
 
 			privateMethods.afterRulesRan.call(this, traversalHistory);
 		}
-		, afterRulesRan: function (traversalHistory) {
-			if (this._pendingRules === 0) {
-				this._backList = $.map(this._backList, function (e, i) {
-					if (!e.isAsync) return e;
+		, afterRulesRan: function Validator$afterRulesRan(traversalHistory) {
+			///<summary>
+			/// Called after all the rules in the validation set have ran.
+			///</summary>
+			if (this._pendingRules !== 0) {
+				return;
+			}
+			
+			this._backList = $.map(this._backList, function (e, i) {
+				if (!e.isAsync) return e;
+			});
+
+			this._valid(this._computedValidity);
+
+			$.each(this._callouts || [], $.proxy(function (index, callout) {
+				var calloutInHistory = false;
+				$.each(traversalHistory, function (index, historyObject) {
+					if (callout === historyObject) {
+						calloutInHistory = true;
+						return false; // break
+					}
 				});
 
-				this._valid(this._computedValidity);
+				if (!calloutInHistory) {
+					callout.validate($.merge(traversalHistory, [callout]));
+				}
+			}, this));
 
-				$.each(this._callouts || [], $.proxy(function (index, callout) {
-					var calloutInHistory = false;
-					$.each(traversalHistory, function (index, historyObject) {
-						if (callout === historyObject) {
-							calloutInHistory = true;
-							return false; // break
-						}
-					});
-
-					if (!calloutInHistory) {
-						callout.validate($.merge(traversalHistory, [callout]));
-					}
-				}, this));
-
-				privateMethods.trigger_validationApplied.call(this);
-			}
+			privateMethods.trigger_validationApplied.call(this);
 		}
-		, trigger_validationApplied: function () {
+		, trigger_validationApplied: function Validator$trigger_validationApplied() {
+			///<summary>
+			/// Triggers the validationApplied event
+			///</summary>
 			this.trigger('validationApplied', {
 				messages: this._backList
 				, isValid: this._computedValidity
 				/* possibly others */
 			});
 		}
-	}
+	};
 })();
