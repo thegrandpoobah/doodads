@@ -1,0 +1,6 @@
+{
+	"behavior": "./doodads/Label/Label.js",
+	"templates": {
+		"base" : "./doodads/Label/Label.html"
+	}
+}

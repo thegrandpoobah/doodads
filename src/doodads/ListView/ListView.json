@@ -1,0 +1,10 @@
+{
+	"behavior": "./doodads/ListView/ListView.js",
+	"templates": {
+		"base" : "./doodads/ListView/ListView.html",
+		"item" : "./doodads/ListView/ListView.item.html"
+	},
+	"stylesheets": [
+		"./doodads/ListView/ListView.css"
+	]
+}

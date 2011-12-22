@@ -1,0 +1,10 @@
+{
+	"behavior": "./doodads/TextBox/TextBox.js",
+	"templates": {
+		"base" : "./doodads/TextBox/TextBox.html"
+	},
+	"stylesheets": [
+		"./doodads/TextBox/TextBox.css"
+	],
+	"validates": true
+}

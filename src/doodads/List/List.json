@@ -1,0 +1,7 @@
+{
+	"behavior": "./doodads/List/List.js",
+	"templates": {
+		"base" : "./doodads/List/List.html",
+		"item" : "./doodads/List/List.item.html"
+	}
+}

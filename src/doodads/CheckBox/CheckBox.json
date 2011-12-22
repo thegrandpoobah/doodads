@@ -1,0 +1,10 @@
+{
+	"behavior": "./doodads/CheckBox/CheckBox.js",
+	"templates": {
+		"base" : "./doodads/CheckBox/CheckBox.html"
+	},
+	"stylesheets": [
+		"./doodads/CheckBox/CheckBox.css"
+	],
+	"validates": true
+}

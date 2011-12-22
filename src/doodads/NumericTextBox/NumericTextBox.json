@@ -1,0 +1,10 @@
+{
+	"behavior": "./doodads/NumericTextBox/NumericTextBox.js",
+	"templates": {
+		"base" : "./doodads/NumericTextBox/NumericTextBox.html"
+	},
+	"stylesheets": [
+		"./doodads/NumericTextBox/NumericTextBox.css"
+	],
+	"validates": true
+}

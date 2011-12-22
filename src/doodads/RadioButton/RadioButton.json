@@ -1,0 +1,9 @@
+{
+	"behavior": "./doodads/RadioButton/RadioButton.js",
+	"templates": {
+		"base" : "./doodads/RadioButton/RadioButton.html"
+	},
+	"stylesheets": [
+		"./doodads/RadioButton/RadioButton.css"
+	]
+}
