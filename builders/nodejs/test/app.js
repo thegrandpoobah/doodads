@@ -41,7 +41,7 @@ app.register('.html', {
 var builder = new doodads.Builder(__dirname);
 app.get('*.doodad', function(req, res){
 	builder.build(req, function (content) {
-        res.writeHead(200, {'Content-Type' : 'text/html', 'Cache-Control' : "max-age=2592000, must-revalidate"});
+        res.writeHead(200, {'Content-Type' : 'text/javascript', 'Cache-Control' : "max-age=2592000, must-revalidate"});
         res.end(content);
 	});
 });
