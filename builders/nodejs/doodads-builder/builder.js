@@ -7,7 +7,6 @@ function builder(dir) {
 
 builder.prototype.build = function(req, callback) {
 	var self = this,
-		n = req.params[0],
 		output = [],
 		originalUrl = req.originalUrl;
 
@@ -15,7 +14,7 @@ builder.prototype.build = function(req, callback) {
 	output.push("doodads.setup('" + originalUrl + "', definition);");
 
 	var directory = path.dirname(originalUrl),
-		filename = path.basename(originalUrl, '.doodad')
+		filename = path.basename(originalUrl, '.doodad');
 
 	// definition
 	var definitionBuffer = fs.readFileSync(this.dir + '/' + directory + '/' + filename + '/' + filename + '.json'),

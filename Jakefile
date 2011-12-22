@@ -67,3 +67,18 @@ task({'minify': ['concatenate', 'tools']}, function(params) {
 	minify('doodads.js', 'doodads.min.js');
 	minify('doodads.tools.js', 'doodads.tools.min.js');
 });
+
+desc('Library - precompilation of doodads');
+task('library', function(params) {
+	var doodads = require('./builders/nodejs/doodads-builder');
+		builder = new doodads.Builder(__dirname + '/src');
+		
+	fs.readdir('./src/doodads', function (err, files) { 
+		if (err) throw err;
+		files.forEach( function (file) {
+			builder.build({originalUrl: 'doodads/' + file + '.doodad'}, function (content) {
+				fs.writeSync(fs.openSync('./output/doodads/' + file + '.doodad', 'w+'), content);
+			});
+	  	});
+	});
+});
