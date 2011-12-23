@@ -57,8 +57,89 @@
     <Content Include="..\..\..\output\doodads.tools.js">
       <Link>JavaScript\doodads.tools.js</Link>
     </Content>
-    <Content Include="..\..\..\src\support\jquery-1.6.4.js">
-      <Link>JavaScript\jquery-1.6.4.js</Link>
+    <Content Include="..\..\..\src\doodads\Button\Button.css">
+      <Link>doodads\Button\Button.css</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\Button\Button.html">
+      <Link>doodads\Button\Button.html</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\Button\Button.js">
+      <Link>doodads\Button\Button.js</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\Button\Button.xml">
+      <Link>doodads\Button\Button.xml</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\CheckBox\CheckBox.css">
+      <Link>doodads\CheckBox\CheckBox.css</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\CheckBox\CheckBox.html">
+      <Link>doodads\CheckBox\CheckBox.html</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\CheckBox\CheckBox.js">
+      <Link>doodads\CheckBox\CheckBox.js</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\CheckBox\CheckBox.xml">
+      <Link>doodads\CheckBox\CheckBox.xml</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\DropDown\DropDown.css">
+      <Link>doodads\DropDown\DropDown.css</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\DropDown\DropDown.html">
+      <Link>doodads\DropDown\DropDown.html</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\DropDown\DropDown.item.html">
+      <Link>doodads\DropDown\DropDown.item.html</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\DropDown\DropDown.js">
+      <Link>doodads\DropDown\DropDown.js</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\DropDown\DropDown.xml">
+      <Link>doodads\DropDown\DropDown.xml</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\Label\Label.html">
+      <Link>doodads\Label\Label.html</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\Label\Label.js">
+      <Link>doodads\Label\Label.js</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\Label\Label.xml">
+      <Link>doodads\Label\Label.xml</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\ListView\ListView.css">
+      <Link>doodads\ListView\ListView.css</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\ListView\ListView.html">
+      <Link>doodads\ListView\ListView.html</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\ListView\ListView.item.html">
+      <Link>doodads\ListView\ListView.item.html</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\ListView\ListView.js">
+      <Link>doodads\ListView\ListView.js</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\ListView\ListView.xml">
+      <Link>doodads\ListView\ListView.xml</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\RadioButton\RadioButton.css">
+      <Link>doodads\RadioButton\RadioButton.css</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\RadioButton\RadioButton.html">
+      <Link>doodads\RadioButton\RadioButton.html</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\RadioButton\RadioButton.js">
+      <Link>doodads\RadioButton\RadioButton.js</Link>
+    </Content>
+    <Content Include="..\..\..\src\doodads\RadioButton\RadioButton.xml">
+      <Link>doodads\RadioButton\RadioButton.xml</Link>
+    </Content>
+    <Content Include="..\..\..\src\support\jquery-1.7.1.js">
+      <Link>JavaScript\jquery-1.7.1.js</Link>
+    </Content>
+    <Content Include="..\..\..\src\support\jquery.tipsy.js">
+      <Link>JavaScript\jquery.tipsy.js</Link>
+    </Content>
+    <Content Include="..\..\..\src\support\tipsy.css">
+      <Link>tipsy.css</Link>
     </Content>
     <Content Include="..\..\..\src\support\yepnope.js">
       <Link>JavaScript\yepnope.js</Link>
@@ -66,8 +147,6 @@
     <Content Include="..\..\..\src\mustache\mustache.js">
       <Link>JavaScript\mustache.js</Link>
     </Content>
-
-
     <Content Include="..\..\..\src\doodads\TextBox\TextBox.js">
       <Link>doodads\TextBox\TextBox.js</Link>
     </Content>
@@ -80,7 +159,6 @@
     <Content Include="..\..\..\src\doodads\TextBox\TextBox.xml">
       <Link>doodads\TextBox\TextBox.xml</Link>
     </Content>
-
     <Content Include="..\..\..\src\doodads\NumericTextBox\NumericTextBox.js">
       <Link>doodads\NumericTextBox\NumericTextBox.js</Link>
     </Content>
@@ -93,7 +171,6 @@
     <Content Include="..\..\..\src\doodads\NumericTextBox\NumericTextBox.xml">
       <Link>doodads\NumericTextBox\NumericTextBox.xml</Link>
     </Content>
-
     <Content Include="..\..\..\src\doodads\List\List.js">
       <Link>doodads\List\List.js</Link>
     </Content>
@@ -106,22 +183,9 @@
     <Content Include="..\..\..\src\doodads\List\List.xml">
       <Link>doodads\List\List.xml</Link>
     </Content>
-
-    <Content Include="..\..\..\src\doodads\HintBox\HintBox.js">
-      <Link>doodads\HintBox\HintBox.js</Link>
-    </Content>
-    <Content Include="..\..\..\src\doodads\HintBox\HintBox.html">
-      <Link>doodads\HintBox\HintBox.html</Link>
-    </Content>
-    <Content Include="..\..\..\src\doodads\HintBox\HintBox.css">
-      <Link>doodads\HintBox\HintBox.css</Link>
-    </Content>
-    <Content Include="..\..\..\src\doodads\HintBox\HintBox.xml">
-      <Link>doodads\HintBox\HintBox.xml</Link>
-    </Content>
-    
     <Content Include="Default.html" />
-    <Content Include="JavaScript\jquery.debounce-1.0.5.js" />
+    <Content Include="doodads\DropDown\Images\arrow_off.png" />
+    <Content Include="doodads\DropDown\Images\arrow_on.png" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -141,6 +205,7 @@
       <Name>Doodads.Builder</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
   <!--
