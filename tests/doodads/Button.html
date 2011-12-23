@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+	<script src="../../src/support/jquery-1.6.4.js"></script>
+	<script src="../../src/support/yepnope.js"></script>
+	<script src="../../src/support/jquery.tipsy.js"></script>
+
+	<script src="../../src/mustache/mustache.js"></script>
+
+	<script src="../../output/doodads.js"></script>
+	<script src="../../output/doodads.tools.js"></script>
+
+	<style>
+		@import url(../output/tipsy.css);
+	</style>
+<body>
+</body>
+
+<script>	
+	$(function() {
+		doodads.config.rootUrl = '../../output/doodads/';
+
+		doodads.create('~/Button.doodad', {text: 'Button'}).done(function(doodad) {
+			doodad.render($(document.body));
+		});
+	});
+</script>
+
+</html>
