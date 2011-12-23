@@ -1,5 +1,6 @@
 (function() {
 	doodads.config = {
-		domDataKey: 'doodads'
+		domDataKey: 'doodads',
+		rootUrl: './'
 	};
-});
+})();

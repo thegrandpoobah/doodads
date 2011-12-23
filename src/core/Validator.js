@@ -115,7 +115,7 @@
 			///</summary>
 			return this._ranValidation;
 		}
-		, valid: function function Validator$valid() {
+		, valid: function Validator$valid() {
 			if (arguments.length === 0 && this._source && !this._ranValidation) {
 				this.validate();
 			}
