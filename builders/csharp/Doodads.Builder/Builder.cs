@@ -93,10 +93,10 @@ namespace Doodads.Builder
 
 
                 output.AppendLine("(function(definition) {");
-                output.AppendFormat("doodads.setup('{0}', definition);\n", context.Request.Path);
+                output.AppendFormat("doodads.setup('{0}', definition);\n", context.Request.Url.AbsoluteUri);
                 if (c.behaviour == null)
                 {
-                    output.AppendFormat("doodads.setup('{0}').complete();\n", context.Request.Path);
+                    output.AppendFormat("doodads.setup('{0}').complete();\n", context.Request.Url.AbsoluteUri);
                 }
                 else
                 {
@@ -113,7 +113,7 @@ namespace Doodads.Builder
                     output.AppendFormat("/* BEGIN Behaviour file {0} */\n", c.behaviour.path);
 #endif
                     Regex regex = new Regex("doodads\\s*\\.\\s*setup\\(\\)", RegexOptions.Multiline);
-                    string url = regex.Replace(File.ReadAllText(serverPath), string.Format("doodads.setup({0})", serializer.Serialize(context.Request.Path)));
+                    string url = regex.Replace(File.ReadAllText(serverPath), string.Format("doodads.setup({0})", serializer.Serialize(context.Request.Url.AbsoluteUri)));
                     output.AppendLine(url);
 #if DEBUG
                     output.AppendFormat("/* END Behaviour file {0} */\n", c.behaviour.path);
@@ -210,7 +210,7 @@ namespace Doodads.Builder
                 output.AppendLine("});");
 
 #if DEBUG
-                output.AppendFormat("\n//@ sourceURL={0}\n", context.Request.Path);
+                output.AppendFormat("\n//@ sourceURL={0}\n", context.Request.Url.AbsoluteUri);
 #endif
                 context.Response.Cache.SetCacheability(HttpCacheability.Public);
                 context.Response.Cache.SetETagFromFileDependencies();

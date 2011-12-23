@@ -27,6 +27,10 @@
 				/// CC by Attribution 3.0
 				/// adapted to use one time lazy initialization.
 				///</remarks>
+				if (url.indexOf('~/') === 0) {
+					url = doodads.config.rootUrl + url.substring(2);
+				}
+				
 				if (!canonicalizationDiv) {
 					canonicalizationDiv = document.createElement('div');
 				}
@@ -101,7 +105,7 @@
 						.appendTo(headDom);
 				} else {
 					headDom.append('<style type="text/css">' + byteStream + '</style>');
-				}			
+				}
 			}
 		};
 
