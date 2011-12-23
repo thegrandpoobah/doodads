@@ -1,16 +1,64 @@
 ﻿<html>
 <head>
     <title></title>
-    <script type="text/javascript" src="JavaScript/jquery-1.6.4.js"></script>
-    <script type="text/javascript" src="JavaScript/jquery.debounce-1.0.5.js"></script>
+    <script type="text/javascript" src="JavaScript/jquery-1.7.1.js"></script>
+    <script type="text/javascript" src="JavaScript/jquery.tipsy.js"></script>
     <script type="text/javascript" src="JavaScript/yepnope.js"></script>
     <script type="text/javascript" src="JavaScript/mustache.js"></script>
     <script type="text/javascript" src="JavaScript/doodads.js"></script>
     <script type="text/javascript" src="JavaScript/doodads.tools.js"></script>
+    <style>
+        @import url('tipsy.css');
+        
+        html, body
+        {
+            height: 100%;
+        }
+    </style>
     <script type="text/javascript">
         $(function () {
-        /*           
-            doodads.create('/doodads/TextBox.doodad', { text: 'HELLO', required: true })
+            doodads.config.rootUrl = '/doodads/';
+            doodads.create('~/Button.doodad', { text: 'Button' })
+                .done(function (doodad) {
+                    doodad.render($(document.body));
+                });
+
+            doodads.create('~/CheckBox.doodad', { text: 'Box' })
+                .done(function (doodad) {
+                    doodad.render($(document.body));
+                });
+
+            doodads.create('~/DropDown.doodad', { watermark: 'Select an item' })
+                .done(function (doodad) {
+                    doodad.render($(document.body));
+                    doodad.dataSource([
+                        { text: 'Yakko', value: 1 },
+                        { text: 'Wakko', value: 2 },
+                        { text: 'Dot', value: 3 }
+                    ]);
+                });
+
+            doodads.create('~/Label.doodad', { text: 'It was the best of times, it was the blurst of times' })
+                .done(function (doodad) {
+                    doodad.render($(document.body));
+                });
+
+            // list view
+            doodads.create('~/ListView.doodad')
+                .done(function (doodad) {
+                    doodad.render($(document.body));
+                    doodad.dataSource([
+                        { id: '1', text: 'Superman (Clark Kent)' }
+                        , { id: '2', text: 'Batman (Bruce Wayne)' }
+                        , { id: '3', text: 'Spider-Man (Peter Parker)' }
+                        , { id: '4', text: 'Iron Man (Tony Stark)' }
+                        , { id: '5', text: 'Green Lantern (John Stewart)' }
+                        , { id: '6', text: 'Robin (Dick Grayson)' }
+                        , { id: '7', text: 'Cyclops (Scott Summers)' }
+                    ]);
+                });
+
+            doodads.create('~/NumericTextBox.doodad', { text: 'HELLO', required: true })
                 .done(function (component) {
                     component.render($(document.body));
 
@@ -26,11 +74,30 @@
                         console.log('invalid');
                     });
                 });
-            */
 
-            doodads.create('/doodads/NumericTextBox.doodad', { text: 'HELLO', required: true })
+            doodads.create('~/RadioButton.doodad', { text: 'All I want is my Radio' })
+                .done(function (doodad) {
+                    doodad.render($(document.body));
+                });
+
+
+            doodads.create('~/TextBox.doodad', { text: 'HELLO', required: true, multiline: true, maxlength: 100 })
                 .done(function (component) {
                     component.render($(document.body));
+
+                    component.addRule(function (ctx) {
+                        return {
+                            valid: ctx === 'Groucho Marx',
+                            message: 'Must be \'Groucho Marx\'',
+                            alwaysShow: true
+                        };
+                    });
+                    component.addRule(function (ctx) {
+                        return {
+                            valid: ctx.length === 12,
+                            message: 'Must be 12 characters long'
+                        };
+                    });
 
                     component.bind('changing', function () {
                         console.log(arguments);
