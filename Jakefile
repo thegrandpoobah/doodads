@@ -2,6 +2,17 @@ var fs = require('fs'),
 	sys = require('sys'),
 	uglify = require('uglify-js');
 
+function makeDirectoryIfNotExists(path) {
+	try {
+		var stats = fs.statSync(path);	
+		if (!stats.isDirectory()) {
+			fs.mkdirSync(path, 0);
+		}
+	} catch (e) {
+		fs.mkdirSync(path, 0);
+	}
+}
+
 function concatenate(files, outputFile, withPreamble) {
 	var output = '',
 		license = fs.readFileSync('src/core/license.tmpl').toString(),
@@ -20,6 +31,8 @@ function concatenate(files, outputFile, withPreamble) {
 		output = all;
 	}
 
+	makeDirectoryIfNotExists('output');
+	
 	fs.openSync('output/' + outputFile, 'w+');
 	
 	var out = fs.openSync('output/' + outputFile, 'w+');
@@ -72,7 +85,9 @@ desc('Library - precompilation of doodads');
 task('library', function(params) {
 	var doodads = require('./builders/nodejs/doodads-builder');
 		builder = new doodads.Builder(__dirname + '/src');
-		
+	
+	makeDirectoryIfNotExists('output/doodads');
+	
 	fs.readdir('./src/doodads', function (err, files) { 
 		if (err) throw err;
 		files.forEach( function (file) {
