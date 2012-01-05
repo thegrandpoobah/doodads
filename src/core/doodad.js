@@ -958,8 +958,11 @@
 
 		/* BEGIN Validation Management */
 		, _trigger_validity: function doodad$trigger_validity(isValid) {
-			var e = $.Event(isValid ? 'valid' : 'invalid'), $this = $(this);
-			$this.trigger.call($this, e, arguments);
+			var e = $.Event(isValid ? 'valid' : 'invalid'), 
+				params = Array.prototype.slice.call(arguments);
+			
+			params.shift(); // ignore the isValid parameter
+			this.trigger(e, params);
 			
 			if (!e.isPropagationStopped() && this.parent()) {
 				this.parent()._valid(isValid);
@@ -1001,7 +1004,7 @@
 			/// <remarks>
 			/// 	Calling "valid(value)" will override the validity.  Because of this, the validity of its children will never 
 			///		again be included in the computation of its validity, unless "listenToChildrenValidity(true)" is called.
-			/// </remarks>		    
+			/// </remarks>
 			if (arguments.length === 0) {
 				return this._valid();
 			} else {
@@ -1026,7 +1029,7 @@
 		, _computeValidityState: function doodad$_computeValidityState() {
 			///<summary>
 			/// Check that all children are valid.  If one is invalid, then the doodad
-			/// itself is invalid	
+			/// itself is invalid
 			///</summary>
 
 			var isValid = true;
