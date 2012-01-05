@@ -22,6 +22,7 @@
 		this._watermark = this._options.watermark;
 		this._selectedIndex = undefined;
 		this._selectedItem = undefined;
+		this._scrollTopBuffered = 0;
 
 		this._hoverTimer = null;
 		this._hidingTimeout = null;
@@ -488,6 +489,7 @@
 						this.show();
 					}
 					this._moveSelectedItem(-1);
+					this._bringSelectedItemIntoView();
 
 					e.preventDefault();
 					e.stopPropagation();
@@ -498,6 +500,7 @@
 						this.show();
 					}
 					this._moveSelectedItem(1);
+					this._bringSelectedItemIntoView();
 
 					e.preventDefault();
 					e.stopPropagation();
@@ -525,6 +528,16 @@
 			});
 			return !evt.isDefaultPrevented();
 		}, /* END Events */
+
+		_bringSelectedItemIntoView: function DropDown$_bringSelectedItemIntoView() {
+			var list = this._list[0],
+				$domNode = this._itemMap[this.selectedIndex()].domNode,
+				domNode = $domNode[0];
+
+			if (domNode.offsetTop + domNode.offsetHeight > list.scrollTop + list.offsetHeight) {
+				list.scrollTop = domNode.offsetTop;
+			}
+		},
 
 		show: function DropDown$show() {
 			if (this._isListVisible) return;
@@ -629,10 +642,13 @@
 			// zero it out, and then once the list is ready, set the scroll top value to the buffered
 			// one
 			if (this.selected()) {
+				this._bringSelectedItemIntoView();
+				
 				this._list.children().removeClass('active');
-				list.scrollTop = this._itemMap[this.selectedIndex()].domNode[0].offsetTop;
 				this._itemMap[this.selectedIndex()].domNode.addClass('active');
-			} else if (this._scrollTopBuffered) {
+			}
+
+			if (list.scrollTop === 0) {
 				list.scrollTop = this._scrollTopBuffered;
 			}
 
