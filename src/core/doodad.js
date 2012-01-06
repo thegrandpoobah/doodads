@@ -2,7 +2,8 @@
 	// constants
 	var DEBOUNCE_TIMEOUT = 50; // in milliseconds
 
-	var $window = $(window); // cache $window, reused fairly frequently
+	var $window = $(window), // cache $window, reused fairly frequently
+		instantiationSibling = $(document.createElement('div'));
 
 	var doodad = function (options, defaultOptions) {
 		///<summary>
@@ -51,7 +52,6 @@
 			doodads.validation.remove(this);
 		}
 	}
-	doodad.instantiationSibling = $(document.createElement('div'));
 	doodad.defaultOptions = {
 		id: ''
 		, cssClass: ''
@@ -506,8 +506,8 @@
 				}
 				options.id = $doodadElement.attr('id');
 				
-				var instantiationSibling = doodad.instantiationSibling.clone();
-				instantiationSibling.insertAfter($doodadElement);
+				var iS = instantiationSibling.clone();
+				iS.insertAfter($doodadElement);
 				$doodadElement.remove();
 
 				asyncCreationDfd = $.Deferred();
@@ -579,7 +579,7 @@
 
 					self.addChild(new_doodad);
 					
-					new_doodad.render(instantiationSibling);
+					new_doodad.render(iS);
 					new_doodad.element().unwrap();
 					
 					completionDfd.resolve();
