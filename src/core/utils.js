@@ -149,9 +149,9 @@
 		},
 		
 		mouseCode: {
-			left: 1, // 0
-			middle: 2, // 1
-			right: 3 // 2
+			left: 1,
+			middle: 2,
+			right: 3
 		}
 	});
 })();
