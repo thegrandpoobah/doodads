@@ -1,8 +1,8 @@
 ﻿<span>
-    <span class="affordance">
+    <span name="affordance" class="affordance">
         {{^showOnHover}}<span class="arrow"><span>&nbsp;</span></span>{{/showOnHover}}
-         <span class="itemContainer"></span>
+         <span name="affordanceText" class="itemContainer"></span>
         {{#showOnHover}}<span class="arrow"><span>&nbsp;</span></span>{{/showOnHover}}
     </span>
-    <ul>{{#items}}{{>item}}{{/items}}</ul>
+    <ul name="list">{{#items}}{{>item}}{{/items}}</ul>
 </span>

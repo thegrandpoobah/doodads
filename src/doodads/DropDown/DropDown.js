@@ -70,14 +70,6 @@
 
 			this._list.attr('class', this.element().attr('class')).appendTo($(document.body)); // the list needs to get the same classnames as the parent
 		},
-		constructElement: function DropDown$constructElement() {
-			base.constructElement.apply(this, arguments);
-
-			this._affordance = this.element().find('span.affordance');
-			this._affordanceText = this._affordance.find('span.itemContainer');
-
-			this._list = this.element().find('ul');
-		},
 		_templateData: function DropDown$_templateData() {
 			return $.extend(base._templateData.apply(this, arguments), {
 				showOnHover: this._options.showOnHover
