@@ -33,7 +33,7 @@ using System.Xml.Serialization;
 
 namespace Doodads.Builder
 {
-    public class Builder : IHttpHandler, IReadOnlySessionState
+    public class Builder : IHttpHandler
     {
         public bool IsReusable
         {
