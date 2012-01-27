@@ -326,7 +326,7 @@
 					return function(fn) {
 						baseDfd.promise().done(function(baseType) {
 							constructor.setupObject.base = baseType;
-							fn.call(constructor, baseType);
+							fn.call(constructor, baseType, function() { return doodads.getType(url) });
 						});
 					};
 				}
