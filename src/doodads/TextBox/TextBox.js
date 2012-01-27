@@ -1,4 +1,4 @@
-﻿doodads.setup().inherits()(function (base) {
+﻿doodads.setup().inherits()(function (base, type) {
 	var KEYUP_DEBOUNCE_PERIOD = 10; // in ms
 
 	var defaultRequiredRule = function (content) {
@@ -30,6 +30,26 @@
 		enabled: true,
 		rows: 4,
 		cols: 40
+	}).statics({
+		lengthValidationRuleGenerator: function(min, max) {
+			var format = 'count:{{0}}';
+
+			if (max !== type().defaultOptions.maxlength) {
+				format = 'max:' + max + ' | ' + format;
+			}
+			if (min !== type().defaultOptions.minlength) {
+				format = 'min:' + min + ' | ' + format;
+			}
+
+			return function (context) {
+				var l = context.toString().length;
+				return {
+					valid: l >= min && l < max,
+					message: Mustache.format(format, l),
+					alwaysShow: true
+				};
+			}
+		}
 	}).proto({
 		onReady: function TextBox$onReady() {
 			base.onReady.apply(this, arguments);
@@ -43,15 +63,10 @@
 
 			this._input = this._source.find('input, textarea');
 
-			if (this._options.validates && this._options.maxlength !== -1) {
-				var self = this;
-				this.addRule(function (context) {
-					return {
-						valid: context.toString().length <= self._options.maxlength,
-						message: Mustache.format('Character count {{0}} of {{1}}', context.length, self._options.maxlength),
-						alwaysShow: true
-					};
-				});
+			if (this._options.validates && 
+				(this._options.maxlength !== type().defaultOptions.maxlength || this._options.minlength !== type().defaultOptions.minlength))
+			{
+				this.addRule(type().lengthValidationRuleGenerator(this._options.minlength, this._options.maxlength));
 			}
 		},
 		cssClassPrefix: function TextBox$cssClassPrefix() {
