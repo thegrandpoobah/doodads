@@ -345,27 +345,25 @@
 				return;
 			}
 
+			var messages, backList = this._backList;
+
 			this._pendingRules--;
 
 			// if result.message is not an array, turn it into an array
-			var messages;
 			if (!$.isArray(result.message)) {
 				messages = [result.message];
 			} else {
 				messages = result.message;
 			}
 
-			var self = this;
-			if (result.alwaysShow) {
-				$.each(messages, function (index, message) {
-					self._backList.push({ text: message });
-				});
-			} else if (!result.valid) {
-				$.each(messages, function (index, message) {
-					if (message && message !== '') {
-						self._backList.push({ text: message });
+			if (!result.valid || result.alwaysShow) {
+				$.each(messages, function (i, msg) {
+					if (msg && msg !== '') {
+						backList.push({ text: msg });
 					}
 				});
+			}
+			if (!result.valid) {
 				this._computedValidity = false;
 			}
 
