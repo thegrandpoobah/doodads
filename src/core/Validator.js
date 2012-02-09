@@ -158,14 +158,22 @@
 			/// Optionally triggers the validate function of other doodad's if they are part of the callout
 			/// list for this doodad.
 			///</summary>
-			var context = this.validationContext();
-			var traversalHistory = arguments[0];
+			var context = this.validationContext(),
+				traversalHistory = arguments[0],
+				passId,
+				hasAsync = false,
+				self = this,
+				callback = function(result) {
+					privateMethods.ruleCallback.call(self, result, passId, traversalHistory || [self]);
+				};
+				
 			this._backList = [];
 
 			if (this._validationSuspended) {
 				return;
-			} else if (!this.required() && this.isValidationContextEmpty(context)) {
-				// By-pass validation
+			}
+			
+			if (!this.required() && this.isValidationContextEmpty(context)) {
 				this._computedValidity = true;
 				privateMethods.afterRulesRan.call(this, traversalHistory || [this]);
 				return;
@@ -174,20 +182,14 @@
 			this._computedValidity = true;
 			this._ranValidation = true;
 			this._pendingRules = (this._rules || []).length;
-			this._passId = (this._passId || 0) + 1;
+			passId = this._passId = (this._passId || 0) + 1;
 
-			var passId = this._passId;
-			var hasAsync = false;
-			var callback = $.proxy(function (result) {
-				privateMethods.ruleCallback.call(this, result, passId, traversalHistory || [this]);
-			}, this);
-
-			$.each(this._rules || [], $.proxy(function (index, rule) {
-				var result = rule(context, {
-					computedValidity: this._computedValidity,
+			$.each(this._rules || [], function () {
+				var result = this(context, {
+					computedValidity: self._computedValidity,
 					isCallout: traversalHistory ? true : false,
 					callback: callback,
-					callee: this
+					callee: self
 				});
 
 				if (!result.async) {
@@ -195,15 +197,17 @@
 				} else {
 					hasAsync = true;
 				}
-			}, this));
+			});
 
 			if (hasAsync) {
-				setTimeout($.proxy(function () {
-					if (this._pendingRules === 0 || passId !== this._passId) return;
+				window.setTimeout(function () {
+					if (self._pendingRules === 0 || passId !== self._passId) {
+						return;
+					}
 
-					this._backList.push({ text: 'Validating...', isAsync: true });
-					privateMethods.trigger_validationApplied.call(this);
-				}, this), ASYNC_GRACE_PERIOD);
+					self._backList.push({ text: 'Validating...', isAsync: true });
+					privateMethods.trigger_validationApplied.call(self);
+				}, ASYNC_GRACE_PERIOD);
 			}
 
 			privateMethods.afterRulesRan.call(this, traversalHistory || [this]);
@@ -238,11 +242,7 @@
 					// if transitioning to required and a new requirement rule is passed in
 					// then override the existing (or add a new) requirement rule
 					if (this._requirementRule) {
-						this._rules = $.map(this._rules || [], $.proxy(function (rule, index) {
-							if (rule !== this._requirementRule) {
-								return rule;
-							}
-						}, this));
+						privateMethods.removeRequirementRule.call(this);
 					}
 					this._requirementRule = arguments[1]; // store
 					this.addRule(this._requirementRule);
@@ -257,11 +257,7 @@
 					}
 				} else if (!this._required) {
 					// if transitioning to not required, then remove the requirement rule
-					this._rules = $.map(this._rules || [], $.proxy(function (rule, index) {
-						if (rule !== this._requirementRule) {
-							return rule;
-						}
-					}, this));
+					privateMethods.removeRequirementRule.call(this);
 				}
 
 				$(this).trigger('required');
@@ -378,14 +374,16 @@
 			}
 			
 			this._backList = $.map(this._backList, function (e, i) {
-				if (!e.isAsync) return e;
+				if (!e.isAsync) {
+					return e;
+				}
 			});
 
 			this._valid(this._computedValidity);
 
-			$.each(this._callouts || [], $.proxy(function (index, callout) {
+			$.each(this._callouts || [], function (i, callout) {
 				var calloutInHistory = false;
-				$.each(traversalHistory, function (index, historyObject) {
+				$.each(traversalHistory, function (j, historyObject) {
 					if (callout === historyObject) {
 						calloutInHistory = true;
 						return false; // break
@@ -395,17 +393,26 @@
 				if (!calloutInHistory) {
 					callout.validate($.merge(traversalHistory, [callout]));
 				}
-			}, this));
+			});
 
 			privateMethods.trigger_validationApplied.call(this);
+		}
+		, removeRequirementRule: function Validator$removeRequirementRule() {
+			var requirementRule = this._requirementRule;
+			
+			this._rules = $.map(this._rules || [], function (rule) {
+				if (rule !== requirementRule) {
+					return rule;
+				}
+			});
 		}
 		, trigger_validationApplied: function Validator$trigger_validationApplied() {
 			///<summary>
 			/// Triggers the validationApplied event
 			///</summary>
 			this.trigger('validationApplied', {
-				messages: this._backList
-				, isValid: this._computedValidity
+				messages: this._backList,
+				isValid: this._computedValidity
 				/* possibly others */
 			});
 		}
