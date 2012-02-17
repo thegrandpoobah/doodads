@@ -203,6 +203,7 @@
 				}
 
 				if (this._options.validates) {
+					this._updateTextBox();
 					this.validate();
 				}
 
