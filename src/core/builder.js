@@ -5,9 +5,43 @@
 			types: {},
 			waitFunctions: {},
 			constructions: {},
-			stylesheets: {}
+			stylesheets: {},
+			guid: 0
 		},
 		utils = {
+			load: function utils$load(url, callback) {
+				// this method is basically taken verbatim from Julian Aubourg's blog post on the subject of JSONP:
+				// http://jaubourg.net/archive/7/2010
+				var script = document.documentElement.ownerDocument.createElement('script');
+				
+				function done() {
+					if (!/i/.test(script.readyState || '')) {
+						try {
+							script.onclick();
+						} catch (e) { }
+
+						document.documentElement.removeChild(script);
+						done = script = script.onload = script.onreadystatechange = null;
+						callback();
+					}
+				}
+				
+				$.extend(script, {
+					'async': true,
+					'onload': done,
+					'onreadystatechange': done,
+					'src': url
+				});
+				
+				// IE is special.. in so many ways:
+				// http://msdn.microsoft.com/en-us/library/ms533746(VS.85).aspx
+				if (document.documentMode) {
+					script.event = 'onclick';
+					script.id = script.htmlFor = utils.makeGuid();
+				}
+				
+				document.documentElement.appendChild(script);
+			},
 			getResponseFunc: function utils$getResponseFunc(url) {
 				///<summary>
 				/// Returns the response function associated with a given doodad.
@@ -63,7 +97,18 @@
 						dfd: $.Deferred()
 					};
 
-					yepnope(canonUrl);
+					utils.load(canonUrl, function() {
+						var key, construction;
+						
+						for (key in cache.constructions) {
+							if (cache.constructions.hasOwnProperty(key)) {
+								construction = cache.constructions[key];
+								
+								construction.loadDfd.resolve(canonUrl);
+							}
+						}
+						cache.constructions = {};
+					});
 				
 					return cache.waitFunctions[canonUrl].dfd.promise();
 				}
@@ -106,13 +151,17 @@
 				} else {
 					headDom.append('<style type="text/css">' + byteStream + '</style>');
 				}
+			},
+			makeGuid: function utils$makeGuid() {
+				return cache.guid++;
 			}
 		};
 
 	// The builder is a class used by doodad authors to aid in the construction
 	// of doodads. An instance of it is returned via the doodads.setup API.
-	function builder(name) {
-		this.name = name;
+	function builder() {
+		// this.name = '/url/to/doodad'; // this field is automatically populated by doodads.setup
+		this.loadDfd = $.Deferred();
 		this.setupObject = {
 			base: null,
 			validates: false,
@@ -258,43 +307,38 @@
 			
 			// after everything is done..
 			utils.getResponseFunc(name)(new_doodad);
-			delete cache.constructions[name];
 			
 			(callback || $.noop)(new_doodad);
 		}
 	}
 
 	$.extend(doodads, {
-		setup: function doodads$setup(url, definition) {
+		setup: function doodads$setup(inheritsFrom) {
 			///<summary>
-			/// Bootstraps the doodad authoring process by associating a proto-doodad with a url and a definition object.
+			/// Bootstraps the doodad authoring process by associating a proto-doodad with an existing base doodad (or the root
+			/// doodad object if no inheritsFrom parameter is given).
 			///</summary>
-			///<param name="url">
-			/// The url to associate with a given doodad. This url becomes the canonical name for the doodad
-			/// and the only way to reference the doodad class after construction. As such, it is the user's responsibility to
-			/// ensure that the URL is unique.
-			///</param>
-			///<param name="definition">
-			/// Only used by the server-side builder support code.
-			///</param>
+			///<param name="inheritsFrom">
+			/// Optional. The URL of a doodad to use as the base class for the newly constructed doodad.
+			/// If not provided, the base class of the doodad will be the root doodad class.
 			///<returns>
-			/// Returns an object with a single member named "inherits" which must be called to continue the bootstrap procedure.
+			/// Returns a function which takes a callback parameter which must be called immediately. The callback
+			/// has the following signature: function(base) where base is the type of the superclass.
 			///</returns>
+			///<example>doodads.setup()(function(base) {});</example>
+			///<example>doodads.setup('/path/to/doodad.doodad')(function(base) {});</example>
 			///<remarks>
 			/// Look at an existing doodad JavaScript file for details on how to use this function.
 			///</remarks>
-			if (cache.constructions[url]) {
-				return cache.constructions[url];
-			}
-			
-			var constructor = new builder(url);
+			var constructor = new builder();
 			
 			definition = $.extend({
 				inheritsTemplates: false,
 				templates: null,
 				stylesheets: null,
 				validates: false
-			}, definition);
+			}, doodads.builderDefinition);
+			delete doodads.builderDefinition; // buiderDefinition is used for server side builder support
 
 			if (definition.validates) {
 				constructor.validates();
@@ -304,35 +348,32 @@
 				.templates(definition.templates, definition.inheritsTemplates)
 				.stylesheets(definition.stylesheets);
 			
-			cache.constructions[url] = {
-				inherits: function(from) {
-					var baseDfd = $.Deferred(),
-						baseType;
-					
-					if (from) {
-						baseType = doodads.getType(from);
-						
-						if (!baseType) {
-							utils.require(from).done(function() {
-								baseDfd.resolve(doodads.getType(from).prototype);
-							});
-						} else {
-							baseDfd.resolve(baseType.prototype);
-						}
-					} else {
-						baseDfd.resolve(doodads.doodad.prototype);
-					}
-					
-					return function(fn) {
-						baseDfd.promise().done(function(baseType) {
-							constructor.setupObject.base = baseType;
-							fn.call(constructor, baseType, function() { return doodads.getType(url) });
-						});
-					};
-				}
-			};
+			var baseDfd = $.Deferred(),
+				baseType;
 			
-			return cache.constructions[url];
+			if (inheritsFrom) {
+				baseType = doodads.getType(inheritsFrom);
+				
+				if (!baseType) {
+					utils.require(inheritsFrom).done(function() {
+						baseDfd.resolve(doodads.getType(inheritsFrom).prototype);
+					});
+				} else {
+					baseDfd.resolve(baseType.prototype);
+				}
+			} else {
+				baseDfd.resolve(doodads.doodad.prototype);
+			}
+			
+			cache.constructions[utils.makeGuid()] = constructor;
+			
+			return function(fn) {
+				$.when(baseDfd.promise(), constructor.loadDfd).done(function(baseType, url) {
+					constructor.name = url;
+					constructor.setupObject.base = baseType;
+					fn.call(constructor, baseType, function() { return doodads.getType(constructor.name) });
+				});
+			};
 		},
 		create: function doodads$create(url, options) {
 			///<summary>

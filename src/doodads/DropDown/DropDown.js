@@ -1,4 +1,4 @@
-﻿doodads.setup().inherits('~/List.doodad')(function(base) {
+﻿doodads.setup('~/List.doodad')(function(base) {
 	var FILTER_RESET_DEBOUNCE_TIME = 1000; // in ms
 	
 	var activeDropDown = null;

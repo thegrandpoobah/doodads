@@ -141,9 +141,6 @@
     <Content Include="..\..\..\src\support\tipsy.css">
       <Link>tipsy.css</Link>
     </Content>
-    <Content Include="..\..\..\src\support\yepnope.js">
-      <Link>JavaScript\yepnope.js</Link>
-    </Content>
     <Content Include="..\..\..\src\mustache\mustache.js">
       <Link>JavaScript\mustache.js</Link>
     </Content>
