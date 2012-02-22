@@ -37,7 +37,7 @@
 				// http://msdn.microsoft.com/en-us/library/ms533746(VS.85).aspx
 				if (document.documentMode) {
 					script.event = 'onclick';
-					script.id = script.htmlFor = utils.makeGuid();
+					script.id = script.htmlFor = 's_' + cache.guid++;
 				}
 				
 				document.documentElement.appendChild(script);
@@ -143,9 +143,6 @@
 				} else {
 					headDom.append('<style type="text/css">' + byteStream + '</style>');
 				}
-			},
-			makeGuid: function utils$makeGuid() {
-				return cache.guid++;
 			}
 		};
 
