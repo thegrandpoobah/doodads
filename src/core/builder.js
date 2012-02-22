@@ -10,40 +10,51 @@
 		},
 		utils = {
 			load: function utils$load(url, callback) {
-				// TODO: This should be updated to use the concepts in
-				// https://github.com/jaubourg/jquery-jsonp/blob/master/src/jquery.jsonp.js
 				// This code block is basically a simplication of Julian Aubourg's jQuery JSONP script load
-				// implementation.
+				// implementation: https://github.com/jaubourg/jquery-jsonp/blob/master/src/jquery.jsonp.js
 				// As such, it is used under the MIT License.
-				var script = document.documentElement.ownerDocument.createElement('script');
+				var script = $('<script>')[0], 
+					head = $('head')[0] || document.documentElement,
+					scriptAfter;
 				
-				function done() {
-					if (!/i/.test(script.readyState || '')) {
+				script.id = 's_' + cache.guid++;
+				
+				if (window.opera && window.opera.version() < 11.60) {
+					scriptAfter = $('<script>')[0];
+					scriptAfter.text = 'document.getElementById(\'' + script.id + '\').onerror()';
+				} else {
+					script.async = 'async';
+				}
+				
+				// IE is special.. in so many ways:
+				// http://msdn.microsoft.com/en-us/library/ms533746(VS.85).aspx
+				if ('onreadystatechange' in script) {
+					script.event = 'onclick';
+					script.htmlFor = script.id;
+				}
+				
+				script.onload = script.onerror = script.onreadystatechange = function() {
+					if (!script.readyState || !/i/.test(script.readyState)) {
 						try {
-							script.onclick();
-						} catch (e) { }
+							script.onclick && script.onclick();
+						} catch (_) {}
 
-						document.documentElement.removeChild(script);
-						done = script = script.onload = script.onreadystatechange = null;
+						head.removeChild(script);
+						if (scriptAfter) {
+							head.removeChild(scriptAfter);
+						}
+						script.onload = script.onerror = script.onreadystatechange = null;
+						
 						callback();
 					}
 				}
 				
-				$.extend(script, {
-					'async': true,
-					'onload': done,
-					'onreadystatechange': done,
-					'src': url
-				});
+				script.src = url;
 				
-				// IE is special.. in so many ways:
-				// http://msdn.microsoft.com/en-us/library/ms533746(VS.85).aspx
-				if (document.documentMode) {
-					script.event = 'onclick';
-					script.id = script.htmlFor = 's_' + cache.guid++;
+				head.insertBefore(script, head.firstChild);
+				if (scriptAfter) {
+					head.insertBefore(scriptAfter, head.firstChild);
 				}
-				
-				document.documentElement.appendChild(script);
 			},
 			getResponseFunc: function utils$getResponseFunc(url) {
 				///<summary>
@@ -101,6 +112,10 @@
 					};
 
 					utils.load(canonUrl, function() {
+						if (!cache.activeConstructor) {
+							console.error('Unable to load doodad from url:' + canonUrl);
+							return;
+						}
 						cache.activeConstructor.loadDfd.resolve(canonUrl);
 						cache.activeConstructor = null;
 					});
