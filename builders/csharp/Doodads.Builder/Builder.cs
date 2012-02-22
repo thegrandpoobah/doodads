@@ -91,7 +91,6 @@ namespace Doodads.Builder
                 JavaScriptSerializer serializer = new JavaScriptSerializer();
                 StringBuilder output = new StringBuilder();
 
-
                 output.AppendLine("(function(definition) {");
                 output.AppendLine("doodads.setup.definition = definition;\n");
                 if (c.behaviour == null)
