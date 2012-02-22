@@ -329,8 +329,8 @@
 				templates: null,
 				stylesheets: null,
 				validates: false
-			}, doodads.builderDefinition);
-			delete doodads.builderDefinition; // builderDefinition is used by the server side builders
+			}, doodads.setup.definition);
+			delete doodads.setup.definition; // definition is populated by the server side builders
 
 			if (definition.validates) {
 				constructor.validates();
