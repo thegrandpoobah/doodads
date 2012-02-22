@@ -216,7 +216,7 @@
 						break;
 				}
 			}
-		},
+		}
 		// END event handlers
 	}).complete();
 });
