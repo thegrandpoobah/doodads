@@ -363,7 +363,7 @@
 				$.when(baseDfd.promise(), constructor.loadDfd).done(function(baseType, url) {
 					constructor.name = url;
 					constructor.setupObject.base = baseType;
-					fn.call(constructor, baseType, function() { return doodads.getType(constructor.name) });
+					fn.call(constructor, baseType, function() { return doodads.getType(constructor.name); });
 				});
 			};
 		},
