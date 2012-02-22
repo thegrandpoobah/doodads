@@ -345,16 +345,17 @@
 			
 			if (!baseType) {
 				utils.require(inheritsFrom).done(function() {
-					baseDfd.resolve(doodads.getType(inheritsFrom).prototype);
+					baseDfd.resolve(doodads.getType(inheritsFrom));
 				});
 			} else {
-				baseDfd.resolve(baseType.prototype);
+				baseDfd.resolve(baseType);
 			}
 			
 			cache.activeConstructor = constructor;
 			
 			return function(fn) {
 				$.when(baseDfd.promise(), constructor.loadDfd).done(function(baseType, url) {
+					baseType = baseType.prototype;
 					constructor.name = url;
 					constructor.setupObject.base = baseType;
 					fn.call(constructor, baseType, function() { return doodads.getType(constructor.name); });
