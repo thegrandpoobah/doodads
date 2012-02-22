@@ -315,7 +315,10 @@
 			/// If not provided, the base class of the doodad will be the root doodad class.
 			///<returns>
 			/// Returns a function which takes a callback parameter which must be called immediately. The callback
-			/// has the following signature: function(base) where base is the type of the superclass.
+			/// has the following signature: function(base, type) where 
+			///   * base is the type of the superclass.
+			///   * type() is the type of the current class (useful for getting at defaultOptions and statics from inside the class
+			///   itself.
 			///</returns>
 			///<example>doodads.setup()(function(base) {});</example>
 			///<example>doodads.setup('/path/to/doodad.doodad')(function(base) {});</example>
