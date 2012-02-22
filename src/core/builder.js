@@ -10,8 +10,11 @@
 		},
 		utils = {
 			load: function utils$load(url, callback) {
-				// this method is basically taken verbatim from Julian Aubourg's blog post on the subject of JSONP:
-				// http://jaubourg.net/archive/7/2010
+				// TODO: This should be updated to use the concepts in
+				// https://github.com/jaubourg/jquery-jsonp/blob/master/src/jquery.jsonp.js
+				// This code block is basically a simplication of Julian Aubourg's jQuery JSONP script load
+				// implementation.
+				// As such, it is used under the MIT License.
 				var script = document.documentElement.ownerDocument.createElement('script');
 				
 				function done() {
