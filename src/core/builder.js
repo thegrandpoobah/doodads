@@ -4,7 +4,7 @@
 		cache = {
 			types: {},
 			waitFunctions: {},
-			constructions: {},
+			activeConstructor: null,
 			stylesheets: {},
 			guid: 0
 		},
@@ -98,16 +98,8 @@
 					};
 
 					utils.load(canonUrl, function() {
-						var key, construction;
-						
-						for (key in cache.constructions) {
-							if (cache.constructions.hasOwnProperty(key)) {
-								construction = cache.constructions[key];
-								
-								construction.loadDfd.resolve(canonUrl);
-							}
-						}
-						cache.constructions = {};
+						cache.activeConstructor.loadDfd.resolve(canonUrl);
+						cache.activeConstructor = null;
 					});
 				
 					return cache.waitFunctions[canonUrl].dfd.promise();
@@ -365,7 +357,7 @@
 				baseDfd.resolve(doodads.doodad.prototype);
 			}
 			
-			cache.constructions[utils.makeGuid()] = constructor;
+			cache.activeConstructor = constructor;
 			
 			return function(fn) {
 				$.when(baseDfd.promise(), constructor.loadDfd).done(function(baseType, url) {
