@@ -330,7 +330,7 @@
 				stylesheets: null,
 				validates: false
 			}, doodads.builderDefinition);
-			delete doodads.builderDefinition; // buiderDefinition is used for server side builder support
+			delete doodads.builderDefinition; // builderDefinition is used by the server side builders
 
 			if (definition.validates) {
 				constructor.validates();
@@ -341,20 +341,14 @@
 				.stylesheets(definition.stylesheets);
 			
 			var baseDfd = $.Deferred(),
-				baseType;
-			
-			if (inheritsFrom) {
 				baseType = doodads.getType(inheritsFrom);
-				
-				if (!baseType) {
-					utils.require(inheritsFrom).done(function() {
-						baseDfd.resolve(doodads.getType(inheritsFrom).prototype);
-					});
-				} else {
-					baseDfd.resolve(baseType.prototype);
-				}
+			
+			if (!baseType) {
+				utils.require(inheritsFrom).done(function() {
+					baseDfd.resolve(doodads.getType(inheritsFrom).prototype);
+				});
 			} else {
-				baseDfd.resolve(doodads.doodad.prototype);
+				baseDfd.resolve(baseType.prototype);
 			}
 			
 			cache.activeConstructor = constructor;
@@ -371,13 +365,18 @@
 			///<summary>
 			/// Instantiates the doodad at the given url with the given options, loading the resource if necessary.
 			///</summary>
-			///<param name="url">The doodad to load</param>
-			///<param name="options">The options to associate with the doodad.</param>
+			///<param name="url">(Optional) The doodad to load. If not provided, will load the root doodad.</param>
+			///<param name="options">(Optional) The options to associate with the doodad.</param>
 			///<returns>
-			/// Since the creation process is asynchronous, this method returns a jQuery.Deferred promise object.
+			/// Since the creation process is (potentially) asynchronous, this method returns a jQuery.Deferred promise object.
 			/// On completion, the argument to the done method is the newly constructed doodad instance.
 			///</returns>
-			var dfd = $.Deferred(), type = doodads.getType(url);
+			var dfd = $.Deferred(), type;
+			if ($.isPlainObject(url)) {
+				options = url;
+				url = null;
+			}
+			type = doodads.getType(url);
 			
 			options = options || {};
 			
@@ -401,7 +400,11 @@
 			/// If the doodad resource has been loaded, then returns a JS class object.
 			/// If the doodad resource has not been loaded, returns undefined.
 			///</returns>
-			return cache.types[utils.canonicalize(url)];
+			if (url) {
+				return cache.types[utils.canonicalize(url)];
+			} else {
+				return doodads.doodad;
+			}
 		}
 	});
 })();
