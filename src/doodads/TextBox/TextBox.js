@@ -83,19 +83,6 @@
 				this._input.bind('keypress', this.onTextAreaKeyPress$proxy);
 			}
 		},
-		translateInnerMarkup: function TextBox$translateInnerMarkup(sourceElement, options, defaultOptions) {
-			base.translateInnerMarkup.apply(this, arguments);
-			
-			options.text = sourceElement.find('text').html() || defaultOptions.text;
-			options.watermark = sourceElement.find('watermark').html() || defaultOptions.watermark;
-			
-			options.maxlength = doodad.attrHelpers.toInt(sourceElement.attr('maxlength'), defaultOptions.maxlength);
-			options.multiline = doodad.attrHelpers.toBool(sourceElement.attr('multiline'), defaultOptions.multiline);
-			options.password = doodad.attrHelpers.toBool(sourceElement.attr('password'), defaultOptions.password);
-			options.enabled = doodad.attrHelpers.toBool(sourceElement.attr('enabled'), defaultOptions.enabled);
-			options.rows = doodad.attrHelpers.toInt(sourceElement.attr('rows'), defaultOptions.rows);
-			options.cols = doodad.attrHelpers.toInt(sourceElement.attr('cols'), defaultOptions.cols);
-		},
 		render: function TextBox$render() {
 			base.render.apply(this, arguments);
 
