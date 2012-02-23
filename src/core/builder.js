@@ -416,7 +416,7 @@
 					constructor = new builder();
 				
 				constructor.complete = function(callback) { 
-					this.setupObject.constructor.call(instance); 
+					this.setupObject.init.call(instance); 
 					$.extend(instance, this.setupObject.proto);
 					
 					(callback || $.noop)(instance);
