@@ -445,12 +445,12 @@
 		}
 	});
 	
-	function getTypeDeferred(url, ctx) {
+	function getTypeDeferred(url) {
 		var dfd = $.Deferred(),
 			type = doodads.getType(url);
 			
 		if (!type) {
-			utils.require(url, ctx).done(function() {
+			utils.require(url).done(function() {
 				type = doodads.getType(url);
 				dfd.resolve(type);
 			});
