@@ -380,6 +380,17 @@
 				});
 			};
 		},
+		setupMixin: function doodads$setupMixin(url) {
+			var constructor = { loadDfd: $.Deferred() };
+			
+			cache.activeConstructor = constructor;
+			
+			return function(fn) {
+				constructor.loadDfd.done(function(url) {
+					utils.getResponseFunc(url)(fn);
+				});
+			};
+		},
 		create: function doodads$create(url, options) {
 			///<summary>
 			/// Instantiates the doodad at the given url with the given options, loading the resource if necessary.
@@ -390,25 +401,32 @@
 			/// Since the creation process is (potentially) asynchronous, this method returns a jQuery.Deferred promise object.
 			/// On completion, the argument to the done method is the newly constructed doodad instance.
 			///</returns>
-			var dfd = $.Deferred(), type;
 			if ($.isPlainObject(url)) {
 				options = url;
 				url = null;
 			}
-			type = doodads.getType(url);
 			
-			options = options || {};
-			
-			if (!type) {
-				utils.require(url).done(function() {
-					type = doodads.getType(url);
-					dfd.resolve(new type(options));
-				});
-			} else {
-				dfd.resolve(new type(options));
-			}
-			
-			return dfd.promise();
+			return getTypeDeferred(url).pipe(function(type) {
+				return new type(options);
+			});
+		},
+		createMixin: function doodads$createMixin(url, instance) {
+			return getTypeDeferred(url).pipe(function(mixin) {
+				var dfd = $.Deferred(),
+					constructor = new builder();
+				
+				constructor.complete = function(callback) { 
+					this.setupObject.constructor.call(instance); 
+					$.extend(instance, this.setupObject.proto);
+					
+					(callback || $.noop)(instance);
+					
+					dfd.resolve(instance);
+				};
+				mixin.call(constructor, Object.getPrototypeOf(instance));
+				
+				return dfd;
+			});
 		},
 		getType: function doodads$getType(url) {
 			///<summary>
@@ -426,4 +444,20 @@
 			}
 		}
 	});
+	
+	function getTypeDeferred(url, ctx) {
+		var dfd = $.Deferred(),
+			type = doodads.getType(url);
+			
+		if (!type) {
+			utils.require(url, ctx).done(function() {
+				type = doodads.getType(url);
+				dfd.resolve(type);
+			});
+		} else {
+			dfd.resolve(type);
+		}
+		
+		return dfd.promise();
+	}
 })();
