@@ -283,7 +283,8 @@
 		complete: function builder$complete(callback) {
 			///<summary>
 			/// Once all of the parameters and properties of a doodad have been set, this function must be invoked so that the
-			/// construction can be invoked. Once the construction is finished the callback argument will be invoked if specified.
+			/// construction can be started. Once the construction is finished the callback argument will be invoked if it is
+			/// specified.
 			///</summary>
 			///<param name="callback">
 			/// Optional. A function to invoke once the construction is complete.
@@ -381,7 +382,20 @@
 				});
 			};
 		},
-		setupMixin: function doodads$setupMixin(url) {
+		setupMixin: function doodads$setupMixin() {
+			///<summary>
+			/// Bootstraps the doodad-mixin process. This function must be called by any scripts loaded via
+			/// the doodads.createMixin function.
+			///</summary>
+			///<returns>
+			/// Returns a function which takes a callback parameter which must be called immediately. The callback
+			/// has the following signature: function(base) where 
+			///   * base is the prototype of the instance that the mixin is to be associated with.
+			///</returns>
+			///<example>doodads.setupMixin()(function(base) {});</example>
+			///<remarks>
+			/// Look at the documentation for doodad-mixins to understand how they can be efficiently used.
+			///</remarks>
 			var constructor = cache.activeConstructor = { loadDfd: $.Deferred() };
 			
 			return function(fn) {
@@ -410,6 +424,17 @@
 			});
 		},
 		createMixin: function doodads$createMixin(url, instance) {
+			///<summary>
+			/// Instantiates the doodad-mixin at the given url and associates it with the given instance, 
+			/// loading the resource as necessary.
+			///</summary>
+			///<param name="url">The doodad-mixin to load.</param>
+			///<param name="instance">The doodad instance to associate the mixin with.</param>
+			///<returns>
+			/// Since the creation process is asynchronous, this method returns a jQuery.Deferred promise object.
+			/// On completion the argument to the done method is the instance parameter, but augmented with the
+			/// doodad-mixin.
+			///</returns>
 			return utils.getTypeDeferred(url).pipe(function(mixin) {
 				var dfd = $.Deferred(),
 					constructor = new builder();
@@ -431,10 +456,11 @@
 			///<summary>
 			/// Returns the class for the given doodad url.
 			///</summary>
-			///<param name="url">The URL to get the class type from.</param>
+			///<param name="url">(optional) The URL to get the class type from.</param>
 			///<returns>
 			/// If the doodad resource has been loaded, then returns a JS class object.
 			/// If the doodad resource has not been loaded, returns undefined.
+			/// If no url is given, returns the root doodad class.
 			///</returns>
 			if (url) {
 				return cache.types[utils.canonicalize(url)];
@@ -446,8 +472,10 @@
 	
 	doodads.setup.defaultAction = function doodads$setup$defaultAction() {
 		///<summary>
-		///Used by the server side builders to construct a doodad when there is no
-		///behaviour file associated with a doodad.
+		/// This method is used to support the doodad infrastructure and should not
+		/// be called by client code. 
+		/// Used by the server side builders to construct a doodad when there is no
+		/// behaviour file associated with a doodad.
 		///</summary>
 		doodads.setup()(function() {
 			this.complete();
