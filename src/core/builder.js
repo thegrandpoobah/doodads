@@ -426,4 +426,14 @@
 			}
 		}
 	});
+	
+	doodads.setup.defaultAction = function doodads$setup$defaultAction() {
+		///<summary>
+		///Used by the server side builders to construct a doodad when there is no
+		///behaviour file associated with a doodad.
+		///</summary>
+		doodads.setup()(function() {
+			this.complete();
+		});
+	}
 })();

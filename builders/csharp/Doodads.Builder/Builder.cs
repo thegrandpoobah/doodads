@@ -95,7 +95,7 @@ namespace Doodads.Builder
                 output.AppendLine("doodads.setup.definition = definition;\n");
                 if (c.behaviour == null)
                 {
-                    output.AppendFormat("doodads.setup('{0}').complete();\n", context.Request.Url.AbsoluteUri);
+                    output.AppendLine("doodads.setup.defaultAction();");
                 }
                 else
                 {
