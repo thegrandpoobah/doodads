@@ -523,7 +523,7 @@
 				var completionDfd = $.Deferred();
 				
 				asyncCreationDfd.promise().done(function(new_doodad) {
-					var $new_doodad = $(new_doodad),
+					var $new_doodad = new_doodad._jQueryCache,
 						autogenId;
 						
 					new_doodad.translateInnerMarkup($doodadElement);
