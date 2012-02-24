@@ -161,9 +161,24 @@
 				} else {
 					headDom.append('<style type="text/css">' + byteStream + '</style>');
 				}
+			},
+			getTypeDeferred: function utils$getTypeDeferred(url) {
+				var dfd = $.Deferred(),
+					type = doodads.getType(url);
+					
+				if (!type) {
+					utils.require(url).done(function() {
+						type = doodads.getType(url);
+						dfd.resolve(type);
+					});
+				} else {
+					dfd.resolve(type);
+				}
+				
+				return dfd.promise();
 			}
 		};
-
+		
 	// The builder is a class used by doodad authors to aid in the construction
 	// of doodads. An instance of it is returned via the doodads.setup API.
 	function builder() {
@@ -406,12 +421,12 @@
 				url = null;
 			}
 			
-			return getTypeDeferred(url).pipe(function(type) {
+			return utils.getTypeDeferred(url).pipe(function(type) {
 				return new type(options);
 			});
 		},
 		createMixin: function doodads$createMixin(url, instance) {
-			return getTypeDeferred(url).pipe(function(mixin) {
+			return utils.getTypeDeferred(url).pipe(function(mixin) {
 				var dfd = $.Deferred(),
 					constructor = new builder();
 				
@@ -445,19 +460,13 @@
 		}
 	});
 	
-	function getTypeDeferred(url) {
-		var dfd = $.Deferred(),
-			type = doodads.getType(url);
-			
-		if (!type) {
-			utils.require(url).done(function() {
-				type = doodads.getType(url);
-				dfd.resolve(type);
-			});
-		} else {
-			dfd.resolve(type);
-		}
-		
-		return dfd.promise();
+	doodads.setup.defaultAction = function doodads$setup$defaultAction() {
+		///<summary>
+		///Used by the server side builders to construct a doodad when there is no
+		///behaviour file associated with a doodad.
+		///</summary>
+		doodads.setup()(function() {
+			this.complete();
+		});
 	}
 })();
