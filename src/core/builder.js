@@ -1,12 +1,12 @@
 (function() {
 	var canonicalizationDiv = null,
 		headDom = null,
+		guid = 0,
 		cache = {
 			types: {},
 			waitFunctions: {},
 			activeConstructor: null,
 			stylesheets: {},
-			guid: 0
 		},
 		utils = {
 			load: function utils$load(url, callback) {
@@ -17,7 +17,7 @@
 					head = $('head')[0] || document.documentElement,
 					scriptAfter;
 				
-				script.id = 's_' + cache.guid++;
+				script.id = 's_' + guid++;
 				
 				if (window.opera && window.opera.version() < 11.60) {
 					scriptAfter = $('<script>')[0];
@@ -355,50 +355,34 @@
 			///<remarks>
 			/// Look at an existing doodad JavaScript file for details on how to use this function.
 			///</remarks>
-			var constructor = new builder();
-			
-			definition = $.extend({
-				inheritsTemplates: false,
-				templates: null,
-				stylesheets: null,
-				validates: false
-			}, doodads.setup.definition);
-			delete doodads.setup.definition; // definition is populated by the server side builders
-
-			if (definition.validates) {
-				constructor.validates();
-			}
-
-			constructor
-				.templates(definition.templates, definition.inheritsTemplates)
-				.stylesheets(definition.stylesheets);
-			
-			var baseDfd = $.Deferred(),
-				baseType = doodads.getType(inheritsFrom);
-			
-			if (!baseType) {
-				utils.require(inheritsFrom).done(function() {
-					baseDfd.resolve(doodads.getType(inheritsFrom));
-				});
-			} else {
-				baseDfd.resolve(baseType);
-			}
-			
-			cache.activeConstructor = constructor;
+			var constructor = cache.activeConstructor = new builder(),
+				definition = $.extend({
+					inheritsTemplates: false,
+					templates: null,
+					stylesheets: null,
+					validates: false
+				}, doodads.setup.definition);
+			delete doodads.setup.definition; // doodads.setup.definition is populated by the server side builders
 			
 			return function(fn) {
-				$.when(baseDfd.promise(), constructor.loadDfd).done(function(baseType, url) {
+				$.when(utils.getTypeDeferred(inheritsFrom), constructor.loadDfd).done(function(baseType, url) {
+					if (definition.validates) {
+						constructor.validates();
+					}
+
+					constructor
+						.templates(definition.templates, definition.inheritsTemplates)
+						.stylesheets(definition.stylesheets);
+
 					baseType = baseType.prototype;
 					constructor.name = url;
 					constructor.setupObject.base = baseType;
-					fn.call(constructor, baseType, function() { return doodads.getType(constructor.name); });
+					fn.call(constructor, baseType, function() { return doodads.getType(url); });
 				});
 			};
 		},
 		setupMixin: function doodads$setupMixin(url) {
-			var constructor = { loadDfd: $.Deferred() };
-			
-			cache.activeConstructor = constructor;
+			var constructor = cache.activeConstructor = { loadDfd: $.Deferred() };
 			
 			return function(fn) {
 				constructor.loadDfd.done(function(url) {
