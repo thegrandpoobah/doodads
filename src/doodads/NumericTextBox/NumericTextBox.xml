@@ -1,5 +1,4 @@
 ﻿<doodad xmlns="http://schemas.vastcap.com/doodadDefinition"
-           type="doodads.library.numericTextBox"
            validates="true">
   <behaviour path="~/doodads/NumericTextBox/NumericTextBox.js" />
   <templates>
@@ -8,7 +7,4 @@
   <stylesheets>
     <stylesheet path="~/doodads/NumericTextBox/NumericTextBox.css"/>
   </stylesheets>
-  <imports>
-    <import path="~/doodads/TextBox.doodad"/>
-  </imports>
 </doodad>

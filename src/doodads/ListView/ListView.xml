@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<doodad xmlns="http://schemas.vastcap.com/doodadDefinition"
-           type="doodads.library.listView">
+<doodad xmlns="http://schemas.vastcap.com/doodadDefinition">
   <behaviour path="~/doodads/ListView/ListView.js"/>
   <templates>
     <base path="~/doodads/ListView/ListView.html"/>

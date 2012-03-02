@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <doodad xmlns="http://schemas.vastcap.com/doodadDefinition"
-           type="doodads.library.dropdown"
            validates="true">
   <behaviour path="~/doodads/DropDown/DropDown.js" />
   <templates>

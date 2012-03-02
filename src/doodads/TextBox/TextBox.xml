@@ -1,5 +1,4 @@
 ﻿<doodad xmlns="http://schemas.vastcap.com/doodadDefinition"
-           type="doodads.library.textBox"
            validates="true">
   <behaviour path="~/doodads/TextBox/TextBox.js" />
   <templates>
