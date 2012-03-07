@@ -119,9 +119,7 @@
 				this.trigger('blur');
 			},
 			onClick: function CheckBox$onClick() {
-				this._checked = this._input[0].checked;
-				this.validate();
-				this.trigger('click', this._checked);
+				this.checked(this._input[0].checked, true);
 			}
 		}).complete();
 	});
