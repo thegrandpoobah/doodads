@@ -1,5 +1,5 @@
-﻿(function($) {
-	doodads.setup().inherits()(function(base) {
+(function($) {
+	doodads.setup()(function(base) {
 		var defaultRequiredRule = function (checked) {
 			return {
 				valid: checked,

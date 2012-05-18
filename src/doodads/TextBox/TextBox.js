@@ -1,5 +1,5 @@
 ﻿(function($) {
-	doodads.setup().inherits()(function (base, type) {
+	doodads.setup()(function (base, type) {
 		var KEYUP_DEBOUNCE_PERIOD = 10; // in ms
 
 		var defaultRequiredRule = function (content) {

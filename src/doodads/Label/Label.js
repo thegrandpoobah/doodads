@@ -1,5 +1,5 @@
-﻿(function($) {
-	doodads.setup().inherits()(function(base) {
+(function($) {
+	doodads.setup()(function(base) {
 		this.constructor(function () {
 			this._text = this._options.text;
 		})

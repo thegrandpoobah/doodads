@@ -510,17 +510,14 @@
 				iS.insertAfter($doodadElement);
 				$doodadElement.remove();
 
-				asyncCreationDfd = $.Deferred();
-				if ($doodadElement.attr('url')) {
-					doodads.create($doodadElement.attr('url'), options)
-						.done(function(result) {
-							asyncCreationDfd.resolve(result);
-						});
-				} else {
-					asyncCreationDfd.resolve(new doodad(options));
-				}
+				var asyncCreationDfd = doodads.create($doodadElement.attr('url'), options),
+					completionDfd = $.Deferred();
 				
-				var completionDfd = $.Deferred();
+				if ($doodadElement.attr('mixin')) {
+					asyncCreationDfd = asyncCreationDfd.pipe(function(new_doodad) {
+						return doodads.createMixin($doodadElement.attr('mixin'), new_doodad);
+					});
+				}
 				
 				asyncCreationDfd.promise().done(function(new_doodad) {
 					var $new_doodad = new_doodad._jQueryCache,

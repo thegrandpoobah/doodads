@@ -1,5 +1,5 @@
 ﻿(function($) {
-	doodads.setup().inherits()(function(base) {
+	doodads.setup()(function(base) {
 		this.constructor(function () {
 			///<summary>
 			/// The Generic List serves as a convenient base class for list-oriented Components like Menus.

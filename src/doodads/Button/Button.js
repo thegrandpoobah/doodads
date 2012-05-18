@@ -1,5 +1,5 @@
 ﻿(function($) {
-	doodads.setup().inherits()(function (base) {
+	﻿doodads.setup()(function (base) {
 		this.constructor(function () {
 			this._textElement = null;
 
@@ -61,12 +61,10 @@
 						} else if (this._active || this._tracking || this._hasFocus) {
 							classes.push(this._options.trackingCssClass);
 						}
-					} else {
-						classes.push(this._options.disabledCssClass);
-					}
 
-					this._cssClassOverrides = classes.join(' ');
-					base._updateCssClass.call(this);
+						this._cssClassOverrides = classes.join(' ');
+						base._updateCssClass.call(this);
+					}
 				}
 			},
 			bindEvents: function Button$bindEvents() {

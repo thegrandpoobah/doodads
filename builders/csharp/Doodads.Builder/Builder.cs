@@ -91,12 +91,11 @@ namespace Doodads.Builder
                 JavaScriptSerializer serializer = new JavaScriptSerializer();
                 StringBuilder output = new StringBuilder();
 
-
                 output.AppendLine("(function(definition) {");
-                output.AppendFormat("doodads.setup('{0}', definition);\n", context.Request.Url.AbsoluteUri);
+                output.AppendLine("doodads.setup.definition = definition;\n");
                 if (c.behaviour == null)
                 {
-                    output.AppendFormat("doodads.setup('{0}').complete();\n", context.Request.Url.AbsoluteUri);
+                    output.AppendLine("doodads.setup.defaultAction();");
                 }
                 else
                 {
@@ -112,9 +111,7 @@ namespace Doodads.Builder
 #if DEBUG
                     output.AppendFormat("/* BEGIN Behaviour file {0} */\n", c.behaviour.path);
 #endif
-                    Regex regex = new Regex("doodads\\s*\\.\\s*setup\\(\\)", RegexOptions.Multiline);
-                    string url = regex.Replace(File.ReadAllText(serverPath), string.Format("doodads.setup({0})", serializer.Serialize(context.Request.Url.AbsoluteUri)));
-                    output.AppendLine(url);
+                    output.AppendLine(File.ReadAllText(serverPath));
 #if DEBUG
                     output.AppendFormat("/* END Behaviour file {0} */\n", c.behaviour.path);
 #endif

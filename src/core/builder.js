@@ -1,13 +1,61 @@
 (function() {
 	var canonicalizationDiv = null,
 		headDom = null,
+		guid = 0,
 		cache = {
 			types: {},
 			waitFunctions: {},
-			constructions: {},
-			stylesheets: {}
+			activeConstructor: null,
+			stylesheets: {},
 		},
 		utils = {
+			load: function utils$load(url, callback) {
+				// This code block is basically a simplication of Julian Aubourg's jQuery JSONP script load
+				// implementation: https://github.com/jaubourg/jquery-jsonp/blob/master/src/jquery.jsonp.js
+				// As such, it is used under the MIT License.
+				var script = $('<script>')[0], 
+					head = $('head')[0] || document.documentElement,
+					scriptAfter;
+				
+				script.id = 's_' + guid++;
+				
+				if (window.opera && window.opera.version() < 11.60) {
+					scriptAfter = $('<script>')[0];
+					scriptAfter.text = 'document.getElementById(\'' + script.id + '\').onerror()';
+				} else {
+					script.async = 'async';
+				}
+				
+				// IE is special.. in so many ways:
+				// http://msdn.microsoft.com/en-us/library/ms533746(VS.85).aspx
+				if ('onreadystatechange' in script) {
+					script.event = 'onclick';
+					script.htmlFor = script.id;
+				}
+				
+				script.onload = script.onerror = script.onreadystatechange = function() {
+					if (!script.readyState || !/i/.test(script.readyState)) {
+						try {
+							script.onclick && script.onclick();
+						} catch (_) {}
+
+						head.removeChild(script);
+						if (scriptAfter) {
+							head.removeChild(scriptAfter);
+						}
+						script.onload = script.onerror = script.onreadystatechange = null;
+						
+						callback();
+					}
+				}
+				
+				script.src = url;
+				
+				head.insertBefore(script, head.firstChild);
+				if (scriptAfter) {
+					head.insertBefore(scriptAfter, head.firstChild);
+				}
+			},
 			getResponseFunc: function utils$getResponseFunc(url) {
 				///<summary>
 				/// Returns the response function associated with a given doodad.
@@ -63,7 +111,14 @@
 						dfd: $.Deferred()
 					};
 
-					yepnope(canonUrl);
+					utils.load(canonUrl, function() {
+						if (!cache.activeConstructor) {
+							console.error('Unable to load doodad from url:' + canonUrl);
+							return;
+						}
+						cache.activeConstructor.loadDfd.resolve(canonUrl);
+						cache.activeConstructor = null;
+					});
 				
 					return cache.waitFunctions[canonUrl].dfd.promise();
 				}
@@ -106,13 +161,29 @@
 				} else {
 					headDom.append('<style type="text/css">' + byteStream + '</style>');
 				}
+			},
+			getTypeDeferred: function utils$getTypeDeferred(url) {
+				var dfd = $.Deferred(),
+					type = doodads.getType(url);
+					
+				if (!type) {
+					utils.require(url).done(function() {
+						type = doodads.getType(url);
+						dfd.resolve(type);
+					});
+				} else {
+					dfd.resolve(type);
+				}
+				
+				return dfd.promise();
 			}
 		};
-
+		
 	// The builder is a class used by doodad authors to aid in the construction
 	// of doodads. An instance of it is returned via the doodads.setup API.
-	function builder(name) {
-		this.name = name;
+	function builder() {
+		// this.name = '/url/to/doodad'; // this field is automatically populated by doodads.setup
+		this.loadDfd = $.Deferred();
 		this.setupObject = {
 			base: null,
 			validates: false,
@@ -212,7 +283,8 @@
 		complete: function builder$complete(callback) {
 			///<summary>
 			/// Once all of the parameters and properties of a doodad have been set, this function must be invoked so that the
-			/// construction can be invoked. Once the construction is finished the callback argument will be invoked if specified.
+			/// construction can be started. Once the construction is finished the callback argument will be invoked if it is
+			/// specified.
 			///</summary>
 			///<param name="callback">
 			/// Optional. A function to invoke once the construction is complete.
@@ -258,117 +330,155 @@
 			
 			// after everything is done..
 			utils.getResponseFunc(name)(new_doodad);
-			delete cache.constructions[name];
 			
 			(callback || $.noop)(new_doodad);
 		}
 	}
 
 	$.extend(doodads, {
-		setup: function doodads$setup(url, definition) {
+		setup: function doodads$setup(inheritsFrom) {
 			///<summary>
-			/// Bootstraps the doodad authoring process by associating a proto-doodad with a url and a definition object.
+			/// Bootstraps the doodad authoring process by associating a proto-doodad with an existing base doodad (or the root
+			/// doodad object if no inheritsFrom parameter is given).
 			///</summary>
-			///<param name="url">
-			/// The url to associate with a given doodad. This url becomes the canonical name for the doodad
-			/// and the only way to reference the doodad class after construction. As such, it is the user's responsibility to
-			/// ensure that the URL is unique.
-			///</param>
-			///<param name="definition">
-			/// Only used by the server-side builder support code.
-			///</param>
+			///<param name="inheritsFrom">
+			/// Optional. The URL of a doodad to use as the base class for the newly constructed doodad.
+			/// If not provided, the base class of the doodad will be the root doodad class.
 			///<returns>
-			/// Returns an object with a single member named "inherits" which must be called to continue the bootstrap procedure.
+			/// Returns a function which takes a callback parameter which must be called immediately. The callback
+			/// has the following signature: function(base, type) where 
+			///   * base is the type of the superclass.
+			///   * type() is the type of the current class (useful for getting at defaultOptions and statics from inside the class
+			///   itself.
 			///</returns>
+			///<example>doodads.setup()(function(base) {});</example>
+			///<example>doodads.setup('/path/to/doodad.doodad')(function(base) {});</example>
 			///<remarks>
 			/// Look at an existing doodad JavaScript file for details on how to use this function.
 			///</remarks>
-			if (cache.constructions[url]) {
-				return cache.constructions[url];
-			}
+			var constructor = cache.activeConstructor = new builder(),
+				definition = $.extend({
+					inheritsTemplates: false,
+					templates: null,
+					stylesheets: null,
+					validates: false
+				}, doodads.setup.definition);
+			delete doodads.setup.definition; // doodads.setup.definition is populated by the server side builders
 			
-			var constructor = new builder(url);
-			
-			definition = $.extend({
-				inheritsTemplates: false,
-				templates: null,
-				stylesheets: null,
-				validates: false
-			}, definition);
-
-			if (definition.validates) {
-				constructor.validates();
-			}
-
-			constructor
-				.templates(definition.templates, definition.inheritsTemplates)
-				.stylesheets(definition.stylesheets);
-			
-			cache.constructions[url] = {
-				inherits: function(from) {
-					var baseDfd = $.Deferred(),
-						baseType;
-					
-					if (from) {
-						baseType = doodads.getType(from);
-						
-						if (!baseType) {
-							utils.require(from).done(function() {
-								baseDfd.resolve(doodads.getType(from).prototype);
-							});
-						} else {
-							baseDfd.resolve(baseType.prototype);
-						}
-					} else {
-						baseDfd.resolve(doodads.doodad.prototype);
+			return function(fn) {
+				$.when(utils.getTypeDeferred(inheritsFrom), constructor.loadDfd).done(function(baseType, url) {
+					if (definition.validates) {
+						constructor.validates();
 					}
-					
-					return function(fn) {
-						baseDfd.promise().done(function(baseType) {
-							constructor.setupObject.base = baseType;
-							fn.call(constructor, baseType, function() { return doodads.getType(url) });
-						});
-					};
-				}
+
+					constructor
+						.templates(definition.templates, definition.inheritsTemplates)
+						.stylesheets(definition.stylesheets);
+
+					baseType = baseType.prototype;
+					constructor.name = url;
+					constructor.setupObject.base = baseType;
+					fn.call(constructor, baseType, function() { return doodads.getType(url); });
+				});
 			};
+		},
+		setupMixin: function doodads$setupMixin() {
+			///<summary>
+			/// Bootstraps the doodad-mixin process. This function must be called by any scripts loaded via
+			/// the doodads.createMixin function.
+			///</summary>
+			///<returns>
+			/// Returns a function which takes a callback parameter which must be called immediately. The callback
+			/// has the following signature: function(base) where 
+			///   * base is the prototype of the instance that the mixin is to be associated with.
+			///</returns>
+			///<example>doodads.setupMixin()(function(base) {});</example>
+			///<remarks>
+			/// Look at the documentation for doodad-mixins to understand how they can be efficiently used.
+			///</remarks>
+			var constructor = cache.activeConstructor = { loadDfd: $.Deferred() };
 			
-			return cache.constructions[url];
+			return function(fn) {
+				constructor.loadDfd.done(function(url) {
+					utils.getResponseFunc(url)(fn);
+				});
+			};
 		},
 		create: function doodads$create(url, options) {
 			///<summary>
 			/// Instantiates the doodad at the given url with the given options, loading the resource if necessary.
 			///</summary>
-			///<param name="url">The doodad to load</param>
-			///<param name="options">The options to associate with the doodad.</param>
+			///<param name="url">(Optional) The doodad to load. If not provided, will load the root doodad.</param>
+			///<param name="options">(Optional) The options to associate with the doodad.</param>
 			///<returns>
-			/// Since the creation process is asynchronous, this method returns a jQuery.Deferred promise object.
+			/// Since the creation process is (potentially) asynchronous, this method returns a jQuery.Deferred promise object.
 			/// On completion, the argument to the done method is the newly constructed doodad instance.
 			///</returns>
-			var dfd = $.Deferred(), type = doodads.getType(url);
-			
-			options = options || {};
-			
-			if (!type) {
-				utils.require(url).done(function() {
-					type = doodads.getType(url);
-					dfd.resolve(new type(options));
-				});
-			} else {
-				dfd.resolve(new type(options));
+			if ($.isPlainObject(url)) {
+				options = url;
+				url = null;
 			}
 			
-			return dfd.promise();
+			return utils.getTypeDeferred(url).pipe(function(type) {
+				return new type(options);
+			});
+		},
+		createMixin: function doodads$createMixin(url, instance) {
+			///<summary>
+			/// Instantiates the doodad-mixin at the given url and associates it with the given instance, 
+			/// loading the resource as necessary.
+			///</summary>
+			///<param name="url">The doodad-mixin to load.</param>
+			///<param name="instance">The doodad instance to associate the mixin with.</param>
+			///<returns>
+			/// Since the creation process is asynchronous, this method returns a jQuery.Deferred promise object.
+			/// On completion the argument to the done method is the instance parameter, but augmented with the
+			/// doodad-mixin.
+			///</returns>
+			return utils.getTypeDeferred(url).pipe(function(mixin) {
+				var dfd = $.Deferred(),
+					constructor = new builder();
+				
+				constructor.complete = function(callback) { 
+					this.setupObject.init.call(instance); 
+					$.extend(instance, this.setupObject.proto);
+					
+					(callback || $.noop)(instance);
+					
+					dfd.resolve(instance);
+				};
+				mixin.call(constructor, Object.getPrototypeOf(instance));
+				
+				return dfd;
+			});
 		},
 		getType: function doodads$getType(url) {
 			///<summary>
 			/// Returns the class for the given doodad url.
 			///</summary>
-			///<param name="url">The URL to get the class type from.</param>
+			///<param name="url">(optional) The URL to get the class type from.</param>
 			///<returns>
 			/// If the doodad resource has been loaded, then returns a JS class object.
 			/// If the doodad resource has not been loaded, returns undefined.
+			/// If no url is given, returns the root doodad class.
 			///</returns>
-			return cache.types[utils.canonicalize(url)];
+			if (url) {
+				return cache.types[utils.canonicalize(url)];
+			} else {
+				return doodads.doodad;
+			}
 		}
 	});
+	
+	doodads.setup.defaultAction = function doodads$setup$defaultAction() {
+		///<summary>
+		/// This method is used to support the doodad infrastructure and should not
+		/// be called by client code. 
+		/// Used by the server side builders to construct a doodad when there is no
+		/// behaviour file associated with a doodad.
+		///</summary>
+		doodads.setup()(function() {
+			this.complete();
+		});
+	}
 })();

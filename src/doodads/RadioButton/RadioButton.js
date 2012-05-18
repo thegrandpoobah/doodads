@@ -1,5 +1,5 @@
 ﻿(function($) {
-	doodads.setup().inherits()(function(base) {
+	doodads.setup()(function(base) {
 		this.constructor(function () {
 			this._text = this._options.text;
 			this._checked = this._options.checked;
