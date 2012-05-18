@@ -190,7 +190,7 @@
 			defaultOptions: {},
 			init: $.noop,
 			proto: {},
-			templates: {},
+			templates: null,
 			inheritsTemplates: false,
 			stylesheets: {},
 			statics: {}
@@ -249,7 +249,9 @@
 			/// An optional boolean value indicating whether the doodad will inherit the templates of its
 			/// super class.
 			///</param>
-			$.extend(this.setupObject.templates, templates);
+			if (templates) {
+				this.setupObject.templates = $.extend(this.setupObject.templates || {}, templates);
+			}
 			
 			if (inheritsTemplates) {
 				this.setupObject.inheritsTemplates = true;
@@ -304,11 +306,13 @@
 			};
 			
 			new_doodad.defaultOptions = setupObject.defaultOptions || {};
-			new_doodad.defaultOptions.templates = $.extend({}, 
-				setupObject.inheritsTemplates ? baseType.constructor.defaultOptions.templates : {},  
-				new_doodad.defaultOptions.templates,
-				setupObject.templates);
-				
+			if (new_doodad.defaultOptions.templates || setupObject.templates) {
+				new_doodad.defaultOptions.templates = $.extend({}, 
+					setupObject.inheritsTemplates ? baseType.constructor.defaultOptions.templates : {},  
+					new_doodad.defaultOptions.templates,
+					setupObject.templates);
+			}
+			
 			new_doodad.prototype = $.extend(new baseType.constructor(), setupObject.proto);
 			new_doodad.prototype.constructor = new_doodad;
 			
