@@ -293,9 +293,9 @@
 				// END: WORKAROUND for bug 524360
 			},
 			onBlur: function TextBox$onBlur(e) {
+				this._focused = false;
 				this._addWatermark();
 				this.trigger('blur');
-				this._focused = false;
 			},
 			onTextAreaKeyPress: function TextBox$onTextAreaKeyDown(e) {
 				if (e.which !== 0 && this._options.maxlength !== -1 && e.target.value >= this._options.maxlength) {
