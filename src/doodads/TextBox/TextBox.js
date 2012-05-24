@@ -144,7 +144,7 @@
 				} else {
 					obj = $.extend(obj, {
 						maxlength: this._options.maxlength,
-						hasMaxlength: this._options.maxlength !== -1
+						hasMaxlength: this._options.maxlength !== type().defaultOptions.maxlength
 					});
 
 					if (this._options.password) {
