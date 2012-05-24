@@ -42,6 +42,10 @@
 
 			, _hookedResize: false
 			
+			, _childrenReadyDfd: null
+			, _selfReadyDfd: null
+			, _completionDfd: null
+			
 			, _disposing: false
 		});
 		
@@ -494,6 +498,8 @@
 			var templateDataCache, dfds,
 				self = this;
 			
+			this._childrenReadyDfd = $.Deferred();
+			
 			dfds = this._source.find('doodad').map(function (index, doodadElement) {
 				var $doodadElement = $(doodadElement), asyncCreationDfd, dsAttr,
 					options,
@@ -588,6 +594,7 @@
 			$.when.apply(null, dfds)
 				.done(function() {
 					self.onChildrenReady();
+					self._childrenReadyDfd.resolve();
 				});
 		}
 		, translateInnerMarkup: function doodad$translateInnerMarkup(sourceElement) {
@@ -710,6 +717,9 @@
 			/// DOM for the doodad being present.
 			///</summary>
 			if (!this._source) {
+				this._selfReadyDfd = $.Deferred();
+				this._completionDfd = null;
+				
 				this.constructElement();
 
 				this._instantiateChildren();
@@ -729,6 +739,7 @@
 				}
 				
 				this.onReady();
+				this._selfReadyDfd.resolve();
 			}
 		}
 		, _generateDOMReferences: function doodad$_generateDOMReferences() {
@@ -814,8 +825,9 @@
 			/// doodad authors to bind events onto DOM elements.
 			///</summary>
 			///<remarks>
-			/// This method is called after all child doodads have been instantiated, so doodad
-			/// events can be consumed as well.
+			/// This method is called before any child doodads are instantiated, so doodad
+			/// events cannot be consumed here. Child doodad events should either be consumed
+			/// declaratively through markup or in the onChildrenReady event.
 			///</remarks>
 
 			// Default Implementation is basically abstract since there is nothing to bind unto.
@@ -831,11 +843,42 @@
 		}
 		, onChildrenReady: function doodad$onChildrenReady() {
 			///<summmary>
-			/// Callback function that getsw called when the children doodads have finished the rendering process.
+			/// Callback function that gets called when the children doodads have finished the rendering process.
 			/// Note that this callback gets invoked afer every time the root element is reconstructed (rerendered)
 			///</summary>
 			
 			// Default Implementation is basically abstract since there is nothing to bind unto.
+		}
+		, whenReady: function doodad$whenReady(fn) {
+			///<summary>
+			/// Triggers the function given by the parameter when the doodad (and its children)
+			/// are in a ready state (effectively equivalent to being rendered and all internal 
+			/// bookkeeping information updated.
+			///</summary>
+			///<param name="fn">
+			/// The function to invoke upon completion. The function's `this` will point to
+			/// the invoking doodad
+			///</param>
+			///<remarks>
+			/// This method is mainly intended for doodad developers to defer execution of code blocks
+			/// until rendering has been completed, but may see other external usages as well
+			///</remarks>
+			var dfd = this._completionDfd,
+				self = this;
+			
+			$.each(['childrenReadyDfd', 'selfReadyDfd', 'completionDfd'], function() {
+				if (!self['_' + this]) {
+					self['_' + this] = $.Deferred();
+				}
+			});
+			
+			if (!dfd) {
+				$.when(this._childrenReadyDfd, this._selfReadyDfd).done(function() {
+					self._completionDfd.resolveWith(self);
+				});
+			}
+			
+			this._completionDfd.done(fn);
 		}
 
 		, onAttached: function doodad$onAttached() {
