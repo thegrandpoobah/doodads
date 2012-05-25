@@ -584,8 +584,9 @@
 					
 					new_doodad.render(iS);
 					new_doodad.element().unwrap();
-					
-					completionDfd.resolve();
+					new_doodad.whenReady(function() {
+						completionDfd.resolve();
+					});
 				});
 				
 				return completionDfd.promise();
