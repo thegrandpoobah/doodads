@@ -282,6 +282,13 @@
 			
 			return this;
 		},
+		type: function builder$type() {
+			///<summary>
+			/// Returns a reference to the class for the doodad that is currently being constructed.
+			/// This is useful for getting at defaultOptions and statics from inside the js file for the doodad itself
+			///</summary>
+			return doodads.getType(this.name);
+		},
 		complete: function builder$complete(callback) {
 			///<summary>
 			/// Once all of the parameters and properties of a doodad have been set, this function must be invoked so that the
@@ -340,7 +347,7 @@
 	}
 
 	$.extend(doodads, {
-		setup: function doodads$setup(inheritsFrom) {
+		setup: function doodads$setup(inheritsFrom, args) {
 			///<summary>
 			/// Bootstraps the doodad authoring process by associating a proto-doodad with an existing base doodad (or the root
 			/// doodad object if no inheritsFrom parameter is given).
@@ -348,18 +355,29 @@
 			///<param name="inheritsFrom">
 			/// Optional. The URL of a doodad to use as the base class for the newly constructed doodad.
 			/// If not provided, the base class of the doodad will be the root doodad class.
+			///</param>
+			///<param name="args">
+			/// Array. Optional. A list of arguments to pass to the setup callback function.
+			///</param>
 			///<returns>
 			/// Returns a function which takes a callback parameter which must be called immediately. The callback
-			/// has the following signature: function(base, type) where 
+			/// has the following signature: function(builder, base/*, args */) where 
+			///   * builder is the doodad builder class
 			///   * base is the type of the superclass.
-			///   * type() is the type of the current class (useful for getting at defaultOptions and statics from inside the class
-			///   itself.
+			///   * args is the arguments passed through the setup function
 			///</returns>
-			///<example>doodads.setup()(function(base) {});</example>
-			///<example>doodads.setup('/path/to/doodad.doodad')(function(base) {});</example>
+			///<example>doodads.setup()(function(builder, base) {});</example>
+			///<example>doodads.setup([jQuery])(function(builder, base, $) {});</example>
+			///<example>doodads.setup('/path/to/doodad.doodad')(function(builder, base) {});</example>
+			///<example>doodads.setup('/path/to/doodad.doodad', [jQuery])(function(builder, base, $) {});</example>
 			///<remarks>
 			/// Look at an existing doodad JavaScript file for details on how to use this function.
 			///</remarks>
+			if ($.isArray(inheritsFrom)) {
+				args = inheritsFrom;
+				inheritsFrom = undefined;
+			}
+			
 			var constructor = cache.activeConstructor = new builder(),
 				definition = $.extend({
 					inheritsTemplates: false,
@@ -382,7 +400,8 @@
 					baseType = baseType.prototype;
 					constructor.name = url;
 					constructor.setupObject.base = baseType;
-					fn.call(constructor, baseType, function() { return doodads.getType(url); });
+					
+					fn.apply(null, $.merge([constructor, baseType], args || []));
 				});
 			};
 		},
