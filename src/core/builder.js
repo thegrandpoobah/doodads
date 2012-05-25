@@ -442,10 +442,21 @@
 				url = null;
 			}
 			
-			return utils.getTypeDeferred(url).pipe(function(type) {
+			return doodads.load(url).pipe(function(type) {
 				return new type(options);
 			});
 		},
+		load: function doodads$load(url) {
+			///<summary>
+			/// Primes the doodad type cache with an entry for the doodad at the given url.
+			///</summary>
+			///<param name="url">(Optional) The url to prime the cache with</param>
+			///<returns>
+			/// Since the creation process is (potentially) asynchronous, this method returns a jQuery.Deferred promise object.
+			/// On completion, the argument to the done method is the type of the doodad at the given url.
+			///</returns>
+			return utils.getTypeDeferred(url);
+		}, 
 		createMixin: function doodads$createMixin(url, instance) {
 			///<summary>
 			/// Instantiates the doodad-mixin at the given url and associates it with the given instance, 
