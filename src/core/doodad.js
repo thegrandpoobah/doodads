@@ -495,12 +495,10 @@
 			/// Note that doodad elements that do not have a type attribute will be replaced by
 			/// an instance of the root doodad class.
 			///</remarks>
-			var templateDataCache, dfds,
+			var templateDataCache,
 				self = this;
 			
-			this._childrenReadyDfd = $.Deferred();
-			
-			dfds = this._source.find('doodad').map(function (index, doodadElement) {
+			return this._source.find('doodad').map(function (index, doodadElement) {
 				var $doodadElement = $(doodadElement), asyncCreationDfd, dsAttr,
 					options,
 					autogenId;
@@ -591,12 +589,6 @@
 				
 				return completionDfd.promise();
 			}).get();
-			
-			$.when.apply(null, dfds)
-				.done(function() {
-					self.onChildrenReady();
-					self._childrenReadyDfd.resolve();
-				});
 		}
 		, translateInnerMarkup: function doodad$translateInnerMarkup(sourceElement) {
 			///<summary>
@@ -717,13 +709,20 @@
 			/// method if there is a particular code fragment that explicitly depends on the
 			/// DOM for the doodad being present.
 			///</summary>
+			var self = this;
+			
 			if (!this._source) {
 				this._selfReadyDfd = $.Deferred();
 				this._completionDfd = null;
 				
 				this.constructElement();
 
-				this._instantiateChildren();
+				this._childrenReadyDfd = $.Deferred();
+				$.when.apply(null, this._instantiateChildren()).done(function() {
+					self.onChildrenReady();
+					self._childrenReadyDfd.resolve();
+				});
+				
 				this.bindEvents();
 
 				this._setDomId();
