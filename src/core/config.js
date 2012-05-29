@@ -1,6 +1,8 @@
 (function() {
 	doodads.config = {
 		domDataKey: 'doodads',
-		rootUrl: './'
+		repositories: {
+			'core': '/doodads/'
+		}
 	};
 })();

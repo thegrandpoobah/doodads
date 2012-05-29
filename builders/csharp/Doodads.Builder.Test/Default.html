@@ -16,18 +16,18 @@
     </style>
     <script type="text/javascript">
         $(function () {
-            doodads.config.rootUrl = '/doodads/';
-            doodads.create('~/Button.doodad', { text: 'Button' })
+            doodads.config.repositories['core'] = '/doodads/';
+            doodads.create('core:Button.doodad', { text: 'Button' })
                 .done(function (doodad) {
                     doodad.render($(document.body));
                 });
 
-            doodads.create('~/CheckBox.doodad', { text: 'Box' })
+            doodads.create('core:CheckBox.doodad', { text: 'Box' })
                 .done(function (doodad) {
                     doodad.render($(document.body));
                 });
 
-            doodads.create('~/DropDown.doodad', { watermark: 'Select an item' })
+            doodads.create('core:DropDown.doodad', { watermark: 'Select an item' })
                 .done(function (doodad) {
                     doodad.render($(document.body));
                     doodad.dataSource([
@@ -37,13 +37,13 @@
                     ]);
                 });
 
-            doodads.create('~/Label.doodad', { text: 'It was the best of times, it was the blurst of times' })
+            doodads.create('core:Label.doodad', { text: 'It was the best of times, it was the blurst of times' })
                 .done(function (doodad) {
                     doodad.render($(document.body));
                 });
 
             // list view
-            doodads.create('~/ListView.doodad')
+            doodads.create('core:ListView.doodad')
                 .done(function (doodad) {
                     doodad.render($(document.body));
                     doodad.dataSource([
@@ -57,56 +57,56 @@
                     ]);
                 });
 
-            doodads.create('~/NumericTextBox.doodad', { text: 'HELLO', required: true })
-                .done(function (component) {
-                    component.render($(document.body));
+            doodads.create('core:NumericTextBox.doodad', { text: 'HELLO', required: true })
+                .done(function (doodad) {
+                    doodad.render($(document.body));
 
-                    component.bind('changing', function () {
+                    doodad.bind('changing', function () {
                         console.log(arguments);
                     });
 
-                    component.bind('valid', function () {
+                    doodad.bind('valid', function () {
                         console.log('valid');
                     });
 
-                    component.bind('invalid', function () {
+                    doodad.bind('invalid', function () {
                         console.log('invalid');
                     });
                 });
 
-            doodads.create('~/RadioButton.doodad', { text: 'All I want is my Radio' })
+            doodads.create('core:RadioButton.doodad', { text: 'All I want is my Radio' })
                 .done(function (doodad) {
                     doodad.render($(document.body));
                 });
 
 
-            doodads.create('~/TextBox.doodad', { text: 'HELLO', required: true, multiline: true, maxlength: 100 })
-                .done(function (component) {
-                    component.render($(document.body));
+            doodads.create('core:TextBox.doodad', { text: 'HELLO', required: true, multiline: true, maxlength: 100 })
+                .done(function (doodad) {
+                    doodad.render($(document.body));
 
-                    component.addRule(function (ctx) {
+                    doodad.addRule(function (ctx) {
                         return {
                             valid: ctx === 'Groucho Marx',
                             message: 'Must be \'Groucho Marx\'',
                             alwaysShow: true
                         };
                     });
-                    component.addRule(function (ctx) {
+                    doodad.addRule(function (ctx) {
                         return {
                             valid: ctx.length === 12,
                             message: 'Must be 12 characters long'
                         };
                     });
 
-                    component.bind('changing', function () {
+                    doodad.bind('changing', function () {
                         console.log(arguments);
                     });
 
-                    component.bind('valid', function () {
+                    doodad.bind('valid', function () {
                         console.log('valid');
                     });
 
-                    component.bind('invalid', function () {
+                    doodad.bind('invalid', function () {
                         console.log('invalid');
                     });
                 });

@@ -1,4 +1,4 @@
-﻿doodads.setup('~/List.doodad', [jQuery])(function(builder, base, $) {
+﻿doodads.setup('core:List.doodad', [jQuery])(function(builder, base, $) {
 	var FILTER_RESET_DEBOUNCE_TIME = 1000; // in ms
 	
 	var activeDropDown = null;

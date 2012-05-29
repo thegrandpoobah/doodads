@@ -67,7 +67,7 @@
 			},
 			canonicalize: function utils$canonicalize(url) {
 				///<summary>
-				/// Creates a absolute url out of the passed in url.
+				/// Creates an absolute url out of the passed in url.
 				///</summary>
 				///<param name="url" type="String">The URL to canonicalize.</param>
 				///<remarks>
@@ -75,8 +75,12 @@
 				/// CC by Attribution 3.0
 				/// adapted to use one time lazy initialization.
 				///</remarks>
-				if (url.indexOf('~/') === 0) {
-					url = doodads.config.rootUrl + url.substring(2);
+				var parts = url.split(':'), 
+					repo;
+					
+				repo = doodads.config.repositories[parts[0]];
+				if (parts.length === 2 && repo) {
+					url = repo + parts[1];
 				}
 				
 				if (!canonicalizationDiv) {
