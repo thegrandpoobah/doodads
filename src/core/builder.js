@@ -384,21 +384,15 @@
 			
 			var constructor = cache.activeConstructor = new builder(),
 				definition = $.extend({
-					inheritsTemplates: false,
 					templates: null,
 					stylesheets: null,
-					validates: false
 				}, doodads.setup.definition);
 			delete doodads.setup.definition; // doodads.setup.definition is populated by the server side builders
 			
 			return function(fn) {
 				$.when(utils.getTypeDeferred(inheritsFrom), constructor.loadDfd).done(function(baseType, url) {
-					if (definition.validates) {
-						constructor.validates();
-					}
-
 					constructor
-						.templates(definition.templates, definition.inheritsTemplates)
+						.templates(definition.templates)
 						.stylesheets(definition.stylesheets);
 
 					baseType = baseType.prototype;
@@ -516,7 +510,7 @@
 		/// behaviour file associated with a doodad.
 		///</summary>
 		doodads.setup()(function() {
-			this.complete();
+			builder.complete();
 		});
 	}
 })();

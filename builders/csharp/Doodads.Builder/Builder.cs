@@ -1,228 +1,215 @@
-﻿/* The MIT License
-
-Copyright (c) 2011 Vastardis Capital Services, http://www.vastcap.com/
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-*/
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Web;
 using System.Web.Script.Serialization;
-using System.Web.SessionState;
-using System.Xml.Serialization;
 
 namespace Doodads.Builder
 {
-    public class Builder : IHttpHandler
+    internal class Builder
     {
-        public bool IsReusable
+        private string path;
+        private Doodad doodadDescriptor;
+
+        public Builder(string path)
         {
-            // Return false in case your Managed Handler cannot be reused for another request.
-            // Usually this would be false in case you have some state information preserved per request.
-            get { return true; }
+            this.path = path;
+            this.DebugOutput = false;
         }
 
-        private doodad CreateDoodadFromXml(string path)
+        public string Render()
         {
-            using (StreamReader str = new StreamReader(path))
+            if (!Directory.Exists(this.URI))
             {
-                XmlSerializer serializer = new XmlSerializer(typeof(doodad));
-                return (doodad)serializer.Deserialize(str);
+                throw new DirectoryNotFoundException(this.URI);
             }
-        }
 
-        public string GetDoodadPath(string path)
-        {
-            string mappedPath = HttpContext.Current.Server.MapPath(path);
-            string directory = Path.GetDirectoryName(mappedPath);
-            string filename = Path.GetFileNameWithoutExtension(mappedPath);
+            Doodad c = this.DoodadDescriptor;
 
-            string result = string.Format("{0}\\{1}\\{1}.xml", directory, filename);
-            if (!File.Exists(result))
+            JavaScriptSerializer serializer = new JavaScriptSerializer();
+            StringBuilder output = new StringBuilder();
+
+            output.AppendLine("(function(definition) {");
+            output.AppendLine("doodads.setup.definition = definition;\n");
+            if (string.IsNullOrEmpty(c.Behaviour))
             {
-                result = string.Format("{0}\\{1}.xml", directory, filename);
+                output.AppendLine("doodads.setup.defaultAction();");
             }
-            return result;
-        }
-
-        public void ProcessRequest(HttpContext context)
-        {
-            try
+            else
             {
-                if (!File.Exists(this.GetDoodadPath(context.Request.Path)))
+                //context.Response.AddFileDependency(serverPath);
+                if (this.DebugOutput)
                 {
-                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
-                    context.Response.Output.WriteLine(string.Format("doodad descriptor \"{0}\" not found.", Path.ChangeExtension(context.Request.Path, "xml")));
-                    return;
+                    output.AppendFormat("/* BEGIN Behaviour file {0} */\n", c.Behaviour);
                 }
-
-                doodad c = this.CreateDoodadFromXml(this.GetDoodadPath(context.Request.Path));
-
-                if (c == null)
+                output.AppendLine(File.ReadAllText(c.Behaviour));
+                if (this.DebugOutput)
                 {
-                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                    return;
+                    output.AppendFormat("/* END Behaviour file {0} */\n", c.Behaviour);
+                }
+            }
+
+            output.AppendLine("})({");
+
+            List<string> fields = new List<string>();
+
+            if (c.Templates.Count != 0)
+            {
+                StringBuilder templateOutput = new StringBuilder();
+
+                templateOutput.AppendLine("templates: {");
+
+                string baseTemplate;
+                if (string.IsNullOrEmpty(c.BaseTemplate))
+                {
+                    baseTemplate = "<div />";
                 }
                 else
                 {
-                    context.Response.AddFileDependency(this.GetDoodadPath(context.Request.Path));
+                    //context.Response.AddFileDependency(baseServerPath);
+                    baseTemplate = File.ReadAllText(c.BaseTemplate);
                 }
 
-                JavaScriptSerializer serializer = new JavaScriptSerializer();
-                StringBuilder output = new StringBuilder();
+                templateOutput.AppendFormat("base: {0}", serializer.Serialize(baseTemplate));
 
-                output.AppendLine("(function(definition) {");
-                output.AppendLine("doodads.setup.definition = definition;\n");
-                if (c.behaviour == null)
+                foreach (KeyValuePair<string, string> pair in c.Templates)
                 {
-                    output.AppendLine("doodads.setup.defaultAction();");
-                }
-                else
-                {
-                    string serverPath = context.Server.MapPath(c.behaviour.path);
-                    if (!File.Exists(serverPath))
+                    if (string.IsNullOrEmpty(pair.Key))
                     {
-                        context.Response.StatusCode = (int)HttpStatusCode.NotFound;
-                        context.Response.Output.WriteLine(string.Format("doodad behaviour \"{0}\" not found.", c.behaviour.path));
-                        return;
+                        continue;
                     }
 
-                    context.Response.AddFileDependency(serverPath);
-#if DEBUG
-                    output.AppendFormat("/* BEGIN Behaviour file {0} */\n", c.behaviour.path);
-#endif
-                    output.AppendLine(File.ReadAllText(serverPath));
-#if DEBUG
-                    output.AppendFormat("/* END Behaviour file {0} */\n", c.behaviour.path);
-#endif
+                    //context.Response.AddFileDependency(path);
+                    templateOutput.AppendFormat(", {0}: {1}\n", serializer.Serialize(pair.Key),
+                        serializer.Serialize(File.ReadAllText(pair.Value)));
                 }
 
-                output.AppendLine("})({");
+                templateOutput.AppendLine("}");
 
-                List<string> fields = new List<string>();
+                fields.Add(templateOutput.ToString());
+            }
 
-                if (c.inheritsTemplates)
+            if (c.Stylesheets.Count > 0)
+            {
+                List<string> styleSet = new List<string>();
+                foreach (string path in c.Stylesheets)
                 {
-                    fields.Add("inheritsTemplates: true");
+                    //context.Response.AddFileDependency(path);
+                    styleSet.Add(string.Format("{0}: {1}", serializer.Serialize(this.CalculateMD5Hash(path)), serializer.Serialize(File.ReadAllText(path))));
                 }
-                if (c.validates)
+                fields.Add(string.Format("stylesheets: {{ {0} }}", string.Join(",", styleSet.ToArray())));
+            }
+
+            output.Append(string.Join(",", fields.ToArray()));
+            output.AppendLine("});");
+
+            return output.ToString();
+        }
+
+        private string CalculateMD5Hash(string input)
+        {
+            // step 1, calculate MD5 hash from input
+            MD5 md5 = MD5.Create();
+            byte[] inputBytes = Encoding.ASCII.GetBytes(input);
+            byte[] hash = md5.ComputeHash(inputBytes);
+
+            // step 2, convert byte array to hex string
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < hash.Length; i++)
+            {
+                sb.Append(hash[i].ToString("X2"));
+            }
+            return sb.ToString();
+        }
+
+        private Doodad CreateDoodadFromFileSystem()
+        {
+            Doodad c = new Doodad();
+            foreach (string path in this.EnumerateFiles())
+            {
+                string ext = Path.GetExtension(path);
+                string filename;
+
+                if (ext.Equals(".html"))
                 {
-                    fields.Add("validates: true");
-                }
-
-                if (c.templates != null)
-                {
-                    StringBuilder templateOutput = new StringBuilder();
-
-                    templateOutput.AppendLine("templates: {");
-
-                    string baseTemplate;
-                    if (c.templates.@base == null || string.IsNullOrEmpty(c.templates.@base.path))
+                    filename = Path.GetFileNameWithoutExtension(path);
+                    if (filename.IndexOf(".") == -1)
                     {
-                        baseTemplate = "<div />";
+                        c.BaseTemplate = path;
                     }
                     else
                     {
-                        string baseServerPath = context.Server.MapPath(c.templates.@base.path);
-                        if (!File.Exists(baseServerPath))
-                        {
-                            context.Response.StatusCode = (int)HttpStatusCode.NotFound;
-                            context.Response.Output.WriteLine(string.Format("Base template \"{0}\" not found.", c.templates.@base.path));
-                            return;
-                        }
-                        else
-                        {
-                            context.Response.AddFileDependency(baseServerPath);
-                            baseTemplate = File.ReadAllText(baseServerPath);
-                        }
+                        // e.g. Button.{something}.js
+                        Match results = Regex.Match(filename + ".html", string.Format("{0}\\.(.*)\\.html", this.Name));
+
+                        c.Templates.Add(results.Groups[1].Value, path);
                     }
-
-                    templateOutput.AppendFormat("base: {0}", serializer.Serialize(baseTemplate));
-
-                    if (c.templates.partial != null && c.templates.partial.Length > 0)
-                    {
-                        foreach (doodadTemplatesPartial partial in c.templates.partial)
-                        {
-                            string path = context.Server.MapPath(partial.path);
-                            if (!File.Exists(path))
-                            {
-                                context.Response.StatusCode = (int)HttpStatusCode.NotFound;
-                                context.Response.Output.WriteLine(string.Format("Partial template \"{0}\" with path \"{1}\" not found.", partial.name, partial.path));
-                                return;
-                            }
-                            context.Response.AddFileDependency(path);
-                            templateOutput.AppendFormat(", {0}: {1}\n", serializer.Serialize(partial.name),
-                                serializer.Serialize(File.ReadAllText(path)));
-                        }
-                    }
-
-                    templateOutput.AppendLine("}");
-                    fields.Add(templateOutput.ToString());
                 }
-
-                if (c.stylesheets != null)
+                else if (ext.Equals(".js"))
                 {
-                    List<string> styleSet = new List<string>();
-
-                    foreach (doodadStylesheet cssDep in c.stylesheets)
-                    {
-                        string path = context.Server.MapPath(cssDep.path);
-                        if (File.Exists(path))
-                        {
-                            context.Response.AddFileDependency(path);
-                            styleSet.Add(string.Format("{0}: {1}", serializer.Serialize(VirtualPathUtility.ToAbsolute(cssDep.path)), serializer.Serialize(File.ReadAllText(path))));
-                        }
-#if DEBUG
-                        else
-                        {
-                            output.AppendFormat("\n/* WARNING: Stylesheet \"{0}\" not found. */\n", cssDep.path);
-                        }
-#endif
-                    }
-
-                    fields.Add(string.Format("stylesheets: {{ {0} }}", string.Join(",", styleSet.ToArray())));
+                    c.Behaviour = path;
                 }
-
-                output.Append(string.Join(",", fields.ToArray()));
-                output.AppendLine("});");
-
-#if DEBUG
-                output.AppendFormat("\n//@ sourceURL={0}\n", context.Request.Url.AbsoluteUri);
-#endif
-                context.Response.Cache.SetCacheability(HttpCacheability.Public);
-                context.Response.Cache.SetETagFromFileDependencies();
-                context.Response.Cache.SetLastModifiedFromFileDependencies();
-                context.Response.ContentType = "text/javascript";
-                context.Response.Write(output.ToString());
+                else if (ext.Equals(".css"))
+                {
+                    c.Stylesheets.Add(path);
+                }
             }
-            catch (Exception e)
+            return c;
+        }
+
+        private IEnumerable<string> EnumerateFiles()
+        {
+            foreach (string s in Directory.EnumerateFiles(this.URI, string.Format("{0}*.html", this.Name)))
             {
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                context.Response.Output.WriteLine(string.Format("Exception of type \"{0}\" was thrown processing the request.", e.GetType().ToString()));
-#if DEBUG
-                throw e;
-#endif
+                yield return s;
             }
+            foreach (string s in Directory.EnumerateFiles(this.URI, string.Format("{0}*.css", this.Name)))
+            {
+                yield return s;
+            }
+            foreach (string s in Directory.EnumerateFiles(this.URI, string.Format("{0}*.js", this.Name)))
+            {
+                yield return s;
+            }
+            yield break;
+        }
+
+        public Doodad DoodadDescriptor
+        {
+            get
+            {
+                if (this.doodadDescriptor == null)
+                {
+                    this.doodadDescriptor = this.CreateDoodadFromFileSystem();
+                }
+                return this.doodadDescriptor;
+            }
+        }
+
+        private string URI
+        {
+            get
+            {
+                string withoutExtension = Path.ChangeExtension(this.path, string.Empty);
+                withoutExtension = withoutExtension.Remove(withoutExtension.Length-1);
+
+                return withoutExtension;
+            }
+        }
+
+        private string Name
+        {
+            get
+            {
+                return Path.GetFileNameWithoutExtension(this.path);
+            }
+        }
+
+        public bool DebugOutput
+        {
+            get;
+            set;
         }
     }
 }

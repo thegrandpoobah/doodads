@@ -1,7 +1,0 @@
-﻿<doodad xmlns="http://schemas.vastcap.com/doodadDefinition">
-  <behaviour path="~/doodads/List/List.js" />
-  <templates>
-    <base path="~/doodads/List/List.html"/>
-    <partial name="item" path="~/doodads/List/List.item.html"/>
-  </templates>
-</doodad>

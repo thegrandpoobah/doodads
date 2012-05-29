@@ -8,7 +8,7 @@
     <ProjectGuid>{FE43FFFC-6001-4063-AADA-B31C586B2E95}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Doodads</RootNamespace>
+    <RootNamespace>Doodads.Builder</RootNamespace>
     <AssemblyName>Doodads.Builder</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -31,6 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
@@ -39,16 +41,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\src\doodad.xsd">
-      <Link>doodad.xsd</Link>
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Builder.cs" />
-    <Compile Include="doodad.cs">
-      <DependentUpon>doodad.xsd</DependentUpon>
-    </Compile>
+    <Compile Include="BuilderHttpHandler.cs" />
+    <Compile Include="BuilderTask.cs" />
+    <Compile Include="Doodad.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
