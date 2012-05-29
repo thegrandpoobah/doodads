@@ -18,7 +18,8 @@ doodads.setup([jQuery])(function(builder, base, $) {
 		text: '',
 		enabled: true,
 		checked: false
-	}).proto({
+    }).validates()
+	.proto({
 		constructElement: function CheckBox$constructElement() {
 			base.constructElement.apply(this, arguments);
 

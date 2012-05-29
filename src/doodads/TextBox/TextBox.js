@@ -31,7 +31,8 @@
 		enabled: true,
 		rows: 4,
 		cols: 40
-	}).statics({
+    }).validates()
+    .statics({
 		lengthValidationRuleGenerator: function(min, max) {
 			var format = 'count:{{0}}';
 

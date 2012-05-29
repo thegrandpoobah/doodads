@@ -156,7 +156,8 @@
 		enabled: true,
 		textDecimals: 2,
 		valueDecimals: 4
-	}).proto({
+    }).validates()
+    .proto({
 		onChildrenReady: function NumericTextBox$onChildrenReady() {
 			base.onChildrenReady.apply(this, arguments);
 			

@@ -1,5 +1,4 @@
-﻿<doodad xmlns="http://schemas.vastcap.com/doodadDefinition"
-           validates="true">
+﻿<doodad xmlns="http://schemas.vastcap.com/doodadDefinition">
   <behaviour path="~/doodads/NumericTextBox/NumericTextBox.js" />
   <templates>
     <base path="~/doodads/NumericTextBox/NumericTextBox.html"/>

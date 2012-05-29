@@ -56,7 +56,8 @@
 		showOnHover: false, // true => Type1, false => Type2
 		showAfter: 500, // in ms
 		watermark: ''
-	}).proto({
+    }).validates()
+    .proto({
 		onReady: function DropDown$onReady() {
 			base.onReady.apply(this, arguments);
 
