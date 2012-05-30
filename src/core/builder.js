@@ -5,9 +5,9 @@
 		cache = {
 			types: {},
 			waitFunctions: {},
-			activeConstructor: null,
 			stylesheets: {},
 		},
+		activeConstruction = null,
 		utils = {
 			load: function utils$load(url, callback) {
 				// This code block is basically a simplication of Julian Aubourg's jQuery JSONP script load
@@ -114,12 +114,12 @@
 					};
 
 					utils.load(canonUrl, function() {
-						if (!cache.activeConstructor) {
+						if (!activeConstruction) {
 							console.error('Unable to load doodad from url:' + canonUrl);
 							return;
 						}
-						cache.activeConstructor.loadDfd.resolve(canonUrl);
-						cache.activeConstructor = null;
+						activeConstruction.loadDfd.resolve(canonUrl);
+						activeConstruction = null;
 					});
 				}
 				
@@ -380,7 +380,7 @@
 				inheritsFrom = undefined;
 			}
 			
-			var constructor = cache.activeConstructor = new builder(),
+			var constructor = activeConstruction = new builder(),
 				definition = $.extend({
 					inheritsTemplates: false,
 					templates: null,
