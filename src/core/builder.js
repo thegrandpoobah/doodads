@@ -390,7 +390,7 @@
 			delete doodads.setup.definition; // doodads.setup.definition is populated by the server side builders
 			
 			return function(fn) {
-				$.when(utils.getTypeDeferred(inheritsFrom), constructor.loadDfd).done(function(baseType, url) {
+				$.when(doodads.load(inheritsFrom), constructor.loadDfd).done(function(baseType, url) {
 					if (definition.validates) {
 						constructor.validates();
 					}
