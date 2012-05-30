@@ -4,9 +4,9 @@
 		guid = 0,
 		cache = {
 			types: {},
-			waitFunctions: {},
 			stylesheets: {},
 		},
+		pendingConstructions = {},
 		activeConstruction = null,
 		utils = {
 			load: function utils$load(url, callback) {
@@ -56,15 +56,6 @@
 					head.insertBefore(scriptAfter, head.firstChild);
 				}
 			},
-			getResponseFunc: function utils$getResponseFunc(url) {
-				///<summary>
-				/// Returns the response function associated with a given doodad.
-				///</summary>
-				///<remarks>
-				/// This method is part of the builder infrastructure and should not be used.
-				///</remarks>
-				return (cache.waitFunctions[utils.canonicalize(url)] || { func : $.noop }).func;
-			},
 			canonicalize: function utils$canonicalize(url) {
 				///<summary>
 				/// Creates an absolute url out of the passed in url.
@@ -100,30 +91,29 @@
 				///<remarks>
 				/// This method is part of the builder infrastructure and should not be used.
 				///</remarks>
-				var canonUrl = utils.canonicalize(url);
+				var canonUrl = utils.canonicalize(url), dfd;
 
-				if (!cache.waitFunctions[canonUrl]) {
-					cache.waitFunctions[canonUrl] = {
-						func: function(type) {
-							var dfd = cache.waitFunctions[canonUrl].dfd;
-							cache.types[canonUrl] = type;
-							delete cache.waitFunctions[canonUrl];
-							dfd.resolve();
-						},
-						dfd: $.Deferred()
-					};
-
+				dfd = pendingConstructions[canonUrl];
+				if (!dfd) {
+					dfd = pendingConstructions[canonUrl] = $.Deferred().done(function(type) {
+						cache.types[canonUrl] = type;
+						delete pendingConstructions[canonUrl];
+					});
+					
 					utils.load(canonUrl, function() {
-						if (!activeConstruction) {
+						var aC = activeConstruction;
+						activeConstruction = null;
+						
+						if (!aC) {
 							console.error('Unable to load doodad from url:' + canonUrl);
 							return;
 						}
-						activeConstruction.loadDfd.resolve(canonUrl);
-						activeConstruction = null;
+						aC.scriptLoaded(canonUrl, dfd);
+						aC = null;
 					});
 				}
 				
-				return cache.waitFunctions[canonUrl].dfd.promise();
+				return dfd.promise();
 			},
 			addStylesheet: function utils$addStylesheet(url, byteStream) {
 				///<summary>
@@ -184,7 +174,7 @@
 	// The builder is a class used by doodad authors to aid in the construction
 	// of doodads. An instance of it is returned via the doodads.setup API.
 	function builder() {
-		// this.name = '/url/to/doodad'; // this field is automatically populated by doodads.setup
+		// this.name = '/url/to/doodad'; // this field is automatically populated once the scripts load
 		this.loadDfd = $.Deferred();
 		this.setupObject = {
 			base: null,
@@ -303,7 +293,6 @@
 			///</param>
 			var setupObject = this.setupObject, 
 				baseType = setupObject.base,
-				name = this.name,
 				key,
 				new_doodad;
 
@@ -342,9 +331,19 @@
 			}
 			
 			// after everything is done..
-			utils.getResponseFunc(name)(new_doodad);
+			this.completionDfd.resolve(new_doodad);
 			
 			(callback || $.noop)(new_doodad);
+		},
+		
+		whenLoaded: function builder$whenLoaded() {
+			return this.loadDfd.promise();
+		},
+		scriptLoaded: function builder$scriptLoaded(url, completionDfd) {
+			this.name = url;
+			this.completionDfd = completionDfd;
+			
+			this.loadDfd.resolve();
 		}
 	}
 
@@ -387,10 +386,10 @@
 					stylesheets: null,
 					validates: false
 				}, doodads.setup.definition);
-			delete doodads.setup.definition; // doodads.setup.definition is populated by the server side builders
+			delete doodads.setup.definition; // doodads.setup.definition is optionally populated by the server side builders
 			
 			return function(fn) {
-				$.when(doodads.load(inheritsFrom), constructor.loadDfd).done(function(baseType, url) {
+				$.when(doodads.load(inheritsFrom), constructor.whenLoaded()).done(function(baseType) {
 					if (definition.validates) {
 						constructor.validates();
 					}
@@ -400,7 +399,6 @@
 						.stylesheets(definition.stylesheets);
 
 					baseType = baseType.prototype;
-					constructor.name = url;
 					constructor.setupObject.base = baseType;
 					
 					fn.apply(null, $.merge([constructor, baseType], args || []));
