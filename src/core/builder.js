@@ -515,8 +515,8 @@
 		/// Used by the server side builders to construct a doodad when there is no
 		/// behaviour file associated with a doodad.
 		///</summary>
-		doodads.setup()(function() {
-			this.complete();
+		doodads.setup()(function(builder) {
+			builder.complete();
 		});
 	}
 })();
