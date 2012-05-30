@@ -102,9 +102,7 @@
 				///</remarks>
 				var canonUrl = utils.canonicalize(url);
 
-				if (cache.waitFunctions[canonUrl]) {
-					return cache.waitFunctions[canonUrl].dfd.promise();
-				} else {
+				if (!cache.waitFunctions[canonUrl]) {
 					cache.waitFunctions[canonUrl] = {
 						func: function(type) {
 							var dfd = cache.waitFunctions[canonUrl].dfd;
@@ -123,9 +121,9 @@
 						cache.activeConstructor.loadDfd.resolve(canonUrl);
 						cache.activeConstructor = null;
 					});
-				
-					return cache.waitFunctions[canonUrl].dfd.promise();
 				}
+				
+				return cache.waitFunctions[canonUrl].dfd.promise();
 			},
 			addStylesheet: function utils$addStylesheet(url, byteStream) {
 				///<summary>
