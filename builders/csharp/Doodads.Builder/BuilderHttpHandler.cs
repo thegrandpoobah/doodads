@@ -70,7 +70,7 @@ namespace Doodads.Builder
             catch (DirectoryNotFoundException e)
             {
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                context.Response.Output.WriteLine("No doodad exists at the specified URL \"{0}\".");
+                context.Response.Output.WriteLine("No doodad exists at the specified URL \"{0}\".", e.Message);
 #if DEBUG
                 throw e;
 #endif

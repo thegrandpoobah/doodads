@@ -38,7 +38,6 @@ namespace Doodads.Builder
             }
             else
             {
-                //context.Response.AddFileDependency(serverPath);
                 if (this.DebugOutput)
                 {
                     output.AppendFormat("/* BEGIN Behaviour file {0} */\n", c.Behaviour);
@@ -67,7 +66,6 @@ namespace Doodads.Builder
                 }
                 else
                 {
-                    //context.Response.AddFileDependency(baseServerPath);
                     baseTemplate = File.ReadAllText(c.BaseTemplate);
                 }
 
@@ -80,7 +78,6 @@ namespace Doodads.Builder
                         continue;
                     }
 
-                    //context.Response.AddFileDependency(path);
                     templateOutput.AppendFormat(", {0}: {1}\n", serializer.Serialize(pair.Key),
                         serializer.Serialize(File.ReadAllText(pair.Value)));
                 }
@@ -95,7 +92,6 @@ namespace Doodads.Builder
                 List<string> styleSet = new List<string>();
                 foreach (string path in c.Stylesheets)
                 {
-                    //context.Response.AddFileDependency(path);
                     styleSet.Add(string.Format("{0}: {1}", serializer.Serialize(this.CalculateMD5Hash(path)), serializer.Serialize(File.ReadAllText(path))));
                 }
                 fields.Add(string.Format("stylesheets: {{ {0} }}", string.Join(",", styleSet.ToArray())));
