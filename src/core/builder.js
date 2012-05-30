@@ -485,7 +485,7 @@
 				};
 				mixin.call(constructor, Object.getPrototypeOf(instance));
 				
-				return dfd;
+				return dfd.promise();
 			});
 		},
 		getType: function doodads$getType(url) {
