@@ -150,7 +150,7 @@
 
 				if ($.browser.msie) {
 					var joinedResult,
-						style$ = $('style#__componentInfrastructure', headDom);
+						style$ = $('style#__doodads', headDom);
 
 					if (style$.length !== 0) {
 						joinedResult = style$.data('stylesheets') + '\n' + byteStream;
@@ -159,7 +159,7 @@
 						joinedResult = byteStream;
 					}
 
-					$('<style id="__componentInfrastructure" type="text/css">' + joinedResult + '</style>')
+					$('<style id="__doodads" type="text/css">' + joinedResult + '</style>')
 						.data('stylesheets', joinedResult)
 						.appendTo(headDom);
 				} else {
