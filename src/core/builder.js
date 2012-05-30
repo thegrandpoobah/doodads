@@ -153,21 +153,6 @@
 				} else {
 					headDom.append('<style type="text/css">' + byteStream + '</style>');
 				}
-			},
-			getTypeDeferred: function utils$getTypeDeferred(url) {
-				var dfd = $.Deferred(),
-					type = doodads.getType(url);
-					
-				if (!type) {
-					utils.require(url).done(function() {
-						type = doodads.getType(url);
-						dfd.resolve(type);
-					});
-				} else {
-					dfd.resolve(type);
-				}
-				
-				return dfd.promise();
 			}
 		};
 		
@@ -414,7 +399,19 @@
 			/// Since the creation process is (potentially) asynchronous, this method returns a jQuery.Deferred promise object.
 			/// On completion, the argument to the done method is the type of the doodad at the given url.
 			///</returns>
-			return utils.getTypeDeferred(url);
+			var dfd = $.Deferred(),
+				type = doodads.getType(url);
+				
+			if (!type) {
+				utils.require(url).done(function() {
+					type = doodads.getType(url);
+					dfd.resolve(type);
+				});
+			} else {
+				dfd.resolve(type);
+			}
+			
+			return dfd.promise();
 		},
 		create: function doodads$create(url, options) {
 			///<summary>
