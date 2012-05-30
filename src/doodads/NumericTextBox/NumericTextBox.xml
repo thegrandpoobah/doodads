@@ -1,9 +1,0 @@
-﻿<doodad xmlns="http://schemas.vastcap.com/doodadDefinition">
-  <behaviour path="~/doodads/NumericTextBox/NumericTextBox.js" />
-  <templates>
-    <base path="~/doodads/NumericTextBox/NumericTextBox.html"/>
-  </templates>
-  <stylesheets>
-    <stylesheet path="~/doodads/NumericTextBox/NumericTextBox.css"/>
-  </stylesheets>
-</doodad>

@@ -1,10 +1,10 @@
 var fs = require('fs'),
-	sys = require('sys'),
+	sys = require('util'),
 	uglify = require('uglify-js');
 
 function makeDirectoryIfNotExists(path) {
 	try {
-		var stats = fs.statSync(path);	
+		var stats = fs.statSync(path);
 		if (!stats.isDirectory()) {
 			fs.mkdirSync(path, 0);
 		}
@@ -79,21 +79,4 @@ task({'minify': ['concatenate', 'tools']}, function(params) {
 
 	minify('doodads.js', 'doodads.min.js');
 	minify('doodads.tools.js', 'doodads.tools.min.js');
-});
-
-desc('Library - precompilation of doodads');
-task('library', function(params) {
-	var doodads = require('./builders/nodejs/doodads-builder');
-		builder = new doodads.Builder(__dirname + '/src');
-	
-	makeDirectoryIfNotExists('output/doodads');
-	
-	fs.readdir('./src/doodads', function (err, files) { 
-		if (err) throw err;
-		files.forEach( function (file) {
-			builder.build({originalUrl: 'doodads/' + file + '.doodad'}, function (content) {
-				fs.writeSync(fs.openSync('./output/doodads/' + file + '.doodad', 'w+'), content);
-			});
-	  	});
-	});
 });

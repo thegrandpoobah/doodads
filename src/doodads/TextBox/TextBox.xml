@@ -1,9 +1,0 @@
-﻿<doodad xmlns="http://schemas.vastcap.com/doodadDefinition">
-  <behaviour path="~/doodads/TextBox/TextBox.js" />
-  <templates>
-    <base path="~/doodads/TextBox/TextBox.html"/>
-  </templates>
-  <stylesheets>
-    <stylesheet path="~/doodads/TextBox/TextBox.css"/>
-  </stylesheets>
-</doodad>

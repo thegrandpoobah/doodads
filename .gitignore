@@ -6,4 +6,4 @@ builders/csharp/**/*.user
 builders/csharp/Doodads.Builder.Test/JavaScript/*
 builders/csharp/Doodads.Builder.Test/doodads/*
 builders/csharp/Doodads.Builder.Test/tipsy.css
-builders/nodejs/test/javascript
+node_modules/*

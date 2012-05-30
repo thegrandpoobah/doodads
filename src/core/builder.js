@@ -366,21 +366,15 @@
 			
 			var constructor = activeConstruction = new builder(),
 				definition = $.extend({
-					inheritsTemplates: false,
 					templates: null,
 					stylesheets: null,
-					validates: false
 				}, doodads.setup.definition);
 			delete doodads.setup.definition; // doodads.setup.definition is optionally populated by the server side builders
 			
 			return function(fn) {
 				$.when(doodads.load(inheritsFrom), constructor.whenLoaded()).done(function(baseType) {
-					if (definition.validates) {
-						constructor.validates();
-					}
-
 					constructor
-						.templates(definition.templates, definition.inheritsTemplates)
+						.templates(definition.templates)
 						.stylesheets(definition.stylesheets);
 
 					baseType = baseType.prototype;
