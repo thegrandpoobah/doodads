@@ -266,16 +266,12 @@
 			///</summary>
 			return doodads.getType(this.name);
 		},
-		complete: function builder$complete(callback) {
+		complete: function builder$complete() {
 			///<summary>
 			/// Once all of the parameters and properties of a doodad have been set, this function must be invoked so that the
-			/// construction can be started. Once the construction is finished the callback argument will be invoked if it is
+			/// doodad construction can be finalized.
 			/// specified.
 			///</summary>
-			///<param name="callback">
-			/// Optional. A function to invoke once the construction is complete.
-			/// The first parameter to the callback is the newly constructed doodad class object.
-			///</param>
 			var setupObject = this.setupObject, 
 				baseType = setupObject.base,
 				key,
@@ -317,8 +313,6 @@
 			
 			// after everything is done..
 			this.completionDfd.resolve(new_doodad);
-			
-			(callback || $.noop)(new_doodad);
 		},
 		
 		whenLoaded: function builder$whenLoaded() {
