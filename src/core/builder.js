@@ -407,27 +407,16 @@
 				});
 			};
 		},
-		setupMixin: function doodads$setupMixin() {
+		load: function doodads$load(url) {
 			///<summary>
-			/// Bootstraps the doodad-mixin process. This function must be called by any scripts loaded via
-			/// the doodads.createMixin function.
+			/// Primes the doodad type cache with an entry for the doodad at the given url.
 			///</summary>
+			///<param name="url">(Optional) The url to prime the cache with</param>
 			///<returns>
-			/// Returns a function which takes a callback parameter which must be called immediately. The callback
-			/// has the following signature: function(base) where 
-			///   * base is the prototype of the instance that the mixin is to be associated with.
+			/// Since the creation process is (potentially) asynchronous, this method returns a jQuery.Deferred promise object.
+			/// On completion, the argument to the done method is the type of the doodad at the given url.
 			///</returns>
-			///<example>doodads.setupMixin()(function(base) {});</example>
-			///<remarks>
-			/// Look at the documentation for doodad-mixins to understand how they can be efficiently used.
-			///</remarks>
-			var constructor = cache.activeConstructor = { loadDfd: $.Deferred() };
-			
-			return function(fn) {
-				constructor.loadDfd.done(function(url) {
-					utils.getResponseFunc(url)(fn);
-				});
-			};
+			return utils.getTypeDeferred(url);
 		},
 		create: function doodads$create(url, options) {
 			///<summary>
@@ -446,46 +435,6 @@
 			
 			return doodads.load(url).pipe(function(type) {
 				return new type(options);
-			});
-		},
-		load: function doodads$load(url) {
-			///<summary>
-			/// Primes the doodad type cache with an entry for the doodad at the given url.
-			///</summary>
-			///<param name="url">(Optional) The url to prime the cache with</param>
-			///<returns>
-			/// Since the creation process is (potentially) asynchronous, this method returns a jQuery.Deferred promise object.
-			/// On completion, the argument to the done method is the type of the doodad at the given url.
-			///</returns>
-			return utils.getTypeDeferred(url);
-		}, 
-		createMixin: function doodads$createMixin(url, instance) {
-			///<summary>
-			/// Instantiates the doodad-mixin at the given url and associates it with the given instance, 
-			/// loading the resource as necessary.
-			///</summary>
-			///<param name="url">The doodad-mixin to load.</param>
-			///<param name="instance">The doodad instance to associate the mixin with.</param>
-			///<returns>
-			/// Since the creation process is asynchronous, this method returns a jQuery.Deferred promise object.
-			/// On completion the argument to the done method is the instance parameter, but augmented with the
-			/// doodad-mixin.
-			///</returns>
-			return doodads.load(url).pipe(function(mixin) {
-				var dfd = $.Deferred(),
-					constructor = new builder();
-				
-				constructor.complete = function(callback) { 
-					this.setupObject.init.call(instance); 
-					$.extend(instance, this.setupObject.proto);
-					
-					(callback || $.noop)(instance);
-					
-					dfd.resolve(instance);
-				};
-				mixin.call(constructor, Object.getPrototypeOf(instance));
-				
-				return dfd.promise();
 			});
 		},
 		getType: function doodads$getType(url) {
