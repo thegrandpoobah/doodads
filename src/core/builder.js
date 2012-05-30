@@ -471,7 +471,7 @@
 			/// On completion the argument to the done method is the instance parameter, but augmented with the
 			/// doodad-mixin.
 			///</returns>
-			return utils.getTypeDeferred(url).pipe(function(mixin) {
+			return doodads.load(url).pipe(function(mixin) {
 				var dfd = $.Deferred(),
 					constructor = new builder();
 				
