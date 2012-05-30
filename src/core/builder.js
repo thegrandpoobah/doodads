@@ -384,6 +384,24 @@
 				});
 			};
 		},
+		setupMixin: function doodads$setupMixin(args) {
+			var constructor = activeConstruction = {
+				loadDfd: $.Deferred(),
+				whenLoaded: function() { 
+					return this.loadDfd.promise();
+				},
+				scriptLoaded: function(url, completionDfd) {
+					this.completionDfd = completionDfd;
+					this.loadDfd.resolve();
+				}
+			};
+			
+			return function(fn) {
+				constructor.whenLoaded().done(function() {
+					constructor.completionDfd.resolve({ setupFn: fn, args: args });
+				});
+			};
+		},
 		load: function doodads$load(url) {
 			///<summary>
 			/// Primes the doodad type cache with an entry for the doodad at the given url.
@@ -407,11 +425,12 @@
 			
 			return dfd.promise();
 		},
-		create: function doodads$create(url, options) {
+		create: function doodads$create(url, mixinUrl, options) {
 			///<summary>
 			/// Instantiates the doodad at the given url with the given options, loading the resource if necessary.
 			///</summary>
 			///<param name="url">(Optional) The doodad to load. If not provided, will load the root doodad.</param>
+			///<param name="mixinUrl">(Optional) The doodad-mixin to associate with the constructed doodad.</param>
 			///<param name="options">(Optional) The options to associate with the doodad.</param>
 			///<returns>
 			/// Since the creation process is (potentially) asynchronous, this method returns a jQuery.Deferred promise object.
@@ -421,10 +440,35 @@
 				options = url;
 				url = null;
 			}
+			if ($.isPlainObject(mixinUrl)) {
+				options = mixinUrl;
+				mixinUrl = null;
+			}
 			
-			return doodads.load(url).pipe(function(type) {
+			var dfd = doodads.load(url).pipe(function(type) {
 				return new type(options);
 			});
+			if (mixinUrl) {
+				dfd = dfd.pipe(function(instance) {
+					return doodads.load(mixinUrl).pipe(function(mixin) {
+						var dfd = $.Deferred(),
+							constructor = new builder();
+						
+						constructor.name = url;
+						constructor.complete = function(callback) {
+							this.setupObject.init.call(instance);
+							$.extend(instance, this.setupObject.proto);
+							
+							dfd.resolve(instance);
+						};
+						mixin.setupFn.apply(null, $.merge([constructor, Object.getPrototypeOf(instance)], mixin.args || []));
+						
+						return dfd;
+					});
+				});
+			}
+			
+			return dfd;
 		},
 		getType: function doodads$getType(url) {
 			///<summary>

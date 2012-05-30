@@ -514,7 +514,7 @@
 				iS.insertAfter($doodadElement);
 				$doodadElement.remove();
 
-				var asyncCreationDfd = doodads.create($doodadElement.attr('url'), options),
+				var asyncCreationDfd = doodads.create($doodadElement.attr('url'), $doodadElement.attr('mixin'), options),
 					completionDfd = $.Deferred();
 				
 				asyncCreationDfd.promise().done(function(new_doodad) {
