@@ -517,12 +517,6 @@
 				var asyncCreationDfd = doodads.create($doodadElement.attr('url'), options),
 					completionDfd = $.Deferred();
 				
-				if ($doodadElement.attr('mixin')) {
-					asyncCreationDfd = asyncCreationDfd.pipe(function(new_doodad) {
-						return doodads.createMixin($doodadElement.attr('mixin'), new_doodad);
-					});
-				}
-				
 				asyncCreationDfd.promise().done(function(new_doodad) {
 					var $new_doodad = new_doodad._jQueryCache,
 						autogenId;
