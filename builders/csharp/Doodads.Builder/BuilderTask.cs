@@ -4,20 +4,36 @@ using Microsoft.Build.Utilities;
 
 namespace Doodads.Builder
 {
-    public class BuilderTask : Task
+    public class BuildDoodad : Task
     {
         public override bool Execute()
         {
-            Builder builder = new Builder(this.Path)
+            foreach (ITaskItem taskItem in this.SourceDirectories)
             {
-                DebugOutput = this.DebugMode
-            };
+                this.Log.LogMessage(MessageImportance.Low, "Building {0}", taskItem.ItemSpec);
 
-            using (FileStream fs = new FileStream(this.Path, FileMode.Create))
-            {
-                using (StreamWriter sw = new StreamWriter(fs))
+                string inputPath = Path.ChangeExtension(taskItem.ItemSpec, ".doodad");
+                Builder builder = new Builder(inputPath)
                 {
-                    sw.Write(builder.Render());
+                    DebugOutput = this.DebugMode
+                };
+
+                string outputPath;
+                if (string.IsNullOrEmpty(this.OutputDirectory))
+                {
+                    outputPath = inputPath;
+                }
+                else
+                {
+                    outputPath = Path.Combine(this.OutputDirectory, Path.GetFileName(inputPath));
+                }
+
+                using (FileStream fs = new FileStream(outputPath, FileMode.Create))
+                {
+                    using (StreamWriter sw = new StreamWriter(fs))
+                    {
+                        sw.Write(builder.Render());
+                    }
                 }
             }
 
@@ -25,7 +41,13 @@ namespace Doodads.Builder
         }
 
         [Required]
-        public string Path
+        public ITaskItem[] SourceDirectories
+        {
+            get;
+            set;
+        }
+
+        public string OutputDirectory
         {
             get;
             set;

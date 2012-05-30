@@ -1,9 +1,0 @@
-{
-	"behavior": "./doodads/Button/Button.js",
-	"templates": {
-		"base" : "./doodads/Button/Button.html"
-	},
-	"stylesheets": [
-		"./doodads/Button/Button.css"
-	]
-}

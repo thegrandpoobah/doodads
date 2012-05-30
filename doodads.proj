@@ -1,0 +1,55 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
+	DefaultTargets="All">
+	
+	<UsingTask TaskName="Doodads.Builder.BuildDoodad" AssemblyFile="output/bin/Doodads.Builder.dll" />
+	
+	<PropertyGroup>
+		<OutputTarget>output</OutputTarget>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<DoodadDirectory Include="src/doodads/Button" />
+		<DoodadDirectory Include="src/doodads/CheckBox" />
+		<DoodadDirectory Include="src/doodads/DropDown" />
+		<DoodadDirectory Include="src/doodads/Label" />
+		<DoodadDirectory Include="src/doodads/List" />
+		<DoodadDirectory Include="src/doodads/ListView" />
+		<DoodadDirectory Include="src/doodads/NumericTextBox" />
+		<DoodadDirectory Include="src/doodads/RadioButton" />
+		<DoodadDirectory Include="src/doodads/TextBox" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<Jakefile Include="Jakefile" />
+	</ItemGroup>
+	
+	<Target Name="All" DependsOnTargets="BuildTask;Library;StaticAssembly" />
+	
+	<Target Name="CreateOutput">
+		<MakeDir Directories="$(OutputTarget)" Condition="!Exists('$(OutputTarget)')" />
+	</Target>
+	
+	<Target Name="BuildTask" DependsOnTargets="CreateOutput">
+		<!-- Builds the MSBuild Task that is used to do static assemby of doodads -->
+		<MSBuild Projects="builders/csharp/Doodads.Builder/Doodads.Builder.csproj" Properties="Configuration=Release" />
+	</Target>
+	
+	<Target Name="Library" DependsOnTargets="CreateOutput">
+		<!-- Run Node.js and build doodads.js, doodads.tools.js, doodads.min.js, doodads.tools.min.js -->
+		<!-- 
+		Since Windows cmd.exe does not correctly understand UNIX-style paths, everything in this target
+		uses the \ character as opposed to the rest of the file which uses the / character
+		-->
+		<Exec Command="jake minify" />
+	</Target>
+	
+	<Target Name="StaticAssembly" DependsOnTargets="BuildTask">
+		<!-- Merges all doodads from their constituent parts into a set of static javascript files -->
+		<MakeDir Directories="$(OutputTarget)/doodads" Condition="!Exists('$(OutputTarget)/doodads/')" />
+		<BuildDoodad SourceDirectories="@(DoodadDirectory)" OutputDirectory="$(OutputTarget)/doodads/" />
+	</Target>
+	
+	<Target Name="Clean">
+		<RemoveDir Directories="$(OutputTarget)" />
+	</Target>
+</Project>
