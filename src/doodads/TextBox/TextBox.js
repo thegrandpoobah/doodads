@@ -298,7 +298,7 @@
 			this.trigger('blur');
 		},
 		onTextAreaKeyPress: function TextBox$onTextAreaKeyDown(e) {
-			if (e.which !== 0 && this._options.maxlength !== -1 && e.target.value >= this._options.maxlength) {
+			if (e.which !== 0 && this._options.maxlength !== -1 && e.target.value.length >= this._options.maxlength) {
 				e.target.value = e.target.value.substring(0, this._options.maxlength);
 				e.preventDefault();
 			}
