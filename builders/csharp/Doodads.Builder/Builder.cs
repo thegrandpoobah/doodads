@@ -124,7 +124,7 @@ namespace Doodads.Builder
             Doodad c = new Doodad();
             foreach (string path in this.EnumerateFiles())
             {
-                string ext = Path.GetExtension(path);
+                string ext = Path.GetExtension(path).ToLower();
                 string filename;
 
                 if (ext.Equals(".html"))
