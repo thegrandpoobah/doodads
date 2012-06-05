@@ -450,8 +450,8 @@
 						
 						constructor.name = url;
 						constructor.complete = function(callback) {
-							this.setupObject.init.call(instance);
 							$.extend(instance, this.setupObject.proto);
+							this.setupObject.init.call(instance);
 							
 							dfd.resolve(instance);
 						};
