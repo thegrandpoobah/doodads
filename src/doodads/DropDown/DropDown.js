@@ -319,7 +319,7 @@
 				window.clearTimeout(this._hidingTimeout);
 			}
 		},
-		onAffordanceMouseOut: function DropDown$onAffordanceMouseOver(e) {
+		onAffordanceMouseOut: function DropDown$onAffordanceMouseOut(e) {
 			this._cancelHover = true;
 			this._affordance.removeClass('tracking');
 
