@@ -11,17 +11,17 @@
 		/// If some/all of the elements have a doodad, then the input array is mapped into an
 		/// array where elements have a doodad are populated
 		///</returns>
-		var doodads = $.map(this, function (element, index) {
+		var set = $.map(this, function (element, index) {
 			return $(element).data(doodads.config.domDataKey);
 		});
 
-		switch (doodads.length) {
+		switch (set.length) {
 			case 0:
 				return undefined;
 			case 1:
-				return doodads[0];
+				return set[0];
 			default:
-				return doodads;
+				return set;
 		}
 	}
 
