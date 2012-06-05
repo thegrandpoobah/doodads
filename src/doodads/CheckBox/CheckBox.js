@@ -43,7 +43,7 @@ doodads.setup([jQuery])(function(builder, base, $) {
 		_setDomId: function CheckBox_setDomId() {
 			base._setDomId.apply(this, arguments);
 
-			var computedId = Mustache.format('{{0}}_checkbox', this.computedId());
+			var computedId = this.computedId() + '_checkbox';
 
 			this._input.attr('id', computedId);
 			this._label.attr('for', computedId);
@@ -71,7 +71,7 @@ doodads.setup([jQuery])(function(builder, base, $) {
 				this.validate();
 
 				if (arguments[1]) {
-					this.trigger('changed', this._checked);
+					this.trigger_changed(this._checked);
 				}
 			}
 		},
@@ -112,14 +112,24 @@ doodads.setup([jQuery])(function(builder, base, $) {
 		},
 		onFocus: function CheckBox$onFocus(e) {
 			this._focused = true;
-			this.trigger('focus');
+			this.trigger_focus();
 		},
 		onBlur: function CheckBox$onBlur(e) {
 			this._focused = false;
-			this.trigger('blur');
+			this.trigger_blur();
 		},
 		onClick: function CheckBox$onClick() {
 			this.checked(this._input[0].checked, true);
+		},
+		
+		trigger_changed: function CheckBox$trigger_changed(newValue) {
+			this.trigger('changed', newValue);
+		},
+		trigger_focus: function CheckBox$trigger_focus() {
+			this.trigger('focus');
+		},
+		trigger_blur: function CheckBox$trigger_blur() {
+			this.trigger('blur');
 		}
 	}).complete();
 });

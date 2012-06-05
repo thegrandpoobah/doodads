@@ -90,9 +90,13 @@
 		},
 		onClick: function RadioButton$onClick(e) {
 			this._checked = this._input[0].checked;
-			this.trigger('click', this._checked);
+			this.trigger_click(this._checked);
 
 			e.stopPropagation();
+		},
+		
+		trigger_click: function RadioButton$trigger_click(value) {
+			this.trigger('click', value);
 		}
 	}).complete();
 });

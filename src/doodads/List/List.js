@@ -201,7 +201,7 @@
 				this._itemMap = $.map(this._dataSource, $.proxy(this._wrapSingleItem, this));
 
 				this.rerender(); // the list control is completely live!
-				this.trigger('modelChanged');
+				this.trigger_modelChanged();
 			}
 		},
 		items: function List$items() {
@@ -281,7 +281,7 @@
 				this.updateAttachment();
 			});
 
-			this.trigger('modelChanged');
+			this.trigger_modelChanged();
 		},
 		removeItem: function List$removeItem(argv) {
 			///<summary>
@@ -316,7 +316,7 @@
 				});
 				removedItem[0].domNode.remove();
 
-				this.trigger('modelChanged');
+				this.trigger_modelChanged();
 			}
 		},
 		_clear: function List$_clear() {
@@ -346,7 +346,7 @@
 			///</remarks>
 			this._clear();
 
-			this.trigger('modelChanged');
+			this.trigger_modelChanged();
 		},
 		item: function List$item(index, value) {
 			///<summary>
@@ -391,7 +391,7 @@
 					this.updateAttachment();
 				});
 
-				this.trigger('modelChanged');
+				this.trigger_modelChanged();
 			} else {
 				//get
 				return this._dataSource[index];
@@ -402,6 +402,9 @@
 				item: data,
 				domNode: domNode
 			});
+		},
+		trigger_modelChanged: function List$trigger_modelChanged() {
+			this.trigger('modelChanged');
 		}
 	}).complete();
 });

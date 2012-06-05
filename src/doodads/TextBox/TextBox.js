@@ -183,7 +183,7 @@
 				this._removeWatermark();
 
 				if (arguments[1]) {
-					this.trigger('changing');
+					this.trigger_changing();
 				}
 
 				this._text = arguments[0];
@@ -205,7 +205,7 @@
 				}
 
 				if (arguments[1]) {
-					this.trigger('changed');
+					this.trigger_changed();
 				}
 			}
 		},
@@ -270,7 +270,7 @@
 			this._removeWatermark();
 
 			if ($.browser.msie) {
-				this.trigger('focus');
+				this.trigger_focus();
 				return;
 			}
 
@@ -283,7 +283,7 @@
 
 			var self = this;
 			window.setTimeout(function () {
-				self.trigger('focus');
+				self.trigger_focus();
 
 				self._input
 					.focus()
@@ -295,7 +295,7 @@
 		onBlur: function TextBox$onBlur(e) {
 			this._focused = false;
 			this._addWatermark();
-			this.trigger('blur');
+			this.trigger_blur();
 		},
 		onTextAreaKeyPress: function TextBox$onTextAreaKeyDown(e) {
 			if (e.which !== 0 && this._options.maxlength !== -1 && e.target.value.length >= this._options.maxlength) {
@@ -304,5 +304,20 @@
 			}
 		}
 		/* END Event handling */
+		
+		/* BEGIN Event Triggers */
+		trigger_changing: function TextBox$trigger_changing() {
+			this.trigger('changing');
+		},
+		trigger_changed: function TextBox$trigger_changed() {
+			this.trigger('changed');
+		},
+		trigger_focus: function TextBox$trigger_focus() {
+			this.trigger('focus');
+		},
+		trigger_blur: function TextBox$trigger_blur() {
+			this.trigger('blur');
+		}
+		/* END Event Triggers */
 	}).complete();
 });

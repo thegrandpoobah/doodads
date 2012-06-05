@@ -118,7 +118,9 @@
 				this._updateCssClass();
 			}
 		},
-		// BEGIN event handlers
+		
+		/* BEGIN Event Handlers */
+		
 		onMouseOver: function Button$onMouseOver(e) {
 			if (this.enabled()) {
 				this._tracking = true;
@@ -154,7 +156,7 @@
 				this._updateCssClass();
 				$(document).unbind('mouseup', this.onDocumentMouseUp$proxy);
 
-				this.trigger('click');
+				this.trigger_click();
 			}
 			e.stopPropagation();
 		},
@@ -182,7 +184,7 @@
 			if (this.enabled()) {
 				switch (e.which) {
 					case doodads.keyCode.ENTER:
-						this.trigger('click');
+						this.trigger_click();
 
 						e.preventDefault();
 						e.stopPropagation();
@@ -206,7 +208,7 @@
 						this._active = false;
 						this._updateCssClass();
 
-						this.trigger('click');
+						this.trigger_click();
 
 						e.preventDefault();
 						e.stopPropagation();
@@ -214,7 +216,12 @@
 						break;
 				}
 			}
+		},
+		
+		/* END Event Handlers */
+		
+		trigger_click: function Button$trigger_click() {
+			this.trigger('click');
 		}
-		// END event handlers
 	}).complete();
 });

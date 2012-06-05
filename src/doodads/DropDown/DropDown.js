@@ -234,7 +234,7 @@
 				this.validate();
 
 				if (arguments[1]) {
-					this.trigger('changed');
+					this.trigger_changed();
 				}
 			}
 		},
@@ -264,7 +264,7 @@
 		},
 		/* END Properties */
 		
-		/* BEGIN Events */
+		/* BEGIN Event Handlers */
 		onCapturedMouseDown: function DropDown$onCapturedMouseDown(e) {
 			e.stopPropagation();
 
@@ -380,7 +380,7 @@
 			this._focused = true;
 			this._affordance.addClass('tracking');
 
-			this.trigger('focus');
+			this.trigger_focus();
 		},
 		onBlur: function DropDown$onBlur() {
 			this._focused = false;
@@ -389,7 +389,7 @@
 				this._affordance.removeClass('tracking');
 			}
 
-			this.trigger('blur');
+			this.trigger_blur();
 		},
 		onResize: function DropDown$onResize() {
 			this._updateItemContainer();
@@ -517,6 +517,10 @@
 					break;
 			}
 		},
+		/* END Event Handler */
+		
+		/* BEGIN Event Triggers */
+		
 		trigger_changing: function DropDown$trigger_changing(currentSelection, newSelection) {
 			var evt = $.Event('changing');
 			this.trigger(evt, {
@@ -524,7 +528,18 @@
 				newSelection: newSelection
 			});
 			return !evt.isDefaultPrevented();
-		}, /* END Events */
+		}, 
+		trigger_changed: function DropDown$trigger_changed() {
+			this.trigger('changed');
+		},
+		trigger_focus: function DropDown$trigger_focus() {
+			this.trigger('focus');
+		},
+		trigger_blur: function DropDown$trigger_blur() {
+			this.trigger('blur');
+		}
+		
+		/* END Event Triggers */
 
 		_bringSelectedItemIntoView: function DropDown$_bringSelectedItemIntoView() {
 			var list = this._list[0],

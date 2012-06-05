@@ -200,7 +200,7 @@
 				this._frontValue = newValue;
 
 				if (arguments[1]) {
-					this.trigger('changing');
+					this.trigger_changing();
 				}
 
 				if (this._options.validates) {
@@ -209,7 +209,7 @@
 				}
 
 				if (arguments[1]) {
-					this.trigger('changed');
+					this.trigger_changed();
 				}
 			}
 		},
@@ -304,20 +304,37 @@
 
 			this._input._input.select();
 
-			this.trigger('focus');
+			this.trigger_focus();
 		},
 		onBlur: function NumericTextBox$onBlur(e) {
 			this._focused = false;
 
 			this._updateTextBox();
 
-			this.trigger('blur');
+			this.trigger_blur();
 		},
 		onChanging: function NumericTextBox$onChanging(e) {
 			this._computeVal();
 		},
 		/* END Event Handlers */
 
+		/* BEGIN Event Triggers */
+		
+		trigger_changing: function NumericTextBox$trigger_changing() {
+			this.trigger('changing');
+		},
+		trigger_changed: function NumericTextBox$trigger_changed() {
+			this.trigger('changed');
+		},
+		trigger_focus: function NumericTextBox$trigger_focus() {
+			this.trigger('focus');
+		},
+		trigger_blur: function NumericTextBox$trigger_blur() {
+			this.trigger('blur');
+		},
+		
+		/* END Event Triggers */
+		
 		_computeVal: function NumericTextBox$_computeVal() {
 			var text = this._input._input.val(),
 				value;

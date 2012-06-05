@@ -160,7 +160,7 @@
 				}
 
 				if (arguments[1]) {
-					this.trigger('changed');
+					this.trigger_changed();
 				}
 			}
 		}
@@ -330,7 +330,7 @@
 				start;
 			//Override the selection with item being double clicked
 			this._overrideSelection(itemIdx);
-			this.trigger('dblclick');
+			this.trigger_dblclick();
 
 			e.preventDefault();
 			e.stopPropagation();
@@ -566,6 +566,14 @@
 				}
 			}
 		},
+		
+		trigger_changed: function ListView$trigger_changed() {
+			this.trigger('changed');
+		},
+		trigger_dblclick: function ListView$trigger_dblclick() {
+			this.trigger('dblclick');
+		},
+		
 		dispose: function ListView$dispose() {
 			this.unbind('modelChanged', this.onModelChanged$proxy);
 
