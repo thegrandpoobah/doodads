@@ -115,20 +115,24 @@
 				return;
 			}
 
+			var item,
+				itemText,
+				top, bottom;
+			
 			if (this.selectedIndex() >= 0) {
 				this._affordanceText.removeClass('itemContainerWatermark');
-				var item = this._itemMap[this.selectedIndex()].domNode;
+				item = this._itemMap[this.selectedIndex()].domNode;
 				if (this._hasCustomItem()) {
 					this._affordanceText.empty();
 					item.children().clone().appendTo(this._affordanceText);
 				} else {
 					this._list.children().removeClass('active');
-					var itemText = this.item(this.selectedIndex()).text;
+					itemText = this.item(this.selectedIndex()).text;
 					item.addClass('active');
 
 					// Scroll to item (if item is not in view)
-					var top = this._list[0].scrollTop;
-					var bottom = top + this._list[0].offsetHeight;
+					top = this._list[0].scrollTop;
+					bottom = top + this._list[0].offsetHeight;
 					if (item[0].offsetTop < top || item[0].offsetTop > bottom) {
 						this._list[0].scrollTop = item[0].offsetTop;
 					}
@@ -140,7 +144,7 @@
 					this._affordanceText.text(itemText);
 				}
 			} else if (this._watermark !== '') {
-				var itemText = this._watermark;
+				itemText = this._watermark;
 				if (!this._options.showOnHover && this.isAttached()) {
 					itemText = this._ellipsesText(itemText);
 				}
@@ -185,9 +189,9 @@
 					return this.item(this.selectedIndex());
 				}
 			} else {
-				var found = false;
+				var found = false, i, n;
 
-				for (var i = 0; i < this.count(); ++i) {
+				for (i = 0, n = this.count(); i < n; ++i) {
 					if (this.item(i).value == arguments[0]) {
 						this.selectedIndex(i, arguments[1]);
 						found = true;
@@ -415,7 +419,7 @@
 			}
 		},
 		_filter: function DropDown$_filter(ch) {
-			var i;
+			var i, matchSet, repeatCount;
 
 			if (ch === this._filterStr) {
 				this._filterRepeatCount++;
@@ -434,7 +438,7 @@
 				}
 			}
 
-			var matchSet = [];
+			matchSet = [];
 			for (i = 0; i < this.count(); ++i) {
 				if (this.item(i).text.substring(0, this._filterStr.length).toUpperCase() === this._filterStr) {
 					matchSet.push(i);
@@ -442,7 +446,7 @@
 			}
 
 			if (matchSet.length > 0) {
-				var repeatCount = this._filterRepeatCount === 0 ? 1 : this._filterRepeatCount;
+				repeatCount = this._filterRepeatCount === 0 ? 1 : this._filterRepeatCount;
 				this.selectedIndex(matchSet[(repeatCount - 1) % matchSet.length], true);
 			}
 		},
@@ -534,6 +538,22 @@
 
 		show: function DropDown$show() {
 			if (this._isListVisible) return;
+			
+			var list = this._list[0],
+				affordance = this._affordance[0],
+				replaceStyle = {
+					top: null,
+					maxHeight: null,
+					left: null,
+					width: null,
+					visibility: 'visible'
+				},
+				$window = $(window),
+				listBound, affordanceBound,
+				affordanceStyle, listStyle,
+				topPos, leftPos,
+				borderWidth,
+				widthAdjusted = false;
 
 			if (this._options.showOnHover) {
 				this._list.children().removeClass('active');
@@ -551,14 +571,9 @@
 
 			this._affordance.addClass('active');
 
-			var list = this._list[0];
-			var affordance = this._affordance[0];
-
 			if (this._hasCustomItem()) {
 				this._affordanceText.width(this._affordance.width() - 13);
 			}
-
-			var $window = $(window);
 
 			list.style.left = '0px';
 			list.style.top = '0px';
@@ -567,8 +582,8 @@
 			list.style.visibility = 'hidden';
 			list.style.display = 'block';
 
-			var listBound = list.getBoundingClientRect();
-			var affordanceBound = affordance.getBoundingClientRect();
+			listBound = list.getBoundingClientRect();
+			affordanceBound = affordance.getBoundingClientRect();
 
 			if (!listBound.width) {
 				listBound = $.extend({}, listBound, {
@@ -580,7 +595,6 @@
 				});
 			}
 
-			var affordanceStyle, listStyle;
 			if (list.currentStyle) {
 				affordanceStyle = affordance.currentStyle;
 				listStyle = list.currentStyle;
@@ -589,18 +603,9 @@
 				listStyle = document.defaultView.getComputedStyle(list, '');
 			}
 
-			var replaceStyle = {
-				top: null,
-				maxHeight: null,
-				left: null,
-				width: null,
-				visibility: 'visible'
-			};
-
-			var topPos = affordanceBound.bottom - parseFloat(affordanceStyle.borderTopWidth);
+			topPos = affordanceBound.bottom - parseFloat(affordanceStyle.borderTopWidth);
 			replaceStyle.top = (topPos + $window.scrollTop()) + 'px';
 
-			var widthAdjusted = false;
 			if (topPos + listBound.height > $window.height()) {
 				replaceStyle.maxHeight = ($window.height() - topPos - 40) + 'px';
 
@@ -608,8 +613,7 @@
 				widthAdjusted = true;
 			}
 
-			var borderWidth = Math.ceil(parseFloat(listStyle.borderLeftWidth) + parseFloat(listStyle.borderRightWidth));
-			var leftPos;
+			borderWidth = Math.ceil(parseFloat(listStyle.borderLeftWidth) + parseFloat(listStyle.borderRightWidth));
 			if (affordanceBound.left + listBound.width > $window.width()) {
 				leftPos = affordanceBound.right - listBound.width;
 				if (widthAdjusted) {
