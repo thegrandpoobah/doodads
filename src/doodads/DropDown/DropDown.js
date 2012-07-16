@@ -40,9 +40,11 @@
 		this.onItemHover$proxy = doodads.proxy(this.onItemHover, this);
 		this.onItemClick$proxy = doodads.proxy(this.onItemClick, this);
 		this.onCapturedMouseDown$proxy = doodads.proxy(this.onCapturedMouseDown, this);
+		this.onWindowScroll$proxy = doodads.proxy(this.onWindowScroll, this);
 		this.onKeyDown$proxy = doodads.proxy(this.onKeyDown, this);
 		this.killFilter$debounced = doodads.debounce(this.killFilter, FILTER_RESET_DEBOUNCE_TIME, this);
-
+		this.hide$proxy = doodads.proxy(this.hide, this);
+		
 		this._filterStr = '';
 		this._filterRepeatCount = 0;
 		this._enabled = this._options.enabled;
@@ -276,6 +278,9 @@
 
 			this.hide();
 		},
+		onWindowScroll: function DropDown$onWindowScroll() {
+			this.hide();
+		},
 		onAffordanceMouseDown: function DropDown$onAffordanceMouseDown(e) {
 			if (!this.enabled()) return;
 
@@ -343,7 +348,7 @@
 				if (this._hidingTimeout !== null) {
 					window.clearTimeout(this._hidingTimeout);
 				}
-				this._hidingTimeout = window.setTimeout($.proxy(this.hide, this), this._options.showAfter / 2);
+				this._hidingTimeout = window.setTimeout(this.hide$proxy, this._options.showAfter / 2);
 			}
 		},
 		onItemHover: function DropDown$onItemHover(e) {
@@ -419,7 +424,7 @@
 			}
 		},
 		_filter: function DropDown$_filter(ch) {
-			var i, matchSet, repeatCount;
+			var i, n, matchSet, repeatCount;
 
 			if (ch === this._filterStr) {
 				this._filterRepeatCount++;
@@ -439,7 +444,7 @@
 			}
 
 			matchSet = [];
-			for (i = 0; i < this.count(); ++i) {
+			for (i = 0, n = this.count(); i < n; ++i) {
 				if (this.item(i).text.substring(0, this._filterStr.length).toUpperCase() === this._filterStr) {
 					matchSet.push(i);
 				}
@@ -664,9 +669,11 @@
 				list.scrollTop = this._scrollTopBuffered;
 			}
 
+			$(this._affordance).bind('ancestorscroll', this.onWindowScroll$proxy);
 			captureEvent('mousedown', this.element(), this.onCapturedMouseDown$proxy);
 		},
 		hide: function DropDown$hide() {
+			$(this._affordance).unbind('ancestorscroll', this.onWindowScroll$proxy);
 			releaseEvent('mousedown');
 
 			this._affordance.removeClass('active');
