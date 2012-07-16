@@ -166,7 +166,7 @@
 			    return ev + ancestornamespace + handleObj.guid + n;
 			});
 
-		$(self).parents()[action](evs.join(' '), handleObj.handler);
+		$(self).parents().add('window')[action](evs.join(' '), handleObj.handler);
 	}
 
 	$.event.special.ancestorscroll = {
