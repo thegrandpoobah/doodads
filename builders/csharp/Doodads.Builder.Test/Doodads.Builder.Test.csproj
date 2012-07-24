@@ -54,17 +54,19 @@
     <Content Include="..\..\..\output\doodads.js">
       <Link>JavaScript\doodads.js</Link>
     </Content>
-    <Content Include="..\..\..\output\doodads.tools.js">
-      <Link>JavaScript\doodads.tools.js</Link>
+    <Content Include="..\..\..\support\grabbag.js">
+      <Link>JavaScript\grabbag.js</Link>
     </Content>
     <Content Include="..\..\..\src\doodads\Button\Button.css">
       <Link>doodads\Button\Button.css</Link>
+      <DependentUpon>doodads\Button\Button.html</DependentUpon>
     </Content>
     <Content Include="..\..\..\src\doodads\Button\Button.html">
       <Link>doodads\Button\Button.html</Link>
     </Content>
     <Content Include="..\..\..\src\doodads\Button\Button.js">
       <Link>doodads\Button\Button.js</Link>
+      <DependentUpon>doodads\Button\Button.html</DependentUpon>
     </Content>
     <Content Include="..\..\..\src\doodads\CheckBox\CheckBox.css">
       <Link>doodads\CheckBox\CheckBox.css</Link>
@@ -114,16 +116,13 @@
     <Content Include="..\..\..\src\doodads\RadioButton\RadioButton.js">
       <Link>doodads\RadioButton\RadioButton.js</Link>
     </Content>
-    <Content Include="..\..\..\src\support\jquery-1.7.1.js">
-      <Link>JavaScript\jquery-1.7.1.js</Link>
-    </Content>
-    <Content Include="..\..\..\src\support\jquery.tipsy.js">
+    <Content Include="..\..\..\support\jquery.tipsy.js">
       <Link>JavaScript\jquery.tipsy.js</Link>
     </Content>
-    <Content Include="..\..\..\src\support\tipsy.css">
+    <Content Include="..\..\..\support\tipsy.css">
       <Link>tipsy.css</Link>
     </Content>
-    <Content Include="..\..\..\src\mustache\mustache.js">
+    <Content Include="..\..\..\support\mustache.js">
       <Link>JavaScript\mustache.js</Link>
     </Content>
     <Content Include="..\..\..\src\doodads\TextBox\TextBox.js">
@@ -244,7 +243,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>34888</DevelopmentServerPort>
+          <DevelopmentServerPort>61390</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>

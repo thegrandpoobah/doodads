@@ -302,7 +302,7 @@
 				e.target.value = e.target.value.substring(0, this._options.maxlength);
 				e.preventDefault();
 			}
-		}
+		},
 		/* END Event handling */
 		
 		/* BEGIN Event Triggers */

@@ -39,15 +39,6 @@ function concatenate(files, outputFile, withPreamble) {
 	fs.writeSync(out, output);
 }
 
-desc('Library tools');
-task('tools', function(params) {
-	concatenate([
-		'events-capture/events-capture.js'
-		, 'z-manager/z-manager.js'
-		, 'string-measurement/string-measurement.js'
-	], 'doodads.tools.js');
-});
-
 desc('Concatenation');
 task('concatenate', function(params) {
 	concatenate([
@@ -61,7 +52,7 @@ task('concatenate', function(params) {
 });
 
 desc('Obfuscation and Compression');
-task({'minify': ['concatenate', 'tools']}, function(params) {
+task({'minify': ['concatenate']}, function(params) {
 	function minify(inputFile, outputFile) {
 		try {
 			var all = fs.readFileSync('output/' + inputFile).toString(),
@@ -78,5 +69,4 @@ task({'minify': ['concatenate', 'tools']}, function(params) {
 	}
 
 	minify('doodads.js', 'doodads.min.js');
-	minify('doodads.tools.js', 'doodads.tools.min.js');
 });

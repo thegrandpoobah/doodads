@@ -542,7 +542,7 @@
 		},
 		trigger_blur: function DropDown$trigger_blur() {
 			this.trigger('blur');
-		}
+		},
 		
 		/* END Event Triggers */
 
