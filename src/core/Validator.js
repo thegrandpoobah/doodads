@@ -260,7 +260,7 @@
 					privateMethods.removeRequirementRule.call(this);
 				}
 
-				$(this).trigger('required');
+				this.trigger('required');
 
 				this.validate();
 			}
