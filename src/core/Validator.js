@@ -49,7 +49,7 @@
 			});
 		},
 
-		registerListener : function valdation$registerListener(listener) {
+		registerListener: function valdation$registerListener(listener) {
 			///<summary>
 			/// Adds a Validation Listener to the validation listener registry.
 			/// Validation Listeners perform an action after every execution of the validate function
