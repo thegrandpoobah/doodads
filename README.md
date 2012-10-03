@@ -17,9 +17,10 @@ The infrastructure seamlessly assembles these constituent parts into a single en
 
 A couple of dependencies before the library can be built:
 
-- Node for Windows (A version that includes `npm` by default. I believe 0.6.x has it now)
+- Node (0.8.x+) for Windows
 - Jake installed globally (`npm install -g jake`)
 - Uglify-JS installed locally (`npm install uglify-js`)
+- JSHint installed locally (`npm install jshint`)
 - .NET Framework 4.0 for MSBuild and C# Compiler.
 
 ## Building

@@ -1,7 +1,17 @@
 var fs = require('fs'),
 	sys = require('util'),
+	jshint = require('jshint'),
 	uglify = require('uglify-js');
 
+var sourceFiles = [
+	'core/doodad.js'
+	, 'core/builder.js'
+	, 'core/utils.js'
+	, 'core/Validator.js'
+	, 'core/HintBoxValidationListener.js'
+	, 'core/config.js'
+];
+	
 function makeDirectoryIfNotExists(path) {
 	try {
 		var stats = fs.statSync(path);
@@ -41,18 +51,29 @@ function concatenate(files, outputFile, withPreamble) {
 
 desc('Concatenation');
 task('concatenate', function(params) {
-	concatenate([
-		'core/doodad.js'
-		, 'core/builder.js'
-		, 'core/utils.js'
-		, 'core/Validator.js'
-		, 'core/HintBoxValidationListener.js'
-		, 'core/config.js'
-	], 'doodads.js', true);
+	concatenate(sourceFiles, 'doodads.js', true);
+});
+
+desc('Code Lint');
+task('lint', function() {
+	sourceFiles.forEach(function(file, i) {
+		var all = fs.readFileSync('src/' + file).toString();
+		
+		var result = jshint.JSHINT(all, {}, {});
+		if (!result) {
+			for (var i = 0; i < jshint.JSHINT.errors.length; i++) {
+				var error = jshint.JSHINT.errors[i];
+				if (!error) {
+					continue;
+				}
+				process.stdout.write('file: ' + file + ', line: ' + error.line + ', char ' + error.character + ': ' + error.reason + '\n');
+			}
+		}
+	});
 });
 
 desc('Obfuscation and Compression');
-task({'minify': ['concatenate']}, function(params) {
+task({'minify': ['lint', 'concatenate']}, function(params) {
 	function minify(inputFile, outputFile) {
 		try {
 			var all = fs.readFileSync('output/' + inputFile).toString(),
