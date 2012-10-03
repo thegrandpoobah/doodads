@@ -1,4 +1,11 @@
+/*jshint browser:true, jquery:true */
+/*global doodads:true, Mustache:true, captureEvent:true, releaseEvent: true */
+
 (function() {
+	/*jshint bitwise:true, curly:true, eqeqeq:true, immed:true, latedef:true, undef:true, unused:true, smarttabs:true */
+	
+	'use strict';
+	
 	// The HintBox validation listener will successfully bind unto any doodad which has 
 	// validation enabled *and* exposes the following interface:
 	// * hasInputFocus
@@ -56,7 +63,9 @@
 	});
 
 	var HintBoxValidationListener = function (doodad) {
-		if (arguments.length === 0) { return; }
+		if (arguments.length === 0) { 
+			return;
+		}
 
 		this.onValidationApplied$proxy = doodads.proxy(this.onValidationApplied, this);
 		this.onDoodadFocus$proxy = doodads.proxy(this.onDoodadFocus, this);
@@ -69,10 +78,10 @@
 
 		this._doodad = null;
 		this._validationState = {
-			messages: []
-			, isValid: true
+			messages: [],
+			isValid: true
 		};
-	}
+	};
 	HintBoxValidationListener.canListen = function (doodad) {
 		if (doodad._options.validationListeners.indexOf('hintbox') !== -1 && // the doodad *wants* the hint-list
 			$.isFunction(doodad.validationTarget)) // and the doodad implements the IHintBoxListenerSource interface
@@ -81,10 +90,10 @@
 		} else {
 			return false;
 		}
-	}
+	};
 	HintBoxValidationListener.listen = function (doodad) {
 		return new HintBoxValidationListener(doodad);
-	}
+	};
 
 	HintBoxValidationListener.prototype = {
 		/* BEGIN Event Handlers */
@@ -94,9 +103,9 @@
 			this._validationState = args;
 
 			this.setHintBoxVisibility();
-		}
+		},
 
-		, onDoodadFocus: function HintBoxValidationListener$onDoodadFocus(e) {
+		onDoodadFocus: function HintBoxValidationListener$onDoodadFocus(e) {
 			if (e.target._options.validates) {
 				if (!e.target.ranValidation()) {
 					e.target.validate();
@@ -105,30 +114,32 @@
 					this.setHintBoxVisibility();
 				}
 			}
-		}
-		, onDoodadBlur: function HintBoxValidationListener$onDoodadBlur(e) {
+		},
+		onDoodadBlur: function HintBoxValidationListener$onDoodadBlur(e) {
 			if (e.target._options.validates) {
 				this.hideHintBox();
 			}
-		}
-		, onCapturedMouseDown: function HintBoxValidationListener$onCapturedMouseDown(e) {
+		},
+		onCapturedMouseDown: function HintBoxValidationListener$onCapturedMouseDown(e) {
 			var validationTarget = this._doodad.validationTarget();
-			if (validationTarget && e.originalTarget === validationTarget[0]) return;
+			if (validationTarget && e.originalTarget === validationTarget[0]) {
+				return;
+			}
 
 			this.hideHintBox();
-		}
+		},
 
 		/* END Event Handlers */
 
-		, setHintBoxVisibility: function HintBoxValidationListener$setHintBoxVisibility(doodad) {
+		setHintBoxVisibility: function HintBoxValidationListener$setHintBoxVisibility(doodad) {
 			if (this._doodad && this._doodad.hasInputFocus() && (this._validationState.messages || []).length > 0) {
 				this.showHintBox();
 			} else {
 				this.hideHintBox();
 			}
-		}
+		},
 
-		, showHintBox: function HintBoxValidationListener$showHintBox() {
+		showHintBox: function HintBoxValidationListener$showHintBox() {
 			var target = this._doodad ? this._doodad.validationTarget() : null,
 				self = this;
 
@@ -152,8 +163,8 @@
 			isBoxVisible = true;
 			
 			window.captureEvent('mousedown', this._doodad.element(), this.onCapturedMouseDown$proxy);
-		}
-		, hideHintBox: function HintBoxValidationListener$hideHintBox() {
+		},
+		hideHintBox: function HintBoxValidationListener$hideHintBox() {
 			if (!isBoxVisible) {
 				return;
 			}
@@ -163,9 +174,9 @@
 			isBoxVisible = false;
 
 			window.releaseEvent('mousedown');
-		}
+		},
 
-		, dispose: function HintBoxValidationListener$dispose(doodad) {
+		dispose: function HintBoxValidationListener$dispose(doodad) {
 			doodad.unbind('validationApplied', this.onValidationApplied$proxy);
 			doodad.unbind('focus', this.onDoodadFocus$proxy);
 			doodad.unbind('blur', this.onDoodadBlur$proxy);

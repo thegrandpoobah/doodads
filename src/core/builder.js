@@ -1,10 +1,17 @@
+/*jshint browser:true, jquery:true */
+/*global doodads:true, Mustache:true, captureEvent:true, releaseEvent: true */
+
 (function() {
+	/*jshint bitwise:true, curly:true, eqeqeq:true, immed:true, latedef:true, undef:true, unused:true, smarttabs:true, newcap:false */
+	
+	'use strict';
+	
 	var canonicalizationDiv = null,
 		headDom = null,
 		guid = 0,
 		cache = {
 			types: {},
-			stylesheets: {},
+			stylesheets: {}
 		},
 		pendingConstructions = {},
 		activeConstruction = null,
@@ -36,7 +43,9 @@
 				script.onload = script.onerror = script.onreadystatechange = function() {
 					if (!script.readyState || !/i/.test(script.readyState)) {
 						try {
-							script.onclick && script.onclick();
+							if (script.onclick) {
+								script.onclick();
+							}
 						} catch (_) {}
 
 						head.removeChild(script);
@@ -47,7 +56,7 @@
 						
 						callback();
 					}
-				}
+				};
 				
 				script.src = url;
 				
@@ -101,6 +110,7 @@
 					});
 					
 					utils.load(canonUrl, function() {
+						/*jshint devel:true */
 						var aC = activeConstruction;
 						activeConstruction = null;
 						
@@ -158,7 +168,7 @@
 		
 	// The builder is a class used by doodad authors to aid in the construction
 	// of doodads. An instance of it is returned via the doodads.setup API.
-	function builder() {
+	var builder = function() {
 		// this.name = '/url/to/doodad'; // this field is automatically populated once the scripts load
 		this.loadDfd = $.Deferred();
 		this.setupObject = {
@@ -172,7 +182,7 @@
 			stylesheets: {},
 			statics: {}
 		};
-	}
+	};
 	builder.prototype = {
 		constructor: function builder$constructor(func) {
 			///<summary>
@@ -324,7 +334,7 @@
 			
 			this.loadDfd.resolve();
 		}
-	}
+	};
 
 	$.extend(doodads, {
 		setup: function doodads$setup(inheritsFrom, args) {
@@ -358,10 +368,11 @@
 				inheritsFrom = undefined;
 			}
 			
-			var constructor = activeConstruction = new builder(),
-				definition = $.extend({
+			var constructor;
+			constructor = activeConstruction = new builder(),
+			var definition = $.extend({
 					templates: null,
-					stylesheets: null,
+					stylesheets: null
 				}, doodads.setup.definition);
 			delete doodads.setup.definition; // doodads.setup.definition is optionally populated by the server side builders
 			
@@ -379,7 +390,8 @@
 			};
 		},
 		setupMixin: function doodads$setupMixin(args) {
-			var constructor = activeConstruction = {
+			var constructor;
+			constructor = activeConstruction = {
 				loadDfd: $.Deferred(),
 				whenLoaded: function() { 
 					return this.loadDfd.promise();
@@ -492,5 +504,5 @@
 		doodads.setup()(function(builder) {
 			builder.complete();
 		});
-	}
+	};
 })();

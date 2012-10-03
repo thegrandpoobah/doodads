@@ -1,4 +1,11 @@
+/*jshint browser:true, jquery:true */
+/*global doodads:true, Mustache:true, captureEvent:true, releaseEvent: true */
+
 (function() {
+	/*jshint bitwise:true, curly:true, eqeqeq:true, immed:true, latedef:true, undef:true, unused:true, smarttabs:true */
+	
+	'use strict';
+	
 		// determines how long the validator waits for an async rule to callback before
 		// showing the user a message.
 	var ASYNC_GRACE_PERIOD = 100,
@@ -7,68 +14,10 @@
 		
 	var validationListeners = [];
 		
-
-	doodads.validation = { 
-		listeners: {}, // namespace for the validation listeners
-
-		add: function validation$add(doodad) {
-			///<summary>
-			/// Adds validation support on to the given doodad object.
-			///</summary>
-			///<param name="doodad">The doodad to add validation support onto</param>
-			$.each(OVERRIDEMETHODS, function (index, item) {
-				doodad.prototype['_prototype_' + item] = doodad.prototype[item];
-			});
-
-			doodad.prototype.__validator = {};
-			for (var key in Validator) {
-				doodad.prototype.__validator[key] = doodad.prototype[key];
-			}
-
-			$.extend(doodad.prototype, Validator);
-			doodad.defaultOptions = $.extend({
-				validates: true
-				, validationListeners: 'hintbox'
-			}, doodad.defaultOptions);
-		},
-
-		remove: function validation$remove(doodad) {
-			///<summary>
-			/// Removes validation support from the given doodad object.
-			///</summary>
-			///<param name="doodad">The doodad to remove validation support from</param>
-			for (key in Validator) {
-				doodad[key] = doodad.__validator[key];
-			}
-
-			$.each(OVERRIDEMETHODS, function (index, item) {
-				var prototypeFunction = '_prototype_' + item;
-				doodad[item] = doodad[prototypeFunction];
-				delete doodad[prototypeFunction];
-				doodad[prototypeFunction] = undefined;
-			});
-		},
-
-		registerListener: function valdation$registerListener(listener) {
-			///<summary>
-			/// Adds a Validation Listener to the validation listener registry.
-			/// Validation Listeners perform an action after every execution of the validate function
-			/// Typically, listeners modify the DOM to reflect the invalid state of a doodad.
-			///</summary>
-			///<param name="listener">
-			/// The Validation Listener to add to the registry
-			/// The listener is a type with the following static methods:
-			///  * canListen(doodad): determines if the listener is compatible with the given doodad
-			///  * listen(doodad): hook unto the validation infrastructure to receive notifications on validation changes
-			///</param>
-			validationListeners.push(listener);
-		}
-	};
-
 	// The validator class gets mixed with the doodad class using the doodads.validation.add method
 	// In the vast majority of cases, this is done automatically via the doodads.setup family of functions.
-	Validator = {
-		addRule: function Validator$addRule(value) {
+	var validatorMixin = {
+		addRule: function validatorMixin$addRule(value) {
 			///<summary>
 			/// Adds a rule to the list of rules the doodad must validate against. Can optionally add a set of rules if the
 			/// passed in "value" argument is an array.
@@ -95,8 +44,8 @@
 			this._rules = $.merge(this._rules || [], $.isArray(value) ? value : [value]);
 			
 			this.validate();
-		}
-		, addCallout: function Validator$addCallout(doodad) {
+		},
+		addCallout: function validatorMixin$addCallout(doodad) {
 			///<summary>
 			/// Adds a callout to the list of callouts the doodad must invoke when validating its context. Can optionally add a 
 			/// set of callouts if the passed in "doodad" argument is an array.
@@ -108,21 +57,21 @@
 			/// A single doodad or an array of doodads.
 			///</param>
 			this._callouts = $.merge(this._callouts || [], $.isArray(doodad) ? doodad : [doodad]);
-		}
-		, ranValidation: function Validator$ranValidation() {
+		},
+		ranValidation: function validatorMixin$ranValidation() {
 			///<summary>
 			/// Determines if validation has ever been invoked on this doodad.
 			///</summary>
 			return this._ranValidation;
-		}
-		, valid: function Validator$valid() {
+		},
+		valid: function validatorMixin$valid() {
 			if (arguments.length === 0 && this._source && !this._ranValidation) {
 				this.validate();
 			}
 			return this._prototype_valid.apply(this, arguments);
-		}
+		},
 
-		, isValidationContextEmpty: function Validator$isValidationContextEmpty(context) {
+		isValidationContextEmpty: function validatorMixin$isValidationContextEmpty(context) {
 			///<summary>
 			/// Determines if the validation context for a doodad should be considered "empty" or not
 			/// This is doodad specific and must be overridden by doodads to provide the correct functionality.
@@ -135,8 +84,8 @@
 			} else {
 				return (context === null || context === '');
 			}
-		}
-		, validationContext: function Validator$validationContext() {
+		},
+		validationContext: function validatorMixin$validationContext() {
 			///<summary>
 			/// A JS object representation of the properties of this doodad that are needed
 			/// to test validity.
@@ -150,9 +99,9 @@
 			} else {
 				return null;
 			}
-		}
+		},
 
-		, validate: function Validator$validate(/*traversalHistory*/) {
+		validate: function validatorMixin$validate(/*traversalHistory*/) {
 			///<summary>
 			/// Validates this doodad's validation context against the set of rules associated with it.
 			/// Optionally triggers the validate function of other doodad's if they are part of the callout
@@ -211,8 +160,8 @@
 			}
 
 			privateMethods.afterRulesRan.call(this, traversalHistory || [this]);
-		}
-		, required: function Validator$required(/*isRequired, requirementRule*/) {
+		},
+		required: function validatorMixin$required(/*isRequired, requirementRule*/) {
 			/// <summary>
 			///		1: required() - Indicates whethere the doodad is required or not.
 			///		2: required(true, function(){...}) - Sets the doodad to required, and adds the requirement rule.
@@ -264,18 +213,18 @@
 
 				this.validate();
 			}
-		}
-		, suspendValidation: function Validator$suspendValidation() {
+		},
+		suspendValidation: function validatorMixin$suspendValidation() {
 			///<summary>Temporarily stops the validation code from triggering</summary>
 			this._validationSuspended = true;
-		}
-		, resumeValidation: function Validator$resumeValidation() {
+		},
+		resumeValidation: function validatorMixin$resumeValidation() {
 			///<summary>Re-enables validation code and forces a validation event to run</summary>
 			this._validationSuspended = false;
 			this.validate();
-		}
+		},
 
-		, _initializeValidationListeners: function Validator$_initializeValidationListeners() {
+		_initializeValidationListeners: function validatorMixin$_initializeValidationListeners() {
 			///<summary>
 			/// PRIVATE METHOD: Initializes the set of validation listeners for this doodad.
 			///</summary>
@@ -291,9 +240,9 @@
 					this._listeners.push(listener.listen(this));
 				}
 			}
-		}
+		},
 
-		, getValidationListener: function Validator$getValidationListener(type) {
+		getValidationListener: function validatorMixin$getValidationListener(type) {
 			///<summary>
 			/// Given a class type, returns the validation listener associated with this doodad
 			/// that matches that class type if it exists.
@@ -314,9 +263,9 @@
 			});
 
 			return listener;
-		}
+		},
 		
-		, dispose: function Validator$dispose() {
+		dispose: function validatorMixin$dispose() {
 			privateMethods.tearDownValidationListeners.call(this);
 
 			return this._prototype_dispose.apply(this, arguments);
@@ -324,16 +273,16 @@
 	};
 
 	var privateMethods = {
-		tearDownValidationListeners: function Validator$tearDownValidationListeners() {
+		tearDownValidationListeners: function validatorMixin$tearDownValidationListeners() {
 			///<summary>
 			/// Disposes of all validation listeners as necessary
 			///</summary>
 			$.each(this._listeners || [], function () {
 				this.dispose();
 			});
-		}
+		},
 
-		, ruleCallback: function Validator$ruleCallback(result, passId, traversalHistory) {
+		ruleCallback: function validatorMixin$ruleCallback(result, passId, traversalHistory) {
 			///<summary>
 			/// Called after each rule has executed.
 			///</summary>
@@ -364,8 +313,8 @@
 			}
 
 			privateMethods.afterRulesRan.call(this, traversalHistory);
-		}
-		, afterRulesRan: function Validator$afterRulesRan(traversalHistory) {
+		},
+		afterRulesRan: function validatorMixin$afterRulesRan(traversalHistory) {
 			///<summary>
 			/// Called after all the rules in the validation set have ran.
 			///</summary>
@@ -396,8 +345,8 @@
 			});
 
 			privateMethods.trigger_validationApplied.call(this);
-		}
-		, removeRequirementRule: function Validator$removeRequirementRule() {
+		},
+		removeRequirementRule: function validatorMixin$removeRequirementRule() {
 			var requirementRule = this._requirementRule;
 			
 			this._rules = $.map(this._rules || [], function (rule) {
@@ -405,8 +354,8 @@
 					return rule;
 				}
 			});
-		}
-		, trigger_validationApplied: function Validator$trigger_validationApplied() {
+		},
+		trigger_validationApplied: function validatorMixin$trigger_validationApplied() {
 			///<summary>
 			/// Triggers the validationApplied event
 			///</summary>
@@ -415,6 +364,63 @@
 				isValid: this._computedValidity
 				/* possibly others */
 			});
+		}
+	};
+	
+	doodads.validation = { 
+		listeners: {}, // namespace for the validation listeners
+
+		add: function validation$add(doodad) {
+			///<summary>
+			/// Adds validation support on to the given doodad object.
+			///</summary>
+			///<param name="doodad">The doodad to add validation support onto</param>
+			$.each(OVERRIDEMETHODS, function (index, item) {
+				doodad.prototype['_prototype_' + item] = doodad.prototype[item];
+			});
+
+			doodad.prototype.__validator = {};
+			for (var key in validatorMixin) {
+				doodad.prototype.__validator[key] = doodad.prototype[key];
+			}
+
+			$.extend(doodad.prototype, validatorMixin);
+			doodad.defaultOptions = $.extend({
+				validates: true,
+				validationListeners: 'hintbox'
+			}, doodad.defaultOptions);
+		},
+
+		remove: function validation$remove(doodad) {
+			///<summary>
+			/// Removes validation support from the given doodad object.
+			///</summary>
+			///<param name="doodad">The doodad to remove validation support from</param>
+			for (var key in validatorMixin) {
+				doodad[key] = doodad.__validator[key];
+			}
+
+			$.each(OVERRIDEMETHODS, function (index, item) {
+				var prototypeFunction = '_prototype_' + item;
+				doodad[item] = doodad[prototypeFunction];
+				delete doodad[prototypeFunction];
+				doodad[prototypeFunction] = undefined;
+			});
+		},
+
+		registerListener: function valdation$registerListener(listener) {
+			///<summary>
+			/// Adds a Validation Listener to the validation listener registry.
+			/// Validation Listeners perform an action after every execution of the validate function
+			/// Typically, listeners modify the DOM to reflect the invalid state of a doodad.
+			///</summary>
+			///<param name="listener">
+			/// The Validation Listener to add to the registry
+			/// The listener is a type with the following static methods:
+			///  * canListen(doodad): determines if the listener is compatible with the given doodad
+			///  * listen(doodad): hook unto the validation infrastructure to receive notifications on validation changes
+			///</param>
+			validationListeners.push(listener);
 		}
 	};
 })();

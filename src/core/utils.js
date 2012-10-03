@@ -1,4 +1,11 @@
+/*jshint browser:true, jquery:true */
+/*global doodads:true, Mustache:true, captureEvent:true, releaseEvent: true */
+
 (function() {
+	/*jshint bitwise:true, curly:true, eqeqeq:true, immed:true, latedef:true, undef:true, unused:true, smarttabs:true */
+	
+	'use strict';
+	
 	$.fn.doodad = function () {
 		///<summary>
 		/// Returns the doodads that back the elements in a particular jQuery list of elements.
@@ -23,7 +30,7 @@
 			default:
 				return set;
 		}
-	}
+	};
 
 	/**
 	 * Debounce and throttle functions adatapted from http://code.google.com/p/jquery-debounce/
@@ -34,7 +41,7 @@
 	 */
 	$.extend(doodads, {
 		debounce: function doodads$debounce(fn, timeout, invokeAsap, ctx) {
-			if(arguments.length == 3 && typeof invokeAsap != 'boolean') {
+			if(arguments.length === 3 && typeof invokeAsap !== 'boolean') {
 				ctx = invokeAsap;
 				invokeAsap = false;
 			}
@@ -45,12 +52,16 @@
 				var args = arguments;
 				ctx = ctx || this;
 
-				invokeAsap && !timer && fn.apply(ctx, args);
+				if (invokeAsap && !timer) {
+					fn.apply(ctx, args);
+				}
 
 				clearTimeout(timer);
 
 				timer = setTimeout(function() {
-					!invokeAsap && fn.apply(ctx, args);
+					if (!invokeAsap) {
+						fn.apply(ctx, args);
+					}
 					timer = null;
 				}, timeout);
 			};
@@ -65,11 +76,11 @@
 				ctx = ctx || this;
 
 				if(!timer) {
-					(function() {
+					(function throttled() {
 						if(needInvoke) {
 							fn.apply(ctx, args);
 							needInvoke = false;
-							timer = setTimeout(arguments.callee, timeout);
+							timer = setTimeout(throttled, timeout);
 						}
 						else {
 							timer = null;
@@ -87,23 +98,25 @@
 			if (func.bind === protoBind && protoBind) {
 				return protoBind.apply(func, protoSlice.call(arguments, 1));
 			}
-			if (!Object.toString.prototype.call(func) == '[object Function]') {
-				throw new TypeError;
+			if (Object.toString.prototype.call(func) !== '[object Function]') {
+				throw new TypeError();
 			}
 			args = protoSlice.call(arguments, 2);
-			return bound = function() {
+			bound = function() {
+				/*jshint newcap:false */
 				if (!(this instanceof bound)) {
 					return func.apply(context, args.concat(protoSlice.call(arguments)));
 				}
 				var ctor = function(){};
 				ctor.prototype = func.prototype;
-				var self = new ctor,
+				var self = new ctor(),
 					result = func.apply(self, args.concat(protoSlice.call(arguments)));
 				if (Object(result) === result) {
 					return result;
 				}
 				return self;
 			};
+			return bound;
 		}
 	});
 	

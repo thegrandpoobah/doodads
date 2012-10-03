@@ -1,11 +1,19 @@
+/*jshint browser:true, jquery:true */
+/*global doodads:true, Mustache:true, captureEvent:true, releaseEvent: true */
+
 (function() {
+	/*jshint bitwise:true, curly:true, eqeqeq:true, immed:true, latedef:true, undef:true, unused:true, smarttabs:true */
+	
+	'use strict';
+	
 	// constants
 	var DEBOUNCE_TIMEOUT = 50; // in milliseconds
+	var DECLARATIVE_KEY = 'doodad';
 
 	var $window = $(window), // cache $window, reused fairly frequently
 		instantiationSibling = $(document.createElement('div'));
 
-	var doodad = function (options, defaultOptions) {
+	var doodad = function(options, defaultOptions) {
 		///<summary>
 		/// Constructs an instance of doodad, configuring it based on the passed in <paramref name="options">options</paramref> parameter.
 		///  * The case where <paramref name="defaultOptions">defaultOptions</paramref> is supplied is reserved for use
@@ -21,32 +29,32 @@
 		this._options = $.extend({}, doodad.defaultOptions, defaultOptions, options);
 		
 		$.extend(this, {
-			_jQueryCache: $(this)
+			_jQueryCache: $(this),
 			
-			, _id: this._options.id
-			, _cssClassOverrides: this._options.cssClass
-			, _tabIndex: this._options.tabIndex
+			_id: this._options.id,
+			_cssClassOverrides: this._options.cssClass,
+			_tabIndex: this._options.tabIndex,
 			
-			, _parent: null
-			, _children: []
-			, _autogenChildren: [] // the list of children that have private variables
-			, _autogenUnbinds: [] // the list of events to auto-unbind
-			, _autogenRefs: [] // the list of DOM elements with references
-			, _source: null
-			, _dataSource: null
+			_parent: null,
+			_children: [],
+			_autogenChildren: [], // the list of children that have private variables
+			_autogenUnbinds: [], // the list of events to auto-unbind
+			_autogenRefs: [], // the list of DOM elements with references
+			_source: null,
+			_dataSource: null,
 			
-			, _isAttached: false
+			_isAttached: false,
 			
-			, _isValid: true
-			, _listenToChildrenValidity: true
+			_isValid: true,
+			_listenToChildrenValidity: true,
 
-			, _hookedResize: false
+			_hookedResize: false,
 			
-			, _childrenReadyDfd: null
-			, _selfReadyDfd: null
-			, _completionDfd: null
+			_childrenReadyDfd: null,
+			_selfReadyDfd: null,
+			_completionDfd: null,
 			
-			, _disposing: false
+			_disposing: false
 		});
 		
 		this.onWindowResize$proxy = doodads.proxy(this.onWindowResize, this);
@@ -55,17 +63,17 @@
 		if (this._options.validates === false) {
 			doodads.validation.remove(this);
 		}
-	}
+	};
 	doodad.defaultOptions = {
-		id: ''
-		, cssClass: ''
-		, tabIndex: null
+		id: '',
+		cssClass: '',
+		tabIndex: null,
 		///<summary>
 		/// Automatically creates a variable referencing DOM elements with name attributes in the DOM structure for 
 		/// this doodad.
 		///</summary>
-		, autoDOMReferences: true
-		, templates: { base: '<div />' }
+		autoDOMReferences: true,
+		templates: { base: '<div />' }
 	};
 	doodad.prototype = {
 		/* BEGIN ID Management */
@@ -90,9 +98,9 @@
 				// remove the id attribute all together
 				this.element().removeAttr('id');
 			}
-		}
+		},
 
-		, id: function doodad$id(/*[newId]*/) {
+		id: function doodad$id(/*[newId]*/) {
 			///<summary>
 			/// Getter/Setter
 			/// The unique ID of the doodad. Note that IDs do not necessarily have to be unique across
@@ -115,8 +123,8 @@
 					child.parent(this);
 				}, this));
 			}
-		}
-		, computedId: function doodad$computedId() {
+		},
+		computedId: function doodad$computedId() {
 			///<summary>
 			/// The Computed ID of a doodad is a mangled version of the id property that is
 			/// most likely unique across all doodads.
@@ -141,13 +149,13 @@
 			}
 
 			return idChain.join('_');
-		}
+		},
 
 		/* END ID Management */
 
 		/* BEGIN doodad Hierarchy Management */
 
-		, _refreshParent: function doodad$_refreshParent() {
+		_refreshParent: function doodad$_refreshParent() {
 			this._setDomId();
 
 			this._hookWindowResize();
@@ -155,13 +163,13 @@
 			$.each(this.children(), function (index, child) {
 				child._refreshParent();
 			});
-		}
+		},
 		
-		, children: function doodad$children() {
+		children: function doodad$children() {
 			return this._children || [];
-		}
+		},
 
-		, parent: function doodad$parent(/*[newParent]*/) {
+		parent: function doodad$parent(/*[newParent]*/) {
 			///<summary>
 			/// Getter/Setter
 			/// The parent of a doodad is the doodad that provides the Naming Container.
@@ -196,8 +204,8 @@
 
 				this._refreshParent();
 			}
-		}
-		, hasChild: function doodad$hasChild(child) {
+		},
+		hasChild: function doodad$hasChild(child) {
 			///<summary>
 			///Determines whether or not this doodad has the doodad referenced by child as a child doodad.
 			///</summary>
@@ -210,8 +218,8 @@
 				}
 			});
 			return found;
-		}
-		, addChild: function doodad$addChild(child) {
+		},
+		addChild: function doodad$addChild(child) {
 			///<summary>
 			/// Adds doodad to the list of children doodads for this doodad.
 			/// This effectively reparents <paramref name="child">child</paramref>. 
@@ -229,8 +237,8 @@
 
 			this._children.push(child);
 			child.parent(this);
-		}
-		, removeChild: function doodad$removeChild(child) {
+		},
+		removeChild: function doodad$removeChild(child) {
 			///<summary>
 			/// Removes a child from the list of children doodads maintained for this doodad.
 			/// This effectively reparents <paramref name="child">child</paramref> to have no ancestery. That is
@@ -248,7 +256,9 @@
 					found = true;
 					return null;
 				} else {
-					if (!disposing && !c.valid()) invalidCount++;
+					if (!disposing && !c.valid()) {
+						invalidCount++;
+					}
 					return c;
 				}
 			});
@@ -260,13 +270,13 @@
 					this._valid(true);
 				}
 			}
-		}
+		},
 
 		/* END doodad Hierarchy Management */
 
 		/* BEGIN CSS Class Management */
 
-		, _updateCssClass: function doodad$_updateCssClass() {
+		_updateCssClass: function doodad$_updateCssClass() {
 			///<summary>
 			///Assigns the computed CSS Class to the class attribute on the doodad's DOM element.
 			///</summary>
@@ -284,8 +294,8 @@
 			if (computedClass.length !== 0) {
 				this.element().addClass(computedClass.join(' '));
 			}
-		}
-		, cssClassPrefix: function doodad$cssClassPrefix() {
+		},
+		cssClassPrefix: function doodad$cssClassPrefix() {
 			///<summary>
 			/// The CSS Class Prefix is a space delimited list of CSS Classes that defines the look for all
 			/// instances of a particular doodad. By setting this property in a doodad
@@ -302,8 +312,8 @@
 			///This is an abstract method on the doodad base class.
 			///</remarks>
 			return '';
-		}
-		, cssClass: function doodad$cssClass(/*[cssClass]*/) {
+		},
+		cssClass: function doodad$cssClass(/*[cssClass]*/) {
 			///<summary>
 			/// Getter/Setter
 			///
@@ -330,13 +340,13 @@
 				this._cssClassOverrides = arguments[0];
 				this._updateCssClass();
 			}
-		}
+		},
 
 		/* END CSS Class Management */
 
 		/* BEGIN Input Focus Management */
 
-		, tabIndex: function doodad$tabIndex(/*[tabIndex]*/) {
+		tabIndex: function doodad$tabIndex(/*[tabIndex]*/) {
 			///<summary>
 			/// Getter/Setter
 			///
@@ -362,32 +372,32 @@
 					this.element().removeAttr('tabIndex');
 				}
 			}
-		}
-		, focus: function doodad$focus() {
+		},
+		focus: function doodad$focus() {
 			///<summary>
 			///Programatically assigns input focus to this doodad
 			///</summary>
 			this.element().focus();
-		}
-		, blur: function doodad$blur() {
+		},
+		blur: function doodad$blur() {
 			///<summary>
 			///Programmatically removes input focus from this doodad.
 			///</summary>
 			this.element().blur();
-		}
-		, hasInputFocus: function doodad$hasInputFocus() {
+		},
+		hasInputFocus: function doodad$hasInputFocus() {
 			///<summary>
 			/// Returns a boolean value indicating whether or not this doodad currently has
 			/// input focus or not.
 			///</summary>
 			return false;
-		}
+		},
 
 		/* END Input Focus Management */
 
 		/* BEGIN Data Management */
 
-		, dataSource: function doodad$dataSource(/*[value]*/) {
+		dataSource: function doodad$dataSource(/*[value]*/) {
 			///<summary>
 			/// Getter/Setter
 			///
@@ -409,8 +419,8 @@
 			} else {
 				this._dataSource = arguments[0];
 			}
-		}
-		, templateData: function doodad$templateData() {
+		},
+		templateData: function doodad$templateData() {
 			///<summary>
 			/// The Template Data is a mapping of the Data Source property to a schema that is consumable by
 			/// the Mustache templating engine. There are situations where even though it is possible to write
@@ -421,13 +431,13 @@
 			/// exactly the same.
 			///</summary>
 			return this.dataSource() || {};
-		}
+		},
 
 		/* END Data Management */
 
 		/* BEGIN Rendering */
 
-		, template: function doodad$template(key, value) {
+		template: function doodad$template(key, value) {
 			///<summary>
 			///Overrides the partial template with name "key" with the template given in "value"
 			///</summary>
@@ -443,9 +453,9 @@
 				// and we are changing one of the markup templates, then 
 				// we have to clone an instance of the shared copy
 				this._options.templates = $.extend(
-					{ __instance: true }
-					, this._options.templates
-					, { __compiledTemplate: null }
+					{ __instance: true },
+					this._options.templates,
+					{ __compiledTemplate: null }
 				);
 			}
 
@@ -453,9 +463,9 @@
 			if (this._options.templates.__compiledTemplate) {
 				this._options.templates.__compiledTemplate = null;
 			}
-		}
+		},
 
-		, _processTemplates: function doodad$_processTemplates() {
+		_processTemplates: function doodad$_processTemplates() {
 			///<summary>
 			/// Using the templateData property and the templates defined for this doodad, generates
 			/// the HTML that will be used as the source of the DOM fragment for this doodad.
@@ -466,19 +476,11 @@
 			/// will be triggered.
 			///</remarks>
 			if (!this._options.templates.__compiledTemplate) {
-				try {
-					this._options.templates.__compiledTemplate = Mustache.compile(this._options.templates['base'], this._options.templates);
-				} catch (e) {
-					if (e.is_mustache_error) {
-						console.error(e.message);
-					} else {
-						throw e;
-					}
-				}
+				this._options.templates.__compiledTemplate = Mustache.compile(this._options.templates.base, this._options.templates);
 			}
 			return this._options.templates.__compiledTemplate(this.templateData());
-		}
-		, _instantiateChildren: function doodad$_instantiateChildren() {
+		},
+		_instantiateChildren: function doodad$_instantiateChildren() {
 			///<summary>
 			/// Finds all "doodad" elements in the doodad's DOM and instantiates the
 			/// declared type. This is useful for building doodad graphs using 
@@ -498,8 +500,10 @@
 			var templateDataCache,
 				self = this;
 			
-			return this._source.find('doodad').map(function (index, doodadElement) {
-				var $doodadElement = $(doodadElement), asyncCreationDfd, dsAttr,
+			return this._source.find(DECLARATIVE_KEY).map(function (index, doodadElement) {
+				/*jshint evil:true */
+				var $doodadElement = $(doodadElement), dsAttr,
+					asyncCreationDfd, completionDfd = $.Deferred(),
 					options,
 					autogenId;
 
@@ -514,8 +518,7 @@
 				iS.insertAfter($doodadElement);
 				$doodadElement.remove();
 
-				var asyncCreationDfd = doodads.create($doodadElement.attr('url'), $doodadElement.attr('mixin'), options),
-					completionDfd = $.Deferred();
+				asyncCreationDfd = doodads.create($doodadElement.attr('url'), $doodadElement.attr('mixin'), options);
 				
 				asyncCreationDfd.promise().done(function(new_doodad) {
 					var $new_doodad = new_doodad._jQueryCache,
@@ -566,9 +569,9 @@
 						}
 						$new_doodad.bind(evtName, self[proxyName]);
 						self._autogenUnbinds.push({
-							doodad: new_doodad
-							, evt: evtName
-							, fn: self[proxyName]
+							doodad: new_doodad,
+							evt: evtName,
+							fn: self[proxyName]
 						});
 					});
 
@@ -583,8 +586,8 @@
 				
 				return completionDfd.promise();
 			}).get();
-		}
-		, translateInnerMarkup: function doodad$translateInnerMarkup(sourceElement) {
+		},
+		translateInnerMarkup: function doodad$translateInnerMarkup(sourceElement) {
 			///<summary>
 			/// Converts the inner markup of a <doodad> element in a markup template to 
 			/// equivalent code. By default this function converts the text/mustache script sections
@@ -619,9 +622,9 @@
 					}
 				}
 			}
-		}
-
-		, render: function doodad$render(target, rerender) {
+		},
+		
+		render: function doodad$render(target, rerender) {
 			///<summary>
 			/// Appends the DOM for this doodad to the DOM element specified by <paramref name="target">target</paramref>.
 			/// If <paramref name="target">target</paramref> is null/undefined and <paramref name="rerender">rerender</paramref> is
@@ -655,22 +658,22 @@
 			}
 
 			this.updateAttachment();
-		}
-		, rerender: function doodad$rerender() {
+		},
+		rerender: function doodad$rerender() {
 			///<summary>
 			/// Rerenders the DOM Element for a doodad. This is a shortform for
 			/// doodad.render(null, true);
 			///</summary>
 			this.render(null, true);
-		}
-		, detachElement: function doodad$detachElement() {
+		},
+		detachElement: function doodad$detachElement() {
 			///<summary>
 			/// Detaches the DOM element for this doodad. This is a shortform for
 			/// doodad.render(null, false);
 			///</summary>
 			this.render(null, false);
-		}
-		, constructElement: function doodad$constructElement() {
+		},
+		constructElement: function doodad$constructElement() {
 			///<summary>
 			/// Constructs a DOM Fragment representing the visual look for the doodad.
 			/// Child doodads should also be instantiated and referenced in this method.
@@ -687,7 +690,7 @@
 			$.each($.clean([htmlFrag.trim()], undefined, null, null),
 				function (index, element) { domFrag.appendChild(element); });
 
-			if (domFrag.firstChild != domFrag.lastChild) {
+			if (domFrag.firstChild !== domFrag.lastChild) {
 				// this is more of a guard condition. doodads *must* have a single topmost node
 				this._source = $('<div />').append(domFrag);
 			} else {
@@ -695,8 +698,8 @@
 			}
 
 			this._generateDOMReferences();
-		}
-		, ensureElement: function doodad$ensureElement() {
+		},
+		ensureElement: function doodad$ensureElement() {
 			///<summary>
 			/// Guarantees the existence of the DOM Fragment for this doodad.
 			/// This method is intended to support the doodad infrastructure. Call this
@@ -735,14 +738,14 @@
 				this.onReady();
 				this._selfReadyDfd.resolve();
 			}
-		}
-		, _generateDOMReferences: function doodad$_generateDOMReferences() {
+		},
+		_generateDOMReferences: function doodad$_generateDOMReferences() {
 			if (!this._options.autoDOMReferences) {
 				return;
 			}
 
 			var self = this;
-			this._source.find('[name]:not(doodad)').each(function (index, elem) {
+			this._source.find('[name]:not(' + DECLARATIVE_KEY + ')').each(function (index, elem) {
 				$.each(elem.getAttribute('name').split(' '), function () {
 					var name = '_' + this;
 					if (self[name]) {
@@ -753,8 +756,8 @@
 					}
 				});
 			});
-		}
-		, element: function doodad$element() {
+		},
+		element: function doodad$element() {
 			///<summary>
 			/// Returns a reference to the DOM Element for a doodad.
 			///</sumamry>
@@ -764,18 +767,20 @@
 			///</remarks>
 			this.ensureElement();
 			return this._source;
-		}
-		, isAttached: function doodad$isAttached() {
+		},
+		isAttached: function doodad$isAttached() {
 			///<summary>
 			/// Determines whether or not the document element is an
 			/// ancestor for the DOM element of this doodad.
 			///</summary>
-			if (!this._source) return false;
+			if (!this._source) {
+				return false;
+			}
 
 			var parentChain = this.element().parents();
 			return parentChain.length > 0 && parentChain[parentChain.length - 1].tagName === 'HTML';
-		}
-		, updateAttachment: function doodad$updateAttachment() {
+		},
+		updateAttachment: function doodad$updateAttachment() {
 			///<summary>
 			/// Update the DOM attachment of the doodad. Use this method if you are
 			/// bypassing the usage of the render method for whatever reason.
@@ -789,12 +794,12 @@
 				// transition from attached to non-attached
 				this._notifyDetachment();
 			}
-		}
+		},
 		/* END Rendering */
 
 		/* BEGIN Event Management */
 
-		, _notifyAttachment: function doodad$_notifyAttachment() {
+		_notifyAttachment: function doodad$_notifyAttachment() {
 			this._isAttached = true;
 
 			this.onAttached();
@@ -802,8 +807,8 @@
 			$.each(this.children(), function (index, child) {
 				child._notifyAttachment();
 			});
-		}
-		, _notifyDetachment: function doodad$_notifyDetachment() {
+		},
+		_notifyDetachment: function doodad$_notifyDetachment() {
 			this._isAttached = false;
 
 			this.onDetached();
@@ -811,9 +816,9 @@
 			$.each(this.children(), function (index, child) {
 				child._notifyDetachment();
 			});
-		}
+		},
 
-		, bindEvents: function doodad$bindEvents() {
+		bindEvents: function doodad$bindEvents() {
 			///<summary>
 			/// Called by the DOM construction method of the doodad base class to allow
 			/// doodad authors to bind events onto DOM elements.
@@ -825,25 +830,25 @@
 			///</remarks>
 
 			// Default Implementation is basically abstract since there is nothing to bind unto.
-		}
+		},
 
-		, onReady: function doodad$onReady() {
+		onReady: function doodad$onReady() {
 			///<summary>
 			/// Callback function that gets called when the doodad has finished the rendering process.
 			/// Note that this callback gets invoked after every time the root element is reconstructed (rerendered)
 			///</summary>
 
 			// Default Implementation is basically abstract since there is nothing to bind unto.
-		}
-		, onChildrenReady: function doodad$onChildrenReady() {
+		},
+		onChildrenReady: function doodad$onChildrenReady() {
 			///<summmary>
 			/// Callback function that gets called when the children doodads have finished the rendering process.
 			/// Note that this callback gets invoked afer every time the root element is reconstructed (rerendered)
 			///</summary>
 			
 			// Default Implementation is basically abstract since there is nothing to bind unto.
-		}
-		, whenReady: function doodad$whenReady(fn) {
+		},
+		whenReady: function doodad$whenReady(fn) {
 			///<summary>
 			/// Triggers the function given by the parameter when the doodad (and its children)
 			/// are in a ready state (effectively equivalent to being rendered and all internal 
@@ -873,9 +878,9 @@
 			}
 			
 			this._completionDfd.done(fn);
-		}
+		},
 
-		, onAttached: function doodad$onAttached() {
+		onAttached: function doodad$onAttached() {
 			///<summary>
 			/// Callback function that gets called when the doodad's root element is attached to the DOM document.
 			/// Note that this callback is only called if the doodad (or a parent of) is attached via the
@@ -885,8 +890,8 @@
 			///</summary>
 
 			// By default, nothing interesting happens when the doodad becomes attached.
-		}
-		, onDetached: function doodad$onDetached() {
+		},
+		onDetached: function doodad$onDetached() {
 			///<summary>
 			/// Callback function that gets called when the doodad's root element is detached from the DOM document.
 			/// Note that this callback is only called if the doodad (or a parent of) is detached via the
@@ -896,9 +901,9 @@
 			///</summary>
 
 			// By default, nothing interesting happens when the doodad becomes detached.
-		}
+		},
 
-		, _hookWindowResize: function doodad$_hookWindowResize() {
+		_hookWindowResize: function doodad$_hookWindowResize() {
 			///<summary>
 			/// Hooks the window.onresize event if an ancestor of this doodad hasn't already
 			/// hooked it.
@@ -915,9 +920,9 @@
 					$window.unbind('resize orientationchange', this.onWindowResize$proxy);
 				}
 			}
-		}
+		},
 
-		, onWindowResize: function doodad$onWindowResize() {
+		onWindowResize: function doodad$onWindowResize() {
 			///<summary>
 			/// Internal DOM event handler. Handles the window.onresize event 
 			/// and performs the necessary machination to bootstrap a recursive resize event in the doodad tree
@@ -929,9 +934,9 @@
 			}
 			this._currheight = document.documentElement.clientHeight;
 			this._currwidth = document.documentElement.clientWidth;
-		}
+		},
 
-		, _isResizeAutotriggered: function doodad$_isResizeAutotriggered() {
+		_isResizeAutotriggered: function doodad$_isResizeAutotriggered() {
 			///<summary>
 			/// If an ancestor in the doodad hierarchy implements an onResize function,
 			/// the onResize method of this doodad will be auto triggered either as part of a DOM triggered
@@ -944,9 +949,9 @@
 			}
 
 			return false;
-		}
+		},
 
-		, _onResize: function doodad$_onResize() {
+		_onResize: function doodad$_onResize() {
 			///<summary>
 			/// Performs a recursive walk of the descendents of this doodad calling onResize
 			/// if it exists on the descendent.
@@ -960,18 +965,18 @@
 			$.each(this.children(), function (index, child) {
 				child._onResize();
 			});
-		}
+		},
 
-		/*, onResize: function doodad$onResize() {
+		/*onResize: function doodad$onResize() {
 		///<summary>
 		/// onResize is an "optional" member of this class. If it is implemented, the doodad 
 		/// library will trigger it as part of a ancestor->descendants walk when listening to the
 		/// window.onresize event.
 		/// This function *must* be synchronous for the nested children to resize properly.
 		///</summary>
-		}*/
+		},*/
 
-		, trigger_resize: function doodad$trigger_resize(deferred) {
+		trigger_resize: function doodad$trigger_resize(deferred) {
 			///<summary>
 			/// Triggers a resize event with this doodad at the root of the doodad hierarchy
 			///</summary>
@@ -987,11 +992,11 @@
 			} else {
 				this._onResize();
 			}
-		}
+		},
 		/* END Event Management */
 
 		/* BEGIN Validation Management */
-		, _trigger_validity: function doodad$trigger_validity(isValid) {
+		_trigger_validity: function doodad$trigger_validity(isValid) {
 			var e = $.Event(isValid ? 'valid' : 'invalid'), 
 				params = Array.prototype.slice.call(arguments);
 			
@@ -1001,8 +1006,8 @@
 			if (!e.isPropagationStopped() && this.parent()) {
 				this.parent()._valid(isValid);
 			}
-		}
-		, trigger_valid: function doodad$trigger_valid() {
+		},
+		trigger_valid: function doodad$trigger_valid() {
 			///<summary>
 			/// Triggers the "valid" event.
 			///</summary>
@@ -1011,8 +1016,8 @@
 			/// by doodad consumers.
 			///</remarks>
 			this._trigger_validity(true);
-		}
-		, trigger_invalid: function doodad$trigger_invalid() {
+		},
+		trigger_invalid: function doodad$trigger_invalid() {
 			///<summary>
 			/// Triggers the "valid" event.
 			///</summary>
@@ -1021,8 +1026,8 @@
 			/// by doodad consumers.
 			///</remarks>
 			this._trigger_validity(false);
-		}
-		, valid: function doodad$valid(/*value*/) {
+		},
+		valid: function doodad$valid(/*value*/) {
 			/// <summary>
 			///		1: valid() - return the current validity.
 			///		2: valid(value) - sets the validity to "value".
@@ -1045,8 +1050,8 @@
 				this.listenToChildrenValidity(false);
 				this._valid(arguments[0]);
 			}
-		}
-		, validate: function doodad$validate() {
+		},
+		validate: function doodad$validate() {
 			///<summary>
 			/// Validate the contents of this doodad, triggering valid/invalid events
 			/// as necessary.
@@ -1059,8 +1064,8 @@
 			} else {
 				this.trigger_invalid(this);
 			}
-		}
-		, _computeValidityState: function doodad$_computeValidityState() {
+		},
+		_computeValidityState: function doodad$_computeValidityState() {
 			///<summary>
 			/// Check that all children are valid.  If one is invalid, then the doodad
 			/// itself is invalid
@@ -1073,13 +1078,13 @@
 					if (!child.valid()) {
 						isValid = false;
 						return false;
-					};
+					}
 				});
 			}
 
 			this._isValid = isValid;
-		}
-		, _valid: function doodad$_valid(/*value*/) {
+		},
+		_valid: function doodad$_valid(/*value*/) {
 			if (arguments.length === 0) {
 				return this._isValid;
 			} else {
@@ -1096,8 +1101,8 @@
 					this.trigger_invalid(this);
 				}
 			}
-		}
-		, listenToChildrenValidity: function doodad$listenToChildrenValidity(/*value*/) {
+		},
+		listenToChildrenValidity: function doodad$listenToChildrenValidity(/*value*/) {
 			///<summary>
 			/// Determines whether or not validity of this doodad should be the LOGICAL AND of the validity
 			/// states of the children or a value determined manually through the valid function.
@@ -1120,24 +1125,24 @@
 					this.validate();
 				}
 			}
-		}
+		},
 		/* END Validation Management*/
 
 		/* BEGIN Event Binding Helpers */
 		
-		, bind: function doodad$bind() {
+		bind: function doodad$bind() {
 			///<sumamry>
 			/// Same syntax as jQuery.bind
 			///</summary>
 			this._jQueryCache.bind.apply(this._jQueryCache, arguments);
-		}
-		, unbind: function doodad$unbind() {
+		},
+		unbind: function doodad$unbind() {
 			///<sumamry>
 			/// Same syntax as jQuery.unbind
 			///</summary>
 			this._jQueryCache.unbind.apply(this._jQueryCache, arguments);
-		}
-		, trigger: function doodad$trigger() {
+		},
+		trigger: function doodad$trigger() {
 			///<sumamry>
 			/// Maps unto jQuery.trigger.
 			///</summary>
@@ -1145,13 +1150,13 @@
 				evt = params.shift();
 			
 			this._jQueryCache.trigger(evt, params);
-		}
+		},
 		
 		/* END Event Binding Helpers */
 		
 		/* BEGIN doodad Life Cycle */
 
-		, tearDownChildren: function doodad$tearDownChildren() {
+		tearDownChildren: function doodad$tearDownChildren() {
 			///<summary>
 			/// Dispose all the children and null out any extra references to them
 			///</summary>
@@ -1170,9 +1175,9 @@
 			}, this));
 			this._autogenChildren.length = 0;
 			this._autogenRefs.length = 0;
-		}
+		},
 
-		, dispose: function doodad$dispose() {
+		dispose: function doodad$dispose() {
 			///<summary>
 			/// By default, recursively disposes of its children and then
 			/// removes the doodad out of the DOM and parent's children list
@@ -1201,7 +1206,7 @@
 			// the presense of the onResize function causes the hierarchy management functions to
 			// hook unto the window.onresize event in some conditions. to prevent this,
 			// unmap the function as part of teardown
-			delete this['onResize'];
+			delete this.onResize;
 			this.onResize = undefined; // IE is just plain weird
 
 			this.element()
@@ -1215,7 +1220,7 @@
 		}
 
 		/* END doodad Life Cycle */
-	}
+	};
 	doodad.prototype.constructor = doodad;
 	doodads.doodad = doodad;
 })();
