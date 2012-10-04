@@ -1,4 +1,11 @@
-﻿doodads.setup([jQuery])(function(builder, base, $) {
+﻿/*jshint browser:true, jquery:true */
+/*global doodads:true, Mustache:true */
+
+doodads.setup([jQuery])(function(builder, base, $) {
+	/*jshint bitwise:true, curly:true, eqeqeq:true, immed:true, latedef:true, undef:true, unused:true, smarttabs:true */
+	
+	'use strict';
+	
 	builder.constructor(function () {
 		///<summary>
 		/// The Generic List serves as a convenient base class for list-oriented Components like Menus.
@@ -6,11 +13,13 @@
 		/// in an efficient fashion. The presentation of the individual list elements is completely decoupled
 		/// from the data through the use of the templates.
 		///</summary>
-		this._dataSource = [];
-		this._itemMap = [];
-		this._containerElement = null;
-		this._singleItemTemplate = null;
-		this._guid = 0;
+		$.extend(this, {
+			_dataSource: [],
+			_itemMap: [],
+			_containerElement: null,
+			_singleItemTemplate: null,
+			_guid: 0
+		});
 	}).proto({
 		constructElement: function List$constructElement() {
 			///<summary>
@@ -95,7 +104,7 @@
 			this._dataSource = dataSourceRef;
 
 			if (!this._singleItemTemplate) {
-				this._singleItemTemplate = Mustache.compile(this._options.templates['item']);
+				this._singleItemTemplate = Mustache.compile(this._options.templates.item);
 			}
 
 			// some methods on the base Component class only work on the root DOM element (this._source)
@@ -155,15 +164,7 @@
 			/// this.templateData()
 			///</remarks>
 			if (!this._options.templates.__compiledTemplate) {
-				try {
-					this._options.templates.__compiledTemplate = Mustache.compile(this._options.templates['base'], this._options.templates);
-				} catch (e) {
-					if (e.is_mustache_error) {
-						console.error(e.message);
-					} else {
-						throw e;
-					}
-				}
+				this._options.templates.__compiledTemplate = Mustache.compile(this._options.templates.base, this._options.templates);
 			}
 			return this._options.templates.__compiledTemplate(dataSet);
 		},
@@ -259,7 +260,7 @@
 
 			if (typeof index !== 'undefined') {
 				if (!(index >= 0 && index <= this._dataSource.length)) {
-					throw Error('addItem: index out of range.');
+					throw new Error('addItem: index out of range.');
 				}
 
 				this._dataSource.splice(index, 0, item);
@@ -362,13 +363,13 @@
 			/// Note that the index parameter is validated using debugger assert statements.
 			///</remarks>
 			if (!(index >= 0 && index < this._dataSource.length)) {
-				throw Error('item: index out of range.');
+				throw new Error('item: index out of range.');
 			}
 			
 			if (arguments.length === 2) {
 				//set
 				if (typeof value === 'undefined') {
-					throw Error('item: value is undefined.');
+					throw new Error('item: value is undefined.');
 				}
 
 				var removedItem = this._itemMap[index];

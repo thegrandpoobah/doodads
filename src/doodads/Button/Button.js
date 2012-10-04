@@ -1,27 +1,36 @@
-﻿doodads.setup([jQuery])(function (builder, base, $) {
+﻿/*jshint browser:true, jquery:true */
+/*global doodads:true, Mustache:true */
+
+doodads.setup([jQuery])(function (builder, base, $) {
+	/*jshint bitwise:true, curly:true, eqeqeq:true, immed:true, latedef:true, undef:true, unused:true, smarttabs:true */
+	
+	'use strict';
+	
 	builder.constructor(function () {
-		this._textElement = null;
-
-		this._text = this._options.text;
-		this._tooltip = this._options.tooltip;
-		this._enabled = this._options.enabled;
-
-		this._baseCssClass = this._cssClassOverrides;
-		this._tracking = false;
-		this._active = false;
-
-		this._bindEventsInitial$proxy = doodads.proxy(this._bindEventsInitial, this);
-
-		this.onMouseDown$proxy = doodads.proxy(this.onMouseDown, this);
-		this.onMouseUp$proxy = doodads.proxy(this.onMouseUp, this);
-		this.onDocumentMouseUp$proxy = doodads.proxy(this.onDocumentMouseUp, this);
-		this.onMouseOut$proxy = doodads.proxy(this.onMouseOut, this);
-		this.onMouseOver$proxy = doodads.proxy(this.onMouseOver, this);
-
-		this.onFocus$proxy = doodads.proxy(this.onFocus, this);
-		this.onBlur$proxy = doodads.proxy(this.onBlur, this);
-		this.onKeyDown$proxy = doodads.proxy(this.onKeyDown, this);
-		this.onKeyUp$proxy = doodads.proxy(this.onKeyUp, this);
+		$.extend(this, {
+			_textElement: null,
+	
+			_text: this._options.text,
+			_tooltip: this._options.tooltip,
+			_enabled: this._options.enabled,
+	
+			_baseCssClass: this._cssClassOverrides,
+			_tracking: false,
+			_active: false,
+	
+			_bindEventsInitial$proxy: doodads.proxy(this._bindEventsInitial, this),
+	
+			onMouseDown$proxy: doodads.proxy(this.onMouseDown, this),
+			onMouseUp$proxy: doodads.proxy(this.onMouseUp, this),
+			onDocumentMouseUp$proxy: doodads.proxy(this.onDocumentMouseUp, this),
+			onMouseOut$proxy: doodads.proxy(this.onMouseOut, this),
+			onMouseOver$proxy: doodads.proxy(this.onMouseOver, this),
+	
+			onFocus$proxy: doodads.proxy(this.onFocus, this),
+			onBlur$proxy: doodads.proxy(this.onBlur, this),
+			onKeyDown$proxy: doodads.proxy(this.onKeyDown, this),
+			onKeyUp$proxy: doodads.proxy(this.onKeyUp, this)
+		});
 	}).defaultOptions({
 		text: '',
 		tooltip: null,
@@ -202,19 +211,14 @@
 			}
 		},
 		onKeyUp: function Button$onKeyUp(e) {
-			if (this.enabled()) {
-				switch (e.which) {
-					case doodads.keyCode.SPACE:
-						this._active = false;
-						this._updateCssClass();
+			if (this.enabled() && e.which === doodads.keyCode.SPACE) {
+				this._active = false;
+				this._updateCssClass();
 
-						this.trigger_click();
+				this.trigger_click();
 
-						e.preventDefault();
-						e.stopPropagation();
-
-						break;
-				}
+				e.preventDefault();
+				e.stopPropagation();
 			}
 		},
 		

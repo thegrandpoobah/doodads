@@ -1,6 +1,15 @@
+/*jshint browser:true, jquery:true */
+/*global doodads:true, Mustache:true */
+
 doodads.setup([jQuery])(function(builder, base, $) {
+	/*jshint bitwise:true, curly:true, eqeqeq:true, immed:true, latedef:true, undef:true, unused:true, smarttabs:true */
+	
+	'use strict';
+	
 	builder.constructor(function () {
-		this._text = this._options.text;
+		$.extend(this, {
+			_text: this._options.text
+		});
 	}).defaultOptions({
 		text: ''
 	}).proto({

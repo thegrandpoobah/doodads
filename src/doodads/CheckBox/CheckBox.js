@@ -1,19 +1,28 @@
+/*jshint browser:true, jquery:true */
+/*global doodads:true, Mustache:true */
+
 doodads.setup([jQuery])(function(builder, base, $) {
+	/*jshint bitwise:true, curly:true, eqeqeq:true, immed:true, latedef:true, undef:true, unused:true, smarttabs:true */
+	
+	'use strict';
+	
 	var defaultRequiredRule = function (checked) {
 		return {
 			valid: checked,
 			message: ''
-		}
+		};
 	};
 		
 	builder.constructor(function () {
-		this._text = this._options.text;
-		this._checked = this._options.checked;
-		this._enabled = true;
+		$.extend(this, {
+			_text: this._options.text,
+			_checked: this._options.checked,
+			_enabled: true,
 
-		this.onClick$proxy = doodads.proxy(this.onClick, this);
-		this.onFocus$proxy = doodads.proxy(this.onFocus, this);
-		this.onBlur$proxy = doodads.proxy(this.onBlur, this);
+			onClick$proxy: doodads.proxy(this.onClick, this),
+			onFocus$proxy: doodads.proxy(this.onFocus, this),
+			onBlur$proxy: doodads.proxy(this.onBlur, this)
+		});
 	}).defaultOptions({
 		text: '',
 		enabled: true,

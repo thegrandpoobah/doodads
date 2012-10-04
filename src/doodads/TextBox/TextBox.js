@@ -1,11 +1,18 @@
-﻿doodads.setup([jQuery])(function (builder, base, $) {
+﻿/*jshint browser:true, jquery:true */
+/*global doodads:true, Mustache:true, captureEvent:true, releaseEvent: true */
+
+doodads.setup([jQuery])(function (builder, base, $) {
+	/*jshint bitwise:true, curly:true, eqeqeq:true, immed:true, latedef:true, undef:true, unused:true, smarttabs:true */
+	
+	'use strict';
+	
 	var KEYUP_DEBOUNCE_PERIOD = 10; // in ms
 
 	var defaultRequiredRule = function (content) {
 		return {
 			valid: content.trim().length > 0,
 			message: ''
-		}
+		};
 	};
 
 	builder.constructor(function () {
@@ -45,12 +52,13 @@
 
 			return function (context) {
 				var l = context.toString().length;
+				
 				return {
 					valid: l >= min && l < max,
 					message: Mustache.format(format, l),
 					alwaysShow: true
 				};
-			}
+			};
 		}
 	}).proto({
 		onReady: function TextBox$onReady() {

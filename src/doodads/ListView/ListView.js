@@ -1,26 +1,35 @@
-﻿doodads.setup('core:List.doodad', [jQuery])(function(builder, base, $) {
+﻿/*jshint browser:true, jquery:true */
+/*global doodads:true, Mustache:true */
+
+doodads.setup('core:List.doodad', [jQuery])(function(builder, base, $) {
+	/*jshint bitwise:true, curly:true, eqeqeq:true, immed:true, latedef:true, undef:true, unused:true, smarttabs:true */
+	
+	'use strict';
+	
 	var FILTER_RESET_DEBOUNCE_TIME = 1000; // in ms
 	
 	builder.constructor(function () {
-		this._selectionSet = [];
+		$.extend(this, {
+			_selectionSet: [],
 
-		this._modifierComboMode = '_addToSelection';
-		this._rangeAnchorItem = null;
-		this._keyboardNavItem = null;
+			_modifierComboMode: '_addToSelection',
+			_rangeAnchorItem: null,
+			_keyboardNavItem: null,
 
-		this._hasInputFocus = false;
+			_hasInputFocus: false,
 
-		this._filterStr = '';
-		this._filterRepeatCount = 0;
-		this.killFilter$debounced = doodads.debounce(this.killFilter, FILTER_RESET_DEBOUNCE_TIME, this);
+			_filterStr: '',
+			_filterRepeatCount: 0,
+			killFilter$debounced: doodads.debounce(this.killFilter, FILTER_RESET_DEBOUNCE_TIME, this),
 
-		this.onFocus$proxy = doodads.proxy(this.onFocus, this);
-		this.onBlur$proxy = doodads.proxy(this.onBlur, this);
-		this.onKeyDown$proxy = doodads.proxy(this.onKeyDown, this);
-		this.onItemClick$proxy = doodads.proxy(this.onItemClick, this);
-		this.onItemdblClick$proxy = doodads.proxy(this.onItemdblClick, this);
-		this.onBackgroundClick$proxy = doodads.proxy(this.onBackgroundClick, this);
-		this.onModelChanged$proxy = doodads.proxy(this.onModelChanged, this);
+			onFocus$proxy: doodads.proxy(this.onFocus, this),
+			onBlur$proxy: doodads.proxy(this.onBlur, this),
+			onKeyDown$proxy: doodads.proxy(this.onKeyDown, this),
+			onItemClick$proxy: doodads.proxy(this.onItemClick, this),
+			onItemdblClick$proxy: doodads.proxy(this.onItemdblClick, this),
+			onBackgroundClick$proxy: doodads.proxy(this.onBackgroundClick, this),
+			onModelChanged$proxy: doodads.proxy(this.onModelChanged, this)
+		});
 	}).defaultOptions({
 		multiselect: true,
 		tabIndex: 0
@@ -37,7 +46,7 @@
 				.delegate('li', 'dblclick', this.onItemdblClick$proxy)
 				.bind('click', this.onBackgroundClick$proxy)
 				.bind('selectstart', function () {
-					return false
+					return false;
 				}); // disable text selection in IE
 		},
 		onComponentReady: function ListView$onComponentReady() {
@@ -55,14 +64,12 @@
 			}
 
 			return retVal;
-		}
+		},
 
-		,
 		hasInputFocus: function ListView$hasInputFocus() {
 			return this._hasInputFocus;
-		}
+		},
 
-		,
 		_setKeyboardNavItem: function ListView$_setKeyboardNavItem(value) {
 			this._keyboardNavItem = value;
 
@@ -99,9 +106,8 @@
 				source[0].scrollTop = itemTop;
 			}
 			// otherwise inside the viewport so nothing to do
-		}
+		},
 
-		,
 		selection: function ListView$selection( /*value, trigger*/ ) {
 			if (arguments.length === 0) {
 				return this._selectionSet;
@@ -163,9 +169,9 @@
 					this.trigger_changed();
 				}
 			}
-		}
+		},
 
-		,_filter: function ListView$_filter(ch) {
+		_filter: function ListView$_filter(ch) {
 			var i;
 
 			if (ch === this._filterStr) {
@@ -233,6 +239,13 @@
 		_addToSelection: function ListView$_addToSelection(start, end) {
 			var addAfter, nI, temp, i, newSelection = this.selection();
 
+			function selectionIter(i, sI) {
+				if (sI === nI) {
+					addAfter = false;
+					return false; // break;
+				}
+			}
+			
 			end = typeof (end) === 'undefined' ? start : end;
 
 			if (start > end) {
@@ -246,12 +259,7 @@
 				addAfter = true;
 				nI = this.item(i);
 
-				$.each(newSelection, $.proxy(function (index, sI) {
-					if (sI === nI) {
-						addAfter = false;
-						return false; // break;
-					}
-				}, this));
+				$.each(newSelection, selectionIter);
 
 				if (addAfter) {
 					newSelection.push(nI);
@@ -412,6 +420,7 @@
 		},
 		onKeyDown: function ListView$onKeyDown(e) {
 			function navigationHelper(delta) {
+				/*jshint validthis:true */
 				if (this._options.multiselect) {
 					if (e.metaKey && e.shiftKey) {
 						// if shift is pressed, then use range anchor to find the range to select
@@ -518,6 +527,7 @@
 						e.preventDefault();
 						break;
 					}
+					/* falls through */
 				default:
 					var ch = String.fromCharCode(e.which);
 

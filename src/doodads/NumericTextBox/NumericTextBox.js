@@ -1,4 +1,11 @@
-﻿doodads.setup([jQuery])(function(builder, base, $) {
+﻿/*jshint browser:true, jquery:true */
+/*global doodads:true, Mustache:true */
+
+doodads.setup([jQuery])(function(builder, base, $) {
+	/*jshint bitwise:true, curly:true, eqeqeq:true, immed:true, latedef:true, undef:true, unused:true, smarttabs:true */
+	
+	'use strict';
+	
 	var EPSILON = 1e-10,
 		NUMREGEX = /^\-?([1-9]{1}[0-9]{0,2}(\,\d{3})*(\.\d{0,})?|[1-9]{1}\d{0,}(\.\d{0,})?|0(\.\d{0,})?|(\.\d{0,}))$|^\-?([1-9]{1}\d*(\,\d{3})*(\.\d{0,})?|[1-9]{1}\d{0,}(\.\d{0,})?|0(\.\d{0,})?|(\.\d{0,}))$|^\(([1-9]{1}\d{0,2}(\,\d{3})*(\.\d{0,})?|[1-9]{1}\d{0,}(\.\d{0,})?|0(\.\d{0,})?|(\.\d{0,}))\)$/;
 
@@ -17,21 +24,26 @@
 
 	var formatters = {
 		addComma: function (number, dec_places, no_value, prefix, suffix) {
-			if (no_value == null) no_value = '';
-			if (number == null) return no_value;
+			if (no_value === null) {
+				no_value = '';
+			}
+			if (number === null) {
+				return no_value;
+			}
+			var str;
 			var new_number = '';
 			var i = 0; //Just used in loops
 			var sign = ""; //If negative, a minus sign will be prefixed to the result
-			var number = number.toString(); //We need to operate on and return a string, not a number
+			number = number.toString(); //We need to operate on and return a string, not a number
 			// Handle cases when number is in the exp form, such as "6e-7".
 			// In this case, we actually want the expanded form, that is "-0.0000006"
-			exp = number.indexOf('e');
+			var exp = number.indexOf('e');
 			if (exp > -1) {
-				var str = number.substring(exp + 1);
+				str = number.substring(exp + 1);
 				var num = number.substring(0, exp).replace(/-|\./g, '');
-				var dec = parseInt(number.substring(exp + 2)) - 1;
-				var str = (num.charAt(0) == '-') ? '-0.' : '0.';
-				for (var i = 0; i < dec; i++) {
+				var dec = parseInt(number.substring(exp + 2), 10) - 1;
+				str = (num.charAt(0) === '-') ? '-0.' : '0.';
+				for (i = 0; i < dec; i++) {
 					str += '0';
 				}
 				number = str + num;
@@ -39,26 +51,26 @@
 			//Remove any excess white space
 			number = number.replace(/^\s+|\s+$/g, '');
 			//Do we have a negative number?
-			if (number.charAt(0) == '-') //minus sign
+			if (number.charAt(0) === '-') //minus sign
 			{
 				sign = '-';
 				number = number.substring(1);
 			}
-			dec_places = parseInt(dec_places);
-			dec_point_pos = number.lastIndexOf('.');
+			dec_places = parseInt(dec_places, 10);
+			var dec_point_pos = number.lastIndexOf('.');
 			//If there is nothing before the decimal point, prefix with a zero
-			if (dec_point_pos == 0) {
+			if (dec_point_pos === 0) {
 				number = '0' + number;
 				dec_point_pos = 1;
 			}
 			//Is number an integer?
-			if (dec_point_pos == -1 || dec_point_pos == number.length - 1) {
+			if (dec_point_pos === -1 || dec_point_pos === number.length - 1) {
 				if (dec_places > 0) {
 					new_number = number + '.';
 					for (i = 0; i < dec_places; i++) {
 						new_number += '0';
 					}
-					if (new_number == 0) {
+					if (new_number === 0) {
 						sign = '';
 					}
 					str = sign + new_number;
@@ -67,7 +79,7 @@
 				}
 			} else {
 				var existing_places = (number.length - 1) - dec_point_pos;
-				if (existing_places == dec_places) {
+				if (existing_places === dec_places) {
 					//Do we already have the right number of decimal places?
 					str = sign + number;
 				} else if (existing_places < dec_places) {
@@ -77,7 +89,9 @@
 					for (i = existing_places; i < dec_places; i++) {
 						new_number += '0';
 					}
-					if (new_number == 0) sign = '';
+					if (new_number === 0) {
+						sign = '';
+					}
 					str = sign + new_number;
 				} else {
 					//Work out whether to round up or not
@@ -92,7 +106,7 @@
 					//Round up the last digit if required, and continue until no more 9's are found
 					if (round_up) {
 						for (i = digit_array.length - 1; i >= 0; i--) {
-							if (digit_array[i] != '.') {
+							if (digit_array[i] !== '.') {
 								digit_array[i]++;
 								if (digit_array[i] < 10) {
 									break;
@@ -102,18 +116,22 @@
 					}
 					//Reconstruct the string, converting any 10's to 0's (except for first digit which can stay as a 10)
 					for (i = 0; i <= end_pos; i++) {
-						new_number += (digit_array[i] == "." || digit_array[i] < 10 || i == 0) ? digit_array[i] : '0';
+						new_number += (digit_array[i] === "." || digit_array[i] < 10 || i === 0) ? digit_array[i] : '0';
 					}
 					//If there are no decimal places, we don't need a decimal point
-					if (dec_places == 0) new_number = new_number.replace('.', '');
-					if (new_number == 0) sign = '';
+					if (dec_places === 0) {
+						new_number = new_number.replace('.', '');
+					}
+					if (new_number === 0) {
+						sign = '';
+					}
 					str = sign + new_number;
 				}
 			}
 			// Add commas
-			strArray = str.split('.');
-			x1 = strArray[0];
-			x2 = strArray.length > 1 ? '.' + strArray[1] : '';
+			var strArray = str.split('.');
+			var x1 = strArray[0];
+			var x2 = strArray.length > 1 ? '.' + strArray[1] : '';
 			var rgx = /(\d+)(\d{3})/;
 			while (rgx.test(x1)) {
 				x1 = x1.replace(rgx, '$1' + ',' + '$2');
@@ -135,11 +153,14 @@
 			value = sign + value.replace(/[\(\)-,%]/g, '');
 			return value;
 		}
-	}
+	};
 
 	builder.constructor(function () {
-		this._backValue = this._frontValue = this._options.value;
-
+		$.extend(this, {
+			_backValue: this._options.value,
+			_frontValue: this._options.value
+		});
+		
 		var textDecimals = this._options.textDecimals;
 		var valueDecimals = this._options.valueDecimals;
 
@@ -156,8 +177,8 @@
 		enabled: true,
 		textDecimals: 2,
 		valueDecimals: 4
-    }).validates()
-    .proto({
+	}).validates()
+	.proto({
 		onChildrenReady: function NumericTextBox$onChildrenReady() {
 			base.onChildrenReady.apply(this, arguments);
 			

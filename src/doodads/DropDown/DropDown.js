@@ -1,4 +1,11 @@
-﻿doodads.setup('core:List.doodad', [jQuery])(function(builder, base, $) {
+﻿/*jshint browser:true, jquery:true */
+/*global doodads:true, Mustache:true, grabbag:true */
+
+doodads.setup('core:List.doodad', [jQuery])(function(builder, base, $) {
+	/*jshint bitwise:true, curly:true, eqeqeq:true, immed:true, latedef:true, undef:true, unused:true, smarttabs:true */
+	
+	'use strict';
+	
 	var FILTER_RESET_DEBOUNCE_TIME = 1000; // in ms
 	
 	var activeDropDown = null;
@@ -11,43 +18,79 @@
 			};
 		};
 	};
+	
+	// Copied verbatim from: http://www.alexandre-gomes.com/?p=115
+	// Licenced under the Public Domain License
+	function getScrollbarWidth() {
+		if (!getScrollbarWidth._width) {
+			var inner = document.createElement('p');
+			inner.style.width = "100%";
+			inner.style.height = "200px";
+
+			var outer = document.createElement('div');
+			outer.style.position = "absolute";
+			outer.style.top = "0px";
+			outer.style.left = "0px";
+			outer.style.visibility = "hidden";
+			outer.style.width = "200px";
+			outer.style.height = "150px";
+			outer.style.overflow = "hidden";
+			outer.appendChild(inner);
+
+			document.body.appendChild(outer);
+			var w1 = inner.offsetWidth;
+			outer.style.overflow = 'scroll';
+			var w2 = inner.offsetWidth;
+			if (w1 === w2) {
+				w2 = outer.clientWidth;
+			}
+
+			document.body.removeChild(outer);
+
+			getScrollbarWidth._width = w1 - w2;
+		}
+
+		return getScrollbarWidth._width;
+	}
+	getScrollbarWidth._width = null;
 
 	builder.constructor(function () {
-		this._affordanceText = null;
-		this._focused = false;
-		this._enabled = true;
-		this._cancelHover = false;
-		this._isListVisible = false;
-		this._isListPinned = false;
-		this._watermark = this._options.watermark;
-		this._selectedIndex = undefined;
-		this._selectedItem = undefined;
-		this._scrollTopBuffered = 0;
+		$.extend(this, {
+			_affordanceText: null,
+			_focused: false,
+			_cancelHover: false,
+			_isListVisible: false,
+			_isListPinned: false,
+			_watermark: this._options.watermark,
+			_selectedIndex: undefined,
+			_selectedItem: undefined,
+			_scrollTopBuffered: 0,
 
-		this._hoverTimer = null;
-		this._hidingTimeout = null;
+			_hoverTimer: null,
+			_hidingTimeout: null,
 
-		this.onFocus$proxy = doodads.proxy(this.onFocus, this);
-		this.onBlur$proxy = doodads.proxy(this.onBlur, this);
+			_filterStr: '',
+			_filterRepeatCount: 0,
+			_enabled: this._options.enabled,
+			
+			onFocus$proxy: doodads.proxy(this.onFocus, this),
+			onBlur$proxy: doodads.proxy(this.onBlur, this),
 
-		this.onItemRendered$proxy = doodads.proxy(this.onItemRendered, this);
-		this.onModelChanged$proxy = doodads.proxy(this.onModelChanged, this);
-		this.onAffordanceMouseOver$proxy = doodads.proxy(this.onAffordanceMouseOver, this);
-		this.onAffordanceMouseOut$proxy = doodads.proxy(this.onAffordanceMouseOut, this);
-		this.onListMouseOver$proxy = doodads.proxy(this.onListMouseOver, this);
-		this.onListMouseOut$proxy = doodads.proxy(this.onListMouseOut, this);
-		this.onAffordanceMouseDown$proxy = doodads.proxy(this.onAffordanceMouseDown, this);
-		this.onItemHover$proxy = doodads.proxy(this.onItemHover, this);
-		this.onItemClick$proxy = doodads.proxy(this.onItemClick, this);
-		this.onCapturedMouseDown$proxy = doodads.proxy(this.onCapturedMouseDown, this);
-		this.onWindowScroll$proxy = doodads.proxy(this.onWindowScroll, this);
-		this.onKeyDown$proxy = doodads.proxy(this.onKeyDown, this);
-		this.killFilter$debounced = doodads.debounce(this.killFilter, FILTER_RESET_DEBOUNCE_TIME, this);
-		this.hide$proxy = doodads.proxy(this.hide, this);
-		
-		this._filterStr = '';
-		this._filterRepeatCount = 0;
-		this._enabled = this._options.enabled;
+			onItemRendered$proxy: doodads.proxy(this.onItemRendered, this),
+			onModelChanged$proxy: doodads.proxy(this.onModelChanged, this),
+			onAffordanceMouseOver$proxy: doodads.proxy(this.onAffordanceMouseOver, this),
+			onAffordanceMouseOut$proxy: doodads.proxy(this.onAffordanceMouseOut, this),
+			onListMouseOver$proxy: doodads.proxy(this.onListMouseOver, this),
+			onListMouseOut$proxy: doodads.proxy(this.onListMouseOut, this),
+			onAffordanceMouseDown$proxy: doodads.proxy(this.onAffordanceMouseDown, this),
+			onItemHover$proxy: doodads.proxy(this.onItemHover, this),
+			onItemClick$proxy: doodads.proxy(this.onItemClick, this),
+			onCapturedMouseDown$proxy: doodads.proxy(this.onCapturedMouseDown, this),
+			onWindowScroll$proxy: doodads.proxy(this.onWindowScroll, this),
+			onKeyDown$proxy: doodads.proxy(this.onKeyDown, this),
+			killFilter$debounced: doodads.debounce(this.killFilter, FILTER_RESET_DEBOUNCE_TIME, this),
+			hide$proxy: doodads.proxy(this.hide, this)
+		});
 
 		this.bind('itemRendered', this.onItemRendered$proxy);
 		this.bind('modelChanged', this.onModelChanged$proxy);
@@ -194,7 +237,7 @@
 				var found = false, i, n;
 
 				for (i = 0, n = this.count(); i < n; ++i) {
-					if (this.item(i).value == arguments[0]) {
+					if (this.item(i).value === arguments[0]) {
 						this.selectedIndex(i, arguments[1]);
 						found = true;
 						break;
@@ -245,7 +288,7 @@
 		},
 		_ellipsesText: function DropDown$_ellipsesText(itemText) {
 			// The minus is for the arrow... i think
-			return itemText.crop(this._affordance.width() - 20, this._affordanceText[0]);
+			return grabbag.measure.crop(itemText, this._affordance.width() - 20, this._affordanceText[0]);
 		},
 		enabled: function DropDown$enabled( /*enabled*/ ) {
 			if (arguments.length === 0) {
@@ -282,7 +325,9 @@
 			this.hide();
 		},
 		onAffordanceMouseDown: function DropDown$onAffordanceMouseDown(e) {
-			if (!this.enabled()) return;
+			if (!this.enabled()) {
+				return;
+			}
 
 			window.clearTimeout(this._hoverTimer);
 
@@ -304,7 +349,9 @@
 			e.stopImmediatePropagation();
 		},
 		onAffordanceMouseOver: function DropDown$onAffordanceMouseOver(e) {
-			if (!this.enabled()) return;
+			if (!this.enabled()) {
+				return;
+			}
 
 			this._cancelHover = false;
 
@@ -316,13 +363,16 @@
 				clearTimeout(this._hoverTimer);
 			}
 
-			this._hoverTimer = setTimeout($.proxy(function () {
-				this._hoverTimer = null;
-				if (this._cancelHover) return;
-				this._affordance.removeClass('tracking');
-				this.show();
-				this.focus();
-			}, this), this._options.showAfter);
+			var self = this;
+			this._hoverTimer = setTimeout(function () {
+				self._hoverTimer = null;
+				if (self._cancelHover) {
+					return;
+				}
+				self._affordance.removeClass('tracking');
+				self.show();
+				self.focus();
+			}, this._options.showAfter);
 
 			if (!this._isListPinned) {
 				window.clearTimeout(this._hidingTimeout);
@@ -380,7 +430,9 @@
 			e.stopPropagation();
 		},
 		onFocus: function DropDown$onFocus() {
-			if (!this.enabled()) return;
+			if (!this.enabled()) {
+				return;
+			}
 
 			this._focused = true;
 			this._affordance.addClass('tracking');
@@ -460,7 +512,9 @@
 			this._filterRepeatCount = 0;
 		},
 		onKeyDown: function DropDown$onKeyDown(e) {
-			if (!this.enabled()) return;
+			if (!this.enabled()) {
+				return;
+			}
 
 			var key = e.keyCode || e.which;
 
@@ -557,7 +611,9 @@
 		},
 
 		show: function DropDown$show() {
-			if (this._isListVisible) return;
+			if (this._isListVisible) {
+				return;
+			}
 			
 			var list = this._list[0],
 				affordance = this._affordance[0],
@@ -670,11 +726,11 @@
 			}
 
 			$(this._affordance).bind('ancestorscroll', this.onWindowScroll$proxy);
-			captureEvent('mousedown', this.element(), this.onCapturedMouseDown$proxy);
+			grabbag.event.capture('mousedown', this.element(), this.onCapturedMouseDown$proxy);
 		},
 		hide: function DropDown$hide() {
 			$(this._affordance).unbind('ancestorscroll', this.onWindowScroll$proxy);
-			releaseEvent('mousedown');
+			grabbag.event.release('mousedown');
 
 			this._affordance.removeClass('active');
 

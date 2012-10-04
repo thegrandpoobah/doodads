@@ -1,11 +1,20 @@
-﻿doodads.setup([jQuery])(function(builder, base, $) {
-	builder.constructor(function () {
-		this._text = this._options.text;
-		this._checked = this._options.checked;
-		this._enabled = true;
-		this._group = this._options.group;
+﻿/*jshint browser:true, jquery:true */
+/*global doodads:true, Mustache:true */
 
-		this.onClick$proxy = doodads.proxy(this.onClick, this);
+doodads.setup([jQuery])(function(builder, base, $) {
+	/*jshint bitwise:true, curly:true, eqeqeq:true, immed:true, latedef:true, undef:true, unused:true, smarttabs:true */
+	
+	'use strict';
+	
+	builder.constructor(function () {
+		$.extend(this, {
+			_text: this._options.text,
+			_checked: this._options.checked,
+			_enabled: true,
+			_group: this._options.group,
+
+			onClick$proxy: doodads.proxy(this.onClick, this)
+		});
 	}).defaultOptions({
 		text: '',
 		enabled: true,
