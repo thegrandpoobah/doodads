@@ -8,8 +8,11 @@ var sourceFiles = [
 	, 'core/builder.js'
 	, 'core/utils.js'
 	, 'core/Validator.js'
-	, 'core/HintBoxValidationListener.js'
 	, 'core/config.js'
+];
+
+var listenersFiles = [
+	'validationListeners/hintbox.js'
 ];
 	
 function makeDirectoryIfNotExists(path) {
@@ -49,14 +52,8 @@ function concatenate(files, outputFile, withPreamble) {
 	fs.writeSync(out, output);
 }
 
-desc('Concatenation');
-task('concatenate', function(params) {
-	concatenate(sourceFiles, 'doodads.js', true);
-});
-
-desc('Code Lint');
-task('lint', function() {
-	sourceFiles.forEach(function(file, i) {
+function lint(files) {
+	files.forEach(function(file, i) {
 		var all = fs.readFileSync('src/' + file).toString();
 		
 		var result = jshint.JSHINT(all, {}, {});
@@ -70,24 +67,58 @@ task('lint', function() {
 			}
 		}
 	});
+}
+
+function minify(inputFile, outputFile) {
+	try {
+		var all = fs.readFileSync('output/' + inputFile).toString(),
+			out = fs.openSync('output/' + outputFile, 'w+'),
+			ast = uglify.parser.parse(all);
+
+		ast = uglify.uglify.ast_mangle(ast);
+		ast = uglify.uglify.ast_squeeze(ast);
+
+		fs.writeSync(out, uglify.uglify.gen_code(ast));
+	} catch(e) {
+		console.error(e);
+	}
+}
+
+function copyFile(srcFile, destFile) {
+	var BUF_LENGTH, buff, bytesRead, fdr, fdw, pos;
+	BUF_LENGTH = 64 * 1024;
+	buff = new Buffer(BUF_LENGTH);
+	fdr = fs.openSync(srcFile, 'r');
+	fdw = fs.openSync(destFile, 'w');
+	bytesRead = 1;
+	pos = 0;
+	while (bytesRead > 0) {
+		bytesRead = fs.readSync(fdr, buff, 0, BUF_LENGTH, pos);
+		fs.writeSync(fdw, buff, 0, bytesRead);
+		pos += bytesRead;
+	}
+	fs.closeSync(fdr);
+	return fs.closeSync(fdw);
+};
+
+desc('Linter');
+task('lint', function(params) {
+	lint(sourceFiles);
+	lint(listenersFiles);
 });
 
-desc('Obfuscation and Compression');
-task({'minify': ['lint', 'concatenate']}, function(params) {
-	function minify(inputFile, outputFile) {
-		try {
-			var all = fs.readFileSync('output/' + inputFile).toString(),
-				out = fs.openSync('output/' + outputFile, 'w+'),
-				ast = uglify.parser.parse(all);
-
-			ast = uglify.uglify.ast_mangle(ast);
-			ast = uglify.uglify.ast_squeeze(ast);
-
-			fs.writeSync(out, uglify.uglify.gen_code(ast));
-		} catch(e) {
-			console.error(e);
-		}
-	}
-
+desc('Library');
+task('library', function(params) {
+	lint(sourceFiles);
+	concatenate(sourceFiles, 'doodads.js', true);
 	minify('doodads.js', 'doodads.min.js');
+});
+
+desc('Validation Listeners');
+task('listeners', function(params) {
+	lint(listenersFiles);
+	listenersFiles.forEach(function(file, i) {
+		copyFile('src/' + file, 'output/' + file);
+		minify(file, file.replace('.js', '.min.js'));
+	});
 });

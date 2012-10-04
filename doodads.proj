@@ -8,6 +8,12 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
+		<CreateFolder Include="$(OutputTarget)" />
+		<CreateFolder Include="$(OutputTarget)/doodads" />
+		<CreateFolder Include="$(OutputTarget)/validationListeners" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<DoodadDirectory Include="src/doodads/Button" />
 		<DoodadDirectory Include="src/doodads/CheckBox" />
 		<DoodadDirectory Include="src/doodads/DropDown" />
@@ -23,10 +29,10 @@
 		<Jakefile Include="Jakefile" />
 	</ItemGroup>
 	
-	<Target Name="All" DependsOnTargets="BuildTask;Library;Lint;StaticAssembly" />
+	<Target Name="All" DependsOnTargets="BuildTask;Library;Listeners;LintDoodads;StaticAssembly" />
 	
 	<Target Name="CreateOutput">
-		<MakeDir Directories="$(OutputTarget)" Condition="!Exists('$(OutputTarget)')" />
+		<MakeDir Directories="%(CreateFolder.Identity)" Condition="!Exists('%(CreateFolder.Identity)')" />
 	</Target>
 	
 	<Target Name="BuildTask" DependsOnTargets="CreateOutput">
@@ -34,19 +40,25 @@
 		<MSBuild Projects="builders/csharp/Doodads.Builder/Doodads.Builder.csproj" Properties="Configuration=Release" />
 	</Target>
 	
-	<Target Name="Lint">
+	<Target Name="LintDoodads">
 		<Exec Command="node -e &quot;require('jshint/lib/cli').interpret(['', process.argv[1]])&quot; %(DoodadDirectory.Identity)/%(DoodadDirectory.Filename).js" IgnoreExitCode="true" />
+	</Target>
+	
+	<Target Name="Lint" DependsOnTargets="LintDoodads">
 		<Exec Command="jake lint" />
 	</Target>
 	
 	<Target Name="Library" DependsOnTargets="CreateOutput">
 		<!-- Build doodads.js and doodads.min.js -->
-		<Exec Command="jake minify" />
+		<Exec Command="jake library" />
+	</Target>
+	
+	<Target Name="Listeners" DependsOnTargets="CreateOutput">
+		<Exec Command="jake listeners" />
 	</Target>
 	
 	<Target Name="StaticAssembly" DependsOnTargets="BuildTask">
 		<!-- Merges all doodads from their constituent parts into a set of static javascript files -->
-		<MakeDir Directories="$(OutputTarget)/doodads" Condition="!Exists('$(OutputTarget)/doodads/')" />
 		<BuildDoodad SourceDirectories="@(DoodadDirectory)" OutputDirectory="$(OutputTarget)/doodads/" />
 	</Target>
 	
