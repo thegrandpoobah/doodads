@@ -54,6 +54,9 @@
     <Content Include="..\..\..\output\doodads.js">
       <Link>JavaScript\doodads.js</Link>
     </Content>
+    <Content Include="..\..\..\output\validationListeners\hintbox.js">
+      <Link>JavaScript\hintbox.js</Link>
+    </Content>
     <Content Include="..\..\..\support\grabbag.js">
       <Link>JavaScript\grabbag.js</Link>
     </Content>

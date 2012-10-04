@@ -6,6 +6,7 @@
     <script type="text/javascript" src="JavaScript/mustache.js"></script>
     <script type="text/javascript" src="JavaScript/grabbag.js"></script>
     <script type="text/javascript" src="JavaScript/doodads.js"></script>
+    <script type="text/javascript" src="JavaScript/hintbox.js"></script>
     <style>
         @import url('tipsy.css');
         
@@ -17,6 +18,7 @@
     <script type="text/javascript">
         $(function () {
             doodads.config.repositories['core'] = '/doodads/';
+            doodads.config.defaultValidationListeners = 'hintbox';
             doodads.create('core:Button.doodad', { text: 'Button' })
                 .done(function (doodad) {
                     doodad.render($(document.body));
