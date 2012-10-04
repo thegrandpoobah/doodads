@@ -1,5 +1,5 @@
 /*jshint browser:true, jquery:true */
-/*global doodads:true, Mustache:true, captureEvent:true, releaseEvent: true */
+/*global doodads:true, Mustache:true */
 
 (function() {
 	/*jshint bitwise:true, curly:true, eqeqeq:true, immed:true, latedef:true, undef:true, unused:true, smarttabs:true, newcap:false */
@@ -368,9 +368,9 @@
 				inheritsFrom = undefined;
 			}
 			
-			var constructor;
-			constructor = activeConstruction = new builder(),
-			var definition = $.extend({
+			activeConstruction = new builder();
+			var constructor = activeConstruction,
+				definition = $.extend({
 					templates: null,
 					stylesheets: null
 				}, doodads.setup.definition);

@@ -1,5 +1,5 @@
 /*jshint browser:true, jquery:true */
-/*global doodads:true, Mustache:true, captureEvent:true, releaseEvent: true */
+/*global doodads:true, Mustache:true */
 
 (function() {
 	/*jshint bitwise:true, curly:true, eqeqeq:true, immed:true, latedef:true, undef:true, unused:true, smarttabs:true */
@@ -32,13 +32,13 @@
 		}
 	};
 
-	/**
-	 * Debounce and throttle functions adatapted from http://code.google.com/p/jquery-debounce/
-	 * Used under the MIT license
-	 *
-	 * Proxy functions adapted from Underscore.js (http://documentcloud.github.com/underscore/underscore.js)
-	 * Used under the MIT license
-	 */
+	/*
+	Debounce and throttle functions adatapted from http://code.google.com/p/jquery-debounce/
+	Used under the MIT license
+	
+	Proxy functions adapted from Underscore.js (http://documentcloud.github.com/underscore/underscore.js)
+	Used under the MIT license
+	*/
 	$.extend(doodads, {
 		debounce: function doodads$debounce(fn, timeout, invokeAsap, ctx) {
 			if(arguments.length === 3 && typeof invokeAsap !== 'boolean') {

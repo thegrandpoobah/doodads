@@ -1,5 +1,5 @@
 /*jshint browser:true, jquery:true */
-/*global doodads:true, Mustache:true, captureEvent:true, releaseEvent: true */
+/*global doodads:true, Mustache:true, grabbag: true */
 
 (function() {
 	/*jshint bitwise:true, curly:true, eqeqeq:true, immed:true, latedef:true, undef:true, unused:true, smarttabs:true */
@@ -162,7 +162,7 @@
 			
 			isBoxVisible = true;
 			
-			window.captureEvent('mousedown', this._doodad.element(), this.onCapturedMouseDown$proxy);
+			grabbag.event.capture('mousedown', this._doodad.element(), this.onCapturedMouseDown$proxy);
 		},
 		hideHintBox: function HintBoxValidationListener$hideHintBox() {
 			if (!isBoxVisible) {
@@ -173,7 +173,7 @@
 			
 			isBoxVisible = false;
 
-			window.releaseEvent('mousedown');
+			grabbag.event.release('mousedown');
 		},
 
 		dispose: function HintBoxValidationListener$dispose(doodad) {

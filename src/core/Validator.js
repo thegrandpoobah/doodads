@@ -1,5 +1,5 @@
 /*jshint browser:true, jquery:true */
-/*global doodads:true, Mustache:true, captureEvent:true, releaseEvent: true */
+/*global doodads:true, Mustache:true */
 
 (function() {
 	/*jshint bitwise:true, curly:true, eqeqeq:true, immed:true, latedef:true, undef:true, unused:true, smarttabs:true */
