@@ -12,7 +12,7 @@
 		// The list of methods to override on the prototype to get correct behaviour
 		OVERRIDEMETHODS = ['valid', 'validationContext', 'isValidationContextEmpty', 'dispose'];
 		
-	var validationListeners = [];
+	var validationListeners = {};
 		
 	// The validator class gets mixed with the doodad class using the doodads.validation.add method
 	// In the vast majority of cases, this is done automatically via the doodads.setup family of functions.
@@ -230,39 +230,17 @@
 			///</summary>
 			var i, n, listener;
 
-			this._listeners = [];
 			privateMethods.tearDownValidationListeners.call(this);
+			this._listeners = [];
 
-			for (i = 0, n = validationListeners.length; i < n; ++i) {
-				listener = validationListeners[i];
+			var requestedListeners = this._options.validationListeners.split(' ');
+			for (i = 0, n = requestedListeners.length; i < n; ++i) {
+				listener = validationListeners[requestedListeners[i]].listen(this);
 
-				if (listener.canListen(this)) {
-					this._listeners.push(listener.listen(this));
+				if (listener) {
+					this._listeners.push(listener);
 				}
 			}
-		},
-
-		getValidationListener: function validatorMixin$getValidationListener(type) {
-			///<summary>
-			/// Given a class type, returns the validation listener associated with this doodad
-			/// that matches that class type if it exists.
-			///</summary>
-			///<param name="type">
-			/// A class type to retrieve.
-			///</param>
-			///<returns type="object">
-			/// A validation listener object or undefined if none could be found.
-			///</returns>
-			var listener;
-
-			$.each(this._listeners, function () {
-				if (this instanceof type) {
-					listener = this;
-					return false; // break;
-				}
-			});
-
-			return listener;
 		},
 		
 		dispose: function validatorMixin$dispose() {
@@ -277,8 +255,10 @@
 			///<summary>
 			/// Disposes of all validation listeners as necessary
 			///</summary>
+			var self = this;
+			
 			$.each(this._listeners || [], function () {
-				this.dispose();
+				this.dispose(self);
 			});
 		},
 
@@ -366,7 +346,30 @@
 			});
 		}
 	};
-	
+
+	doodads.getValidationListener = function doodads$getValidationListener(doodad, key) {
+		///<summary>
+		/// Given a class type, returns the validation listener associated with this doodad
+		/// that matches that class type if it exists.
+		///</summary>
+		///<param name="type">
+		/// A class type to retrieve.
+		///</param>
+		///<returns type="object">
+		/// A validation listener object or undefined if none could be found.
+		///</returns>
+		var listener;
+
+		$.each(doodad._listeners, function () {
+			if (this instanceof validationListeners[key]) {
+				listener = this;
+				return false; // break;
+			}
+		});
+
+		return listener;
+	};
+		
 	doodads.validation = { 
 		listeners: {}, // namespace for the validation listeners
 
@@ -387,7 +390,7 @@
 			$.extend(doodad.prototype, validatorMixin);
 			doodad.defaultOptions = $.extend({
 				validates: true,
-				validationListeners: 'hintbox'
+				validationListeners: doodads.config.defaultValidationListeners
 			}, doodad.defaultOptions);
 		},
 
@@ -408,19 +411,20 @@
 			});
 		},
 
-		registerListener: function valdation$registerListener(listener) {
+		registerListener: function valdation$registerListener(key, listener) {
 			///<summary>
 			/// Adds a Validation Listener to the validation listener registry.
 			/// Validation Listeners perform an action after every execution of the validate function
 			/// Typically, listeners modify the DOM to reflect the invalid state of a doodad.
 			///</summary>
+			///<param name="key">The name with which to identify this listener</param>
 			///<param name="listener">
 			/// The Validation Listener to add to the registry
 			/// The listener is a type with the following static methods:
 			///  * canListen(doodad): determines if the listener is compatible with the given doodad
 			///  * listen(doodad): hook unto the validation infrastructure to receive notifications on validation changes
 			///</param>
-			validationListeners.push(listener);
+			validationListeners[key] = listener;
 		}
 	};
 })();

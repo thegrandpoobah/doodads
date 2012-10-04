@@ -13,8 +13,9 @@
 	// * focus event
 	// * blur event
 
-	// To optimize DOM usage, the HintBox validation listener shares an instance of the
-	// hint box and hint list doodads
+	// The HintBox validation listener uses jQuery.tipsy.js to display the validation hints
+	
+	// To optimize DOM usage, the HintBox validation listener shares an instance of the hintbox tipsy object
 	var tipsyBox, 
 		isBoxVisible = false, 
 		template = Mustache.compile('<ul>{{#messages}}<li>{{text}}</li>{{/messages}}</ul>');
@@ -67,32 +68,29 @@
 			return;
 		}
 
-		this.onValidationApplied$proxy = doodads.proxy(this.onValidationApplied, this);
-		this.onDoodadFocus$proxy = doodads.proxy(this.onDoodadFocus, this);
-		this.onDoodadBlur$proxy = doodads.proxy(this.onDoodadBlur, this);
-		this.onCapturedMouseDown$proxy = doodads.proxy(this.onCapturedMouseDown, this);
+		$.extend(this, {
+			onValidationApplied$proxy: doodads.proxy(this.onValidationApplied, this),
+			onDoodadFocus$proxy: doodads.proxy(this.onDoodadFocus, this),
+			onDoodadBlur$proxy: doodads.proxy(this.onDoodadBlur, this),
+			onCapturedMouseDown$proxy: doodads.proxy(this.onCapturedMouseDown, this),
 
+			_doodad: null,
+			_validationState: {
+				messages: [],
+				isValid: true
+			}
+		});
+		
 		doodad.bind('validationApplied', this.onValidationApplied$proxy);
 		doodad.bind('focus', this.onDoodadFocus$proxy);
 		doodad.bind('blur', this.onDoodadBlur$proxy);
-
-		this._doodad = null;
-		this._validationState = {
-			messages: [],
-			isValid: true
-		};
-	};
-	HintBoxValidationListener.canListen = function (doodad) {
-		if (doodad._options.validationListeners.indexOf('hintbox') !== -1 && // the doodad *wants* the hint-list
-			$.isFunction(doodad.validationTarget)) // and the doodad implements the IHintBoxListenerSource interface
-		{
-			return true;
-		} else {
-			return false;
-		}
 	};
 	HintBoxValidationListener.listen = function (doodad) {
-		return new HintBoxValidationListener(doodad);
+		if ($.isFunction(doodad.validationTarget)) {
+			return new HintBoxValidationListener(doodad);
+		} else {
+			return null;
+		}
 	};
 
 	HintBoxValidationListener.prototype = {
@@ -184,6 +182,5 @@
 	};
 	HintBoxValidationListener.prototype.constructor = HintBoxValidationListener;
 
-	doodads.validation.listeners.HintBoxValidationListener = HintBoxValidationListener;
-	doodads.validation.registerListener(HintBoxValidationListener);
+	doodads.validation.registerListener('hintbox', HintBoxValidationListener);
 })();
