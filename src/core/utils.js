@@ -98,7 +98,7 @@
 			if (func.bind === protoBind && protoBind) {
 				return protoBind.apply(func, protoSlice.call(arguments, 1));
 			}
-			if (Object.toString.prototype.call(func) !== '[object Function]') {
+			if (Object.prototype.toString.call(func) !== '[object Function]') {
 				throw new TypeError();
 			}
 			args = protoSlice.call(arguments, 2);
